@@ -50,6 +50,21 @@ void ActivityHistory::put(Feeding feeding) {
 }
 
 void ActivityHistory::put(Schedule schedule) {
+    if(hasSDCard) {
+        char* filename = strcat("schedule-", schedule.id);
+        SD.remove(filename);
+        File file = SD.open(filename, FILE_WRITE);
+        if(file) {
+
+            writeBytesToFile(file, schedule.cups);
+            writeBytesToFile(file, schedule.hour);
+            writeBytesToFile(file, schedule.minute);
+
+            file.close();
+        }
+    } else {
+        // TODO: Write to EEPROM
+    }
 }
 
 void ActivityHistory::put(Settings) {
@@ -65,7 +80,20 @@ void ActivityHistory::getAll(Schedule*, int size) {
 }
 
 Feeding ActivityHistory::getFeeding(const char* id) {
-
+    if(hasSDCard) {
+        File file = SD.open(id, FILE_READ);
+        if(file) {
+            return Feeding {
+                .id = id,
+                .cups = readBytesFromFile<float>(file),
+                .date = readBytesFromFile<long>(file)
+            };
+        } else {
+            // file unavailable / not found
+        }
+    } else {
+        // read from EEPROM
+    }
 }
 
 Schedule ActivityHistory::getSchedule(const char* id) {
