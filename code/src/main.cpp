@@ -78,9 +78,14 @@ void setSettings(Settings settings) {
     char* ssid = new char[strlen(_ssid)];
     char* password = new char[strlen(_password)];
     char* name = new char[strlen(_name)];
+
     strcpy(ssid, _ssid);
     strcpy(password, _password);
     strcpy(name, _name);
+
+    delete settings.name;
+    delete settings.password;
+    delete settings.name;
 
     _settings = {
         .ssid = ssid,
