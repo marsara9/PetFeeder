@@ -25,6 +25,8 @@ public:
     void deleteSettings();
     
     void restoreToFactoryDefaults();
+private:
+    bool hasSDCard;
 };
 
 #endif
