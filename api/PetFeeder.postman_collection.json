@@ -1,0 +1,152 @@
+{
+	"info": {
+		"_postman_id": "e15d8bbe-0656-413b-a977-592819fe21e1",
+		"name": "PetFeeder",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AP - Get Settings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/settings",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - PUT Settings - Name=Test",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/settings?name=Test",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"settings"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - PUT Settings - Failing SSID",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/settings?ssid=Test",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"settings"
+					],
+					"query": [
+						{
+							"key": "ssid",
+							"value": "Test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - PUT Settings - Successful SSID",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/settings?ssid=Cicso05019&password=MarSdoras",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"settings"
+					],
+					"query": [
+						{
+							"key": "ssid",
+							"value": "Cicso05019"
+						},
+						{
+							"key": "password",
+							"value": "MarSdoras"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - POST Feed - Failure Incorrect Cup Size",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/feed?cups=1.23",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"feed"
+					],
+					"query": [
+						{
+							"key": "cups",
+							"value": "1.23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - POST Feed - Success",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/feed?cups=1",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"feed"
+					],
+					"query": [
+						{
+							"key": "cups",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
