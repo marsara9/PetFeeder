@@ -3,7 +3,7 @@
 #include "webserver.h"
 #include "wifi.h"
 #include "motorcontrol.h"
-#include "activityHistory.h"
+#include "dataStore.h"
 
 #include <ESP8266WiFi.h>
 
@@ -18,13 +18,15 @@ const int CONTAINERS_PER_ROTATION = 2;
 WiFiConnection* wifi = new WiFiConnection();
 WebServer *webServer = new WebServer(80);
 MotorControl *motorControl = new MotorControl(CONTAINERS_PER_ROTATION);
-ActivityHistory *activityHistory = new ActivityHistory();
+DataStore *dataStore = new DataStore();
 Settings _settings;
 
 void setup() {
     Serial.begin(115200);
     delay(10);
     Serial.print('\n');
+
+    _settings = dataStore->getSettings();
 
     _settings = {
         .ssid = "Cicso05019",
@@ -93,7 +95,7 @@ void setSettings(Settings settings) {
         .name = name
     };
     
-    activityHistory->put(_settings);
+    dataStore->put(_settings);
     wifi->setSettings(_settings);
 }
 
@@ -113,5 +115,5 @@ void feed(Feeding feeding) {
     }
     Serial.println();
 
-    activityHistory->put(feeding);
+    dataStore->put(feeding);
 }
