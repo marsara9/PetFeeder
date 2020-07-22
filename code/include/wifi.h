@@ -9,8 +9,9 @@
 class WiFiConnection {
 public:
     WiFiConnection();
+    void begin(Settings settings);
+    
     void checkStatus();
-    void setSettings(Settings settings);
 private:
     Settings settings;
     bool createAccessPoint();
