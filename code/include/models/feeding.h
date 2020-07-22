@@ -1,9 +1,10 @@
+#include <string>
 
 #ifndef PET_FEEDING
 #define PET_FEEDING
 
 struct Feeding {
-    const char* id;
+    std::string id;
     const float cups;
     const long date;
 };

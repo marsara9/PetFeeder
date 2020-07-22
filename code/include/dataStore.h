@@ -10,6 +10,7 @@
 class DataStore {
 public:
     DataStore();
+    bool begin();
 
     void put(Feeding);
     void put(Schedule);
@@ -41,6 +42,8 @@ private:
     void feedingToFile(Feeding, File);
     void scheduleToFile(Schedule, File);
     void settingsToFile(Settings, File);
+
+    Settings getFactoryDefaultSettings();
 };
 
 #endif

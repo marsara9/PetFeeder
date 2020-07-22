@@ -1,11 +1,12 @@
+#include <string>
 
 #ifndef PET_SETTINGS
 #define PET_SETTINGS
 
 struct Settings {
-    const char* ssid;
-    const char* password;
-    const char* name;
+    std::string ssid;
+    std::string password;
+    std::string name;
 };
 
 #endif

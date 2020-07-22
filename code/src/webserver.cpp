@@ -124,13 +124,16 @@ void WebServer::handlePOSTFeed() {
         .date = now
     };
 
-    char time_buf[21];
+    char time_buf[21]; // YYYY-MM-DDTHH:mm:ssZ
     struct tm ts = *gmtime(&now);
     strftime(time_buf, sizeof(time_buf), "%FT%TZ", &ts);
 
-    String response = "{ \"id\" : \"" + String(feeding.id) + "\", \"cups\" : " + String(feeding.cups) + ", \"time\" : \"" + String(time_buf) + "\" }";
+    char cupsString2[6]; // 0.000
+    snprintf(cupsString2, sizeof(cups), "%f", feeding.cups);
 
-    server->send(HTTP_OK, CONTENT_TYPE, response);
+    std::string response = "{ \"id\" : \"" + feeding.id + "\", \"cups\" : " + cupsString2 + ", \"time\" : \"" + time_buf + "\" }";
+
+    server->send(HTTP_OK, CONTENT_TYPE, response.c_str());
 
     onFeedCallback(feeding);
 }

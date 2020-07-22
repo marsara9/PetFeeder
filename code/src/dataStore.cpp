@@ -4,7 +4,15 @@
 #include <SD.h>
 
 DataStore::DataStore() {
-    SD.begin(16);
+
+}
+
+bool DataStore::begin() {
+    //SPI.pins(14, 12, 13, 16);
+    SPI.begin();
+
+    pinMode(16, OUTPUT);
+    return SD.begin(16);
 }
 
 template<typename T> T DataStore::readBytesFromFile(File file) {
@@ -98,8 +106,14 @@ Schedule DataStore::getSchedule(std::string id) {
 }
 
 Settings DataStore::getSettings() {
-    std::function<Settings(File)> func = std::bind(&DataStore::settingsFromFile, this, std::placeholders::_1);
-    return read("0", "", func);
+    if(SD.exists("0")) {
+        std::function<Settings(File)> func = std::bind(&DataStore::settingsFromFile, this, std::placeholders::_1);
+        return read("0", "", func);
+    } else {
+        Settings settings = getFactoryDefaultSettings();
+        put(settings);
+        return settings;
+    }
 }
 
 void DataStore::deleteAllFeedings() {
@@ -118,10 +132,13 @@ void DataStore::deleteAllSchedules() {
 
 void DataStore::deleteSettings() {
     SD.remove("0");
+    put(getFactoryDefaultSettings());
 }
 
 void DataStore::restoreToFactoryDefaults() {
-
+    deleteAllFeedings();
+    deleteAllSchedules();
+    deleteSettings();
 }
 
 Feeding DataStore::feedingFromFile(File file) {
@@ -142,17 +159,9 @@ Schedule DataStore::scheduleFromFile(File file) {
 }
 
 Settings DataStore::settingsFromFile(File file) {
-    const char* _ssid = file.readString().c_str();
-    const char* _password = file.readString().c_str();
-    const char* _name = file.readString().c_str();
-
-    char* ssid = new char[strlen(_ssid)];
-    char* password = new char[strlen(_password)];
-    char* name = new char[strlen(_name)];
-
-    strcpy(ssid, _ssid);
-    strcpy(password, _password);
-    strcpy(name, _name);
+    const char* ssid = file.readString().c_str();
+    const char* password = file.readString().c_str();
+    const char* name = file.readString().c_str();
     
     return Settings {
         .ssid = ssid,
@@ -173,7 +182,15 @@ void DataStore::scheduleToFile(Schedule schedule, File file) {
 }
 
 void DataStore::settingsToFile(Settings settings, File file) {
-    file.write(settings.ssid);
-    file.write(settings.password);
-    file.write(settings.name);
+    file.write(settings.ssid.c_str());
+    file.write(settings.password.c_str());
+    file.write(settings.name.c_str());
+}
+
+Settings DataStore::getFactoryDefaultSettings() {
+    return Settings {
+        .ssid = "",
+        .password = "",
+        .name = "ESP8266_"+random(9999)
+    };
 }

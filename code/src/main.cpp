@@ -26,15 +26,12 @@ void setup() {
     delay(10);
     Serial.print('\n');
 
+    if(!dataStore->begin()) {
+        Serial.println("SD Card initialization failed.");
+    }
+    wifi->begin(_settings);
+
     _settings = dataStore->getSettings();
-
-    _settings = {
-        .ssid = "Cicso05019",
-        .password = "MarSdoras",
-        .name = "ESP8266_1468"
-    };
-
-    wifi->setSettings(_settings);
 
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
@@ -50,44 +47,30 @@ void loop() {
 }
 
 Settings getSettings() {
-    Serial.println(_settings.name);
+    Serial.println(_settings.name.c_str());
 
     return _settings;
 }
 
-const char* nullCoalesceString(const char* a, const char* b) {
-    if(a != nullptr && strlen(a) > 0) {
-        return a;
-    } else if(b != nullptr && strlen(b) > 0) {
+std::string nullCoalesceString(std::string a, std::string b) {
+    if(a.empty()) {
         return b;
     } else {
-        return nullptr;
+        return a;
     }
 }
 
 void setSettings(Settings settings) {
-    Serial.println(settings.name);
+    Serial.println(settings.name.c_str());
 
 
-    const char* _ssid = nullCoalesceString(settings.ssid, _settings.ssid);
-    const char* _password = nullCoalesceString(settings.password, _settings.password);
-    const char* _name = nullCoalesceString(settings.name, _settings.name);
+    std::string ssid = nullCoalesceString(settings.ssid, _settings.ssid);
+    std::string password = nullCoalesceString(settings.password, _settings.password);
+    std::string name = nullCoalesceString(settings.name, _settings.name);
 
-    if((settings.ssid != nullptr && strlen(settings.ssid) > 0) && (settings.password == nullptr || strlen(settings.password) > 0)) {
-        _password = "";
+    if(!settings.ssid.empty() && settings.password.empty()) {
+        password = "";
     }
-
-    char* ssid = new char[strlen(_ssid)];
-    char* password = new char[strlen(_password)];
-    char* name = new char[strlen(_name)];
-
-    strcpy(ssid, _ssid);
-    strcpy(password, _password);
-    strcpy(name, _name);
-
-    delete settings.name;
-    delete settings.password;
-    delete settings.name;
 
     _settings = {
         .ssid = ssid,
@@ -96,7 +79,7 @@ void setSettings(Settings settings) {
     };
     
     dataStore->put(_settings);
-    wifi->setSettings(_settings);
+    wifi->begin(_settings);
 }
 
 bool isValidFeedAmount(float cups) {
