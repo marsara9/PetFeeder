@@ -1,6 +1,7 @@
 #include "wifi.h"
 
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 
 const int NUMBER_OF_CONNECTION_ATTEMPTS = 10;
 
@@ -18,6 +19,7 @@ WiFiConnection::WiFiConnection() {
 void WiFiConnection::begin(const Settings settings) {
     if(this->settings.name.compare(settings.name) != 0) {
         WiFi.hostname(settings.name.c_str());
+        MDNS.begin(settings.name.c_str());
     }
     if(this->settings.ssid.compare(settings.ssid) != 0 || this->settings.password.compare(settings.password) != 0) {
         WiFi.disconnect(true);
@@ -45,6 +47,8 @@ void WiFiConnection::checkStatus() {
         Serial.println("Setting up Access Point...");
         createAccessPoint();
     }
+
+    MDNS.update();
 }
 
 bool WiFiConnection::createAccessPoint() {
