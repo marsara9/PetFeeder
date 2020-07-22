@@ -1,11 +1,10 @@
 #include "dataStore.h"
 
-#include <EEPROM.h>
 #include <SPI.h>
 #include <SD.h>
 
 DataStore::DataStore() {
-    this->hasSDCard = SD.begin(16);
+    SD.begin(16);
 }
 
 template<typename T> T DataStore::readBytesFromFile(File file) {
@@ -33,50 +32,34 @@ template<typename T> void DataStore::writeBytesToFile(File file, T data) {
 template<typename T> std::vector<T> DataStore::enumerateFiles(std::string folder, std::function<T(File)> read) {
     std::vector<T> vector;
 
-    if(hasSDCard) {
-        File root = SD.open(folder.c_str());
-        File file = root.openNextFile();
-        while(file) {
-            vector.push_back(read(file));
-            
-            file.close();
-            file = root.openNextFile();
-        }
-
-        root.close();
-    } else {
-        // TODO: Read from EEPROM
+    File root = SD.open(folder.c_str());
+    File file = root.openNextFile();
+    while(file) {
+        vector.push_back(read(file));
+        
+        file.close();
+        file = root.openNextFile();
     }
+
+    root.close();
 
     return vector;
 }
 
 template<typename T> T DataStore::read(std::string id, std::string folder, std::function<T(File)> read) {
-    if(hasSDCard) {
-        std::string filename = folder + "/" + id;
-        File file = SD.open(filename.c_str(), FILE_READ);
-        if(file) {
-            return read(file);
-        } else {
-            // file unavailable / not found
-        }
-    } else {
-        // read from EEPROM
-    }
+    std::string filename = folder + "/" + id;
+    File file = SD.open(filename.c_str(), FILE_READ);
+    T result = read(file);
+    file.close();
+    return result;
 }
 
 template<typename T> void DataStore::save(T item, std::string id, std::string folder, std::function<void(T, File)> write) {
-    if(hasSDCard) {
-        std::string filename = folder + "/" + id;
-        SD.remove(filename.c_str());
-        File file = SD.open(filename.c_str(), FILE_WRITE);
-        if(file) {
-            write(item, file);
-            file.close();
-        }
-    } else {
-        // TODO: Write to EEPROM
-    }
+    std::string filename = folder + "/" + id;
+    SD.remove(filename.c_str());
+    File file = SD.open(filename.c_str(), FILE_WRITE);
+    write(item, file);
+    file.close();
 }
 
 void DataStore::put(Feeding feeding) {
@@ -90,8 +73,8 @@ void DataStore::put(Schedule schedule) {
 }
 
 void DataStore::put(Settings settings) {
-    //std::function<void(Settings, File)> func = std::bind(&DataStore::settingsToFile, this, std::placeholders::_1, std::placeholders::_2);
-    //save(settings, "0", "", func);
+    std::function<void(Settings, File)> func = std::bind(&DataStore::settingsToFile, this, std::placeholders::_1, std::placeholders::_2);
+    save(settings, "0", "", func);
 }
 
 std::vector<Feeding> DataStore::getAllFeedings() {
@@ -115,8 +98,8 @@ Schedule DataStore::getSchedule(std::string id) {
 }
 
 Settings DataStore::getSettings() {
-    //std::function<void(Settings, File)> func = std::bind(&DataStore::settingsToFile, this, std::placeholders::_1, std::placeholders::_2);
-    //return read("0", "", func);
+    std::function<Settings(File)> func = std::bind(&DataStore::settingsFromFile, this, std::placeholders::_1);
+    return read("0", "", func);
 }
 
 void DataStore::deleteAllFeedings() {
@@ -134,7 +117,7 @@ void DataStore::deleteAllSchedules() {
 }
 
 void DataStore::deleteSettings() {
-
+    SD.remove("0");
 }
 
 void DataStore::restoreToFactoryDefaults() {
@@ -158,6 +141,26 @@ Schedule DataStore::scheduleFromFile(File file) {
     };
 }
 
+Settings DataStore::settingsFromFile(File file) {
+    const char* _ssid = file.readString().c_str();
+    const char* _password = file.readString().c_str();
+    const char* _name = file.readString().c_str();
+
+    char* ssid = new char[strlen(_ssid)];
+    char* password = new char[strlen(_password)];
+    char* name = new char[strlen(_name)];
+
+    strcpy(ssid, _ssid);
+    strcpy(password, _password);
+    strcpy(name, _name);
+    
+    return Settings {
+        .ssid = ssid,
+        .password = password,
+        .name = name
+    };
+}
+
 void DataStore::feedingToFile(Feeding feeding, File file) {
     writeBytesToFile(file, feeding.cups);
     writeBytesToFile(file, feeding.date);
@@ -167,4 +170,10 @@ void DataStore::scheduleToFile(Schedule schedule, File file) {
     writeBytesToFile(file, schedule.cups);
     writeBytesToFile(file, schedule.hour);
     writeBytesToFile(file, schedule.minute);
+}
+
+void DataStore::settingsToFile(Settings settings, File file) {
+    file.write(settings.ssid);
+    file.write(settings.password);
+    file.write(settings.name);
 }

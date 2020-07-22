@@ -28,8 +28,6 @@ public:
     
     void restoreToFactoryDefaults();
 private:
-    bool hasSDCard;
-
     template<typename T> T readBytesFromFile(File file);
     template<typename T> void writeBytesToFile(File file, T data);
     template<typename T> std::vector<T> enumerateFiles(std::string folder, std::function<T(File)> read);
@@ -38,9 +36,11 @@ private:
 
     Feeding feedingFromFile(File);
     Schedule scheduleFromFile(File);
+    Settings settingsFromFile(File);
 
     void feedingToFile(Feeding, File);
     void scheduleToFile(Schedule, File);
+    void settingsToFile(Settings, File);
 };
 
 #endif
