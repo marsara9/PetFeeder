@@ -29,9 +29,17 @@ void setup() {
     if(!dataStore->begin()) {
         Serial.println("SD Card initialization failed.");
     }
+    _settings = dataStore->getSettings();
+
     wifi->begin(_settings);
 
-    _settings = dataStore->getSettings();
+    Serial.println("Settings:");
+    Serial.print("\tSSID: '");
+    Serial.print(_settings.ssid.c_str());
+    Serial.println("'");
+    Serial.print("\tName: '");
+    Serial.print(_settings.name.c_str());
+    Serial.println("'");
 
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
@@ -47,8 +55,6 @@ void loop() {
 }
 
 Settings getSettings() {
-    Serial.println(_settings.name.c_str());
-
     return _settings;
 }
 

@@ -106,6 +106,8 @@ Settings DataStore::getSettings() {
         std::function<Settings(fs::File)> func = std::bind(&DataStore::settingsFromFile, this, std::placeholders::_1);
         return read("0", "", func);
     } else {
+        Serial.println("Settings file not found; generating default settings.");
+
         Settings settings = getFactoryDefaultSettings();
         put(settings);
         return settings;
@@ -139,7 +141,7 @@ void DataStore::restoreToFactoryDefaults() {
 
 Feeding DataStore::feedingFromFile(fs::File file) {
     return Feeding {
-        .id = file.name(),
+        .id = std::string(file.name()),
         .cups = readBytesFromFile<float>(file),
         .date = readBytesFromFile<long>(file)
     };
@@ -147,22 +149,18 @@ Feeding DataStore::feedingFromFile(fs::File file) {
 
 Schedule DataStore::scheduleFromFile(fs::File file) {
     return Schedule {
-        .id = file.name(),
+        .id = std::string(file.name()),
         .cups = readBytesFromFile<float>(file),
         .hour = readBytesFromFile<int>(file),
         .minute = readBytesFromFile<int>(file)
     };
 }
 
-Settings DataStore::settingsFromFile(fs::File file) {
-    const char* ssid = file.readString().c_str();
-    const char* password = file.readString().c_str();
-    const char* name = file.readString().c_str();
-    
+Settings DataStore::settingsFromFile(fs::File file) {    
     return Settings {
-        .ssid = ssid,
-        .password = password,
-        .name = name
+        .ssid = std::string(file.readStringUntil('\n').c_str()),
+        .password = std::string(file.readStringUntil('\n').c_str()),
+        .name = std::string(file.readStringUntil('\n').c_str())
     };
 }
 
@@ -179,14 +177,16 @@ void DataStore::scheduleToFile(Schedule schedule, fs::File file) {
 
 void DataStore::settingsToFile(Settings settings, fs::File file) {
     file.write(settings.ssid.c_str());
+    file.write("\n");
     file.write(settings.password.c_str());
+    file.write("\n");
     file.write(settings.name.c_str());
 }
 
 Settings DataStore::getFactoryDefaultSettings() {
     return Settings {
-        .ssid = "",
-        .password = "",
-        .name = "ESP8266_"+random(9999)
+        .ssid = std::string(""),
+        .password = std::string(""),
+        .name = std::string("ESP8266_"+random(9999))
     };
 }

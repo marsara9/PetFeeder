@@ -13,6 +13,8 @@ public:
     
     void checkStatus();
 private:
+    std::string defaultName;
+
     Settings settings;
     bool createAccessPoint();
 };
