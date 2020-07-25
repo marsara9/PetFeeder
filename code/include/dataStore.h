@@ -3,6 +3,7 @@
 #include "models/settings.h"
 
 #include <FS.h>
+#include <vector>
 
 #ifndef PET_LOGGING
 #define PET_LOGGING

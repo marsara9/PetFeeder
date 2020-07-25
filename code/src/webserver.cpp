@@ -1,23 +1,28 @@
 #include "webserver.h"
 #include "models/feeding.h"
+#include "models/schedule.h"
+#include "models/settings.h"
+#include "jsonUtils.h"
 
 #include <ESP8266WebServer.h>
 #include <WiFiUDP.h>
 #include <NTPClient.h>
-#include <Time.h>
 
 WiFiUDP ntpUDP;
 NTPClient *timeClient = new NTPClient(ntpUDP);
 
 ESP8266WebServer *server = nullptr;
-Settings (*onGetSettingsCallback)();
-void (*onSettingsChangedCallback)(Settings);
-void (*onFeedCallback)(Feeding);
-bool (*isValidFeedAmountCallback)(float);
+
+std::function<Settings()> onGetSettingsCallback;
+std::function<void(Settings)> onSettingsChangedCallback;
+std::function<std::vector<Feeding>()> onGetFeedingsCallback;
+std::function<void(Feeding)> onFeedCallback;
+std::function<bool(float)> isValidFeedAmountCallback;
 
 const char* CONTENT_TYPE = "application/json";
 
 const int HTTP_OK = 200;
+const int HTTP_CREATED = 201;
 const int HTTP_NO_CONTENT = 204;
 const int HTTP_BAD_REQUEST = 400;
 const int HTTP_NOT_FOUND = 404;
@@ -36,6 +41,7 @@ void WebServer::startServer() {
     server->onNotFound(std::bind(&WebServer::handleNotFound, this));
     server->on("/settings", HTTP_GET, std::bind(&WebServer::handleGETSettings, this));
     server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
+    server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
 }
 
@@ -45,19 +51,23 @@ void WebServer::handleClient() {
     server->handleClient();
 }
 
-void WebServer::onGetSettings(Settings callback()) {
+void WebServer::onGetSettings(std::function<Settings()> callback) {
     onGetSettingsCallback = callback;
 }
 
-void WebServer::onSettingsChanged(void callback(Settings)) {
+void WebServer::onSettingsChanged(std::function<void(Settings)> callback) {
     onSettingsChangedCallback = callback;
 }
 
-void WebServer::onFeed(void callback(Feeding)) {
+void WebServer::onGetFeedings(std::function<std::vector<Feeding>()> callback) {
+    onGetFeedingsCallback = callback;
+}
+
+void WebServer::onFeed(std::function<void(Feeding)> callback) {
     onFeedCallback = callback;
 }
 
-void WebServer::isValidFeedAmount(bool callback(float)) {
+void WebServer::isValidFeedAmount(std::function<bool(float)> callback) {
     isValidFeedAmountCallback = callback;
 }
 
@@ -77,9 +87,7 @@ void WebServer::handleGETSettings() {
 
     Settings settings = onGetSettingsCallback();
 
-    std::string response = "{ \"ssid\" : \"" + std::string(settings.ssid) + "\", \"name\" : \"" + std::string(settings.name) + "\" }";
-
-    server->send(HTTP_OK, CONTENT_TYPE, response.c_str());
+    server->send(HTTP_OK, CONTENT_TYPE, settingsToJson(settings).c_str());
 }
 
 void WebServer::handlePUTSettings() {
@@ -98,6 +106,20 @@ void WebServer::handlePUTSettings() {
         .password = password,
         .name = name
     });
+}
+
+void WebServer::handleGETFeed() {
+    printRequest();
+
+    std::vector<Feeding> feedings = onGetFeedingsCallback();
+
+    std::vector<std::string> feedingsJson;
+    for(size_t i = 0; i < feedings.size(); i++) {
+        feedingsJson.push_back(feedingToJson(feedings.at(i)));
+    }
+    std::string response = std::accumulate(feedingsJson.begin(), feedingsJson.end(), std::string(""));
+
+    server->send(HTTP_OK, response.c_str());
 }
 
 void WebServer::handlePOSTFeed() {
@@ -119,21 +141,12 @@ void WebServer::handlePOSTFeed() {
     //String id = ESPRandom::uuidToString(ESPRandom::uuid());
 
     Feeding feeding = {
-        .id = "",
+        .id = "00000000-0000-0000-0000-000000000000",
         .cups = cups,
         .date = now
     };
 
-    char time_buf[21]; // YYYY-MM-DDTHH:mm:ssZ
-    struct tm ts = *gmtime(&now);
-    strftime(time_buf, sizeof(time_buf), "%FT%TZ", &ts);
-
-    char cupsString2[6]; // 0.000
-    snprintf(cupsString2, sizeof(cups), "%f", feeding.cups);
-
-    std::string response = "{ \"id\" : \"" + feeding.id + "\", \"cups\" : " + cupsString2 + ", \"time\" : \"" + time_buf + "\" }";
-
-    server->send(HTTP_OK, CONTENT_TYPE, response.c_str());
+    server->send(HTTP_OK, CONTENT_TYPE, feedingToJson(feeding).c_str());
 
     onFeedCallback(feeding);
 }

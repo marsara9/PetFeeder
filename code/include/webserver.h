@@ -1,6 +1,8 @@
 #include "models/settings.h"
 #include "models/feeding.h"
 
+#include <vector>
+
 #ifndef PET_SERVER
 #define PET_SERVER
 
@@ -10,17 +12,20 @@ class WebServer {
         void startServer();
         void handleClient();
 
-        void onGetSettings(Settings callback());
-        void onSettingsChanged(void callback(Settings settings));
+        void onGetSettings(std::function<Settings()> callback);
+        void onSettingsChanged(std::function<void(Settings)> callback);
 
-        void onFeed(void callback(Feeding));
-        void isValidFeedAmount(bool callback(float));
+        void onGetFeedings(std::function<std::vector<Feeding>()> callback);
+
+        void onFeed(std::function<void(Feeding)> callback);
+        void isValidFeedAmount(std::function<bool(float)> callback);
     private:
         void handleNotFound();
 
         void handleGETSettings();
         void handlePUTSettings();
 
+        void handleGETFeed();
         void handlePOSTFeed();
 };
 
