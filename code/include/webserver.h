@@ -2,6 +2,8 @@
 #include "models/feeding.h"
 
 #include <vector>
+#include <string>
+#include <functional>
 
 #ifndef PET_WEBSERVER
 #define PET_WEBSERVER

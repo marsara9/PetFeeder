@@ -1,7 +1,4 @@
 #include "webserver.h"
-#include "models/feeding.h"
-#include "models/schedule.h"
-#include "models/settings.h"
 #include "jsonUtils.h"
 
 #include <ESP8266WebServer.h>
@@ -112,14 +109,11 @@ void WebServer::handleGETFeed() {
     printRequest();
 
     std::vector<Feeding> feedings = onGetFeedingsCallback();
+    std::function<std::string(Feeding)> toJson = &feedingToJson;
 
-    std::vector<std::string> feedingsJson;
-    for(size_t i = 0; i < feedings.size(); i++) {
-        feedingsJson.push_back(feedingToJson(feedings.at(i)));
-    }
-    std::string response = std::accumulate(feedingsJson.begin(), feedingsJson.end(), std::string(""));
+    std::string json = toJsonArray(feedings, toJson);
 
-    server->send(HTTP_OK, response.c_str());
+    server->send(HTTP_OK, json.c_str());
 }
 
 void WebServer::handlePOSTFeed() {

@@ -70,7 +70,6 @@ std::string nullCoalesceString(std::string a, std::string b) {
 void setSettings(Settings settings) {
     Serial.println(settings.name.c_str());
 
-
     std::string ssid = nullCoalesceString(settings.ssid, _settings.ssid);
     std::string password = nullCoalesceString(settings.password, _settings.password);
     std::string name = nullCoalesceString(settings.name, _settings.name);

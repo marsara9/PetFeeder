@@ -4,6 +4,7 @@
 
 #include <FS.h>
 #include <vector>
+#include <functional>
 
 #ifndef PET_DATASTORE
 #define PET_DATASTORE

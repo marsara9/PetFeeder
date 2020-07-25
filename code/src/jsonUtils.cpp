@@ -20,5 +20,5 @@ std::string scheduleToJson(Schedule schedule) {
 }
 
 std::string settingsToJson(Settings settings) {
-    
+    return "{ \"ssid\" : \"" + settings.ssid + "\", \"name\" : \"" + settings.name + "\" }";
 }
