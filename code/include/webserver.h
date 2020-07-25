@@ -1,8 +1,8 @@
 #include "models/settings.h"
 #include "models/feeding.h"
 
-#ifndef PET_SERVER
-#define PET_SERVER
+#ifndef PET_WEBSERVER
+#define PET_WEBSERVER
 
 class WebServer {
     public:
