@@ -5,8 +5,8 @@
 #include <FS.h>
 #include <vector>
 
-#ifndef PET_LOGGING
-#define PET_LOGGING
+#ifndef PET_DATASTORE
+#define PET_DATASTORE
 
 class DataStore {
 public:

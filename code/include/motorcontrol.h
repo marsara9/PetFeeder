@@ -1,6 +1,6 @@
 
-#ifndef PET_MOTOR
-#define PET_MOTOR
+#ifndef PET_MOTORCONTROL
+#define PET_MOTORCONTROL
 
 class MotorControl {
 public:
