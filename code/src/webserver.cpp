@@ -1,7 +1,7 @@
 #include "webserver.h"
-#include "models/feeding.h"
 
 #include <ESP8266WebServer.h>
+#include <string>
 
 ESP8266WebServer *server = nullptr;
 Settings (*onGetSettingsCallback)();
@@ -9,9 +9,12 @@ void (*onSettingsChangedCallback)(Settings);
 void (*onFeedCallback)(Feeding);
 bool (*isValidFeedAmountCallback)(float);
 
+std::function<void(Schedule)> onAddScheduledFeedingCallback;
+
 const char* CONTENT_TYPE = "application/json";
 
 const int HTTP_OK = 200;
+const int HTTP_CREATED = 201;
 const int HTTP_NO_CONTENT = 204;
 const int HTTP_BAD_REQUEST = 400;
 const int HTTP_NOT_FOUND = 404;
@@ -50,6 +53,10 @@ void WebServer::onFeed(void callback(Feeding)) {
 
 void WebServer::isValidFeedAmount(bool callback(float)) {
     isValidFeedAmountCallback = callback;
+}
+
+void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
+    onAddScheduledFeedingCallback = callback;
 }
 
 void printRequest() {
@@ -110,7 +117,7 @@ void WebServer::handlePOSTFeed() {
     //String id = ESPRandom::uuidToString(ESPRandom::uuid());
 
     Feeding feeding = {
-        .id = "",
+        .id = "00000000-0000-0000-0000-000000000000",
         .cups = cups,
         .date = now
     };
@@ -127,4 +134,48 @@ void WebServer::handlePOSTFeed() {
     server->send(HTTP_OK, CONTENT_TYPE, response.c_str());
 
     onFeedCallback(feeding);
+}
+
+
+void WebServer::handleGETSchedules() {
+
+}
+
+void WebServer::handlePOSTSchedule() {
+    printRequest();
+
+    const char* cupsString = server->arg("cups").c_str();
+    if(strlen(cupsString) == 0) {
+        server->send(HTTP_BAD_REQUEST);
+        return;
+    }
+
+    float cups = atof(cupsString);
+    if(cups < 0 || !isValidFeedAmountCallback(cups)) {
+        server->send(HTTP_BAD_REQUEST);
+        return;
+    }
+
+    std::string timeString = server->arg("time").c_str();
+    if(timeString.find(":") < 0) {
+        server->send(HTTP_BAD_REQUEST);
+        return;
+    }
+    int hour = atoi(timeString.substr(0, timeString.find(":")).c_str());
+    int minute = atoi(timeString.substr(timeString.find(":")).c_str());
+    if((hour < 0 || hour > 23) || (minute < 0 || minute > 59)) {
+        server->send(HTTP_BAD_REQUEST);
+        return;
+    }
+
+    Schedule schedule = {
+        .id = "00000000-0000-0000-0000-000000000000",
+        .cups = cups,
+        .hour = hour,
+        .minute = minute
+    };
+
+    server->send(HTTP_OK, CONTENT_TYPE, nullptr); // TODO
+
+    onAddScheduledFeedingCallback(schedule);
 }

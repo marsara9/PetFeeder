@@ -15,6 +15,11 @@ void setSettings(Settings settings);
 bool isValidFeedAmount(float cups);
 void feed(Feeding feeding);
 
+Schedule getNextScheduledFeeding();
+void scheduledFeed(Schedule schedule);
+void scheduleNextFeeding();
+void addScheduledFeeding(Schedule schedule);
+
 const float MINIMUM_DISPENCE_AMOUNT = 0.125;
 const int CONTAINERS_PER_ROTATION = 2;
 
@@ -37,6 +42,8 @@ void setup() {
         Serial.println("SD Card initialization failed.");
     }
     _settings = dataStore->getSettings();
+
+    scheduleNextFeeding();
 
     wifi->begin(_settings);
 
@@ -115,4 +122,53 @@ void feed(Feeding feeding) {
     Serial.println();
 
     dataStore->put(feeding);
+}
+
+Schedule getNextScheduledFeeding() {
+    std::vector<Schedule> scheduledFeedings = dataStore->getAllSchedules();
+
+    if(scheduledFeedings.size() > 0) {
+        return std::max_element(scheduledFeedings.begin(), scheduledFeedings.end(), [](Schedule const& lhs, Schedule const& rhs) {
+            time_t ltime = timeKeeper->next(lhs.hour, lhs.minute);
+            time_t rtime = timeKeeper->next(rhs.hour, rhs.minute);
+
+            return ltime < rtime;
+        })[0];
+    } else {
+        return Schedule {
+            .id = "",
+            .cups = 0,
+            .hour = 0,
+            .minute = 0
+        };
+    }
+}
+
+void scheduledFeed(Schedule schedule) {
+    Feeding feeding = {
+        .id = "00000000-0000-0000-0000-000000000000", // TODO
+        .cups = schedule.cups,
+        .date = timeKeeper->now(),
+    };
+
+    feed(feeding);
+}
+
+void scheduleNextFeeding() {
+    Schedule nextFeeding = getNextScheduledFeeding();
+    if(nextFeeding.id == "") {
+        return;
+    }
+
+    scheduler->scheduleEvent(timeKeeper->next(nextFeeding.hour, nextFeeding.minute), [nextFeeding]{
+        scheduledFeed(nextFeeding);
+        scheduleNextFeeding();
+    });
+}
+
+void addScheduledFeeding(Schedule schedule) {
+    dataStore->put(schedule);
+
+    scheduler->cancelEvent();
+    scheduleNextFeeding();
 }
