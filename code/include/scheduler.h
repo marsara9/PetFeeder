@@ -11,7 +11,6 @@ public:
     Scheduler(TimeKeeper *timeKeeper);
 
     void scheduleEvent(time_t time, std::function<void()> event);
-
     void cancelEvent();
 
     void update();

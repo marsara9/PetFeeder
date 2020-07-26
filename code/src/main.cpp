@@ -20,6 +20,7 @@ void addScheduledFeeding(Schedule schedule);
 
 const float MINIMUM_DISPENCE_AMOUNT = 0.125;
 const int CONTAINERS_PER_ROTATION = 2;
+bool timeKeeperAvailable = false;
 
 TimeKeeper *timeKeeper = new TimeKeeper();
 
@@ -40,8 +41,6 @@ void setup() {
         Serial.println("SD Card initialization failed.");
     }
     _settings = dataStore->getSettings();
-
-    scheduleNextFeeding();
 
     wifi->begin(_settings);
 
@@ -71,8 +70,12 @@ void setup() {
 void loop() {
     wifi->checkStatus();
     webServer->handleClient();
-    timeKeeper->update();
     scheduler->update();
+
+    if(timeKeeper->update() && !timeKeeperAvailable) {
+        timeKeeperAvailable = true;
+        scheduleNextFeeding();
+    }
 }
 
 Settings getSettings() {
@@ -131,12 +134,12 @@ Schedule getNextScheduledFeeding() {
     std::vector<Schedule> scheduledFeedings = dataStore->getAllSchedules();
 
     if(scheduledFeedings.size() > 0) {
-        return std::max_element(scheduledFeedings.begin(), scheduledFeedings.end(), [](Schedule const& lhs, Schedule const& rhs) {
+        return *std::min_element(scheduledFeedings.begin(), scheduledFeedings.end(), [](Schedule const& lhs, Schedule const& rhs) {
             time_t ltime = timeKeeper->next(lhs.hour, lhs.minute);
             time_t rtime = timeKeeper->next(rhs.hour, rhs.minute);
 
             return ltime < rtime;
-        })[0];
+        });
     } else {
         return Schedule {
             .id = "",

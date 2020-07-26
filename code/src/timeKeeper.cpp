@@ -25,13 +25,15 @@ time_t TimeKeeper::next(int hour, int minute) {
     t.tm_hour = hour;
     t.tm_min = minute;
 
-    if(mktime(&t) < now) {
-        t.tm_yday += 1;
+    time_t result = mktime(&t);
+
+    if(result < now) {
+        result += 86400;
     }
     
-    return mktime(&t);
+    return result;
 }
 
-void TimeKeeper::update() {
-    timeClient->update();
+bool TimeKeeper::update() {
+    return timeClient->update();
 }

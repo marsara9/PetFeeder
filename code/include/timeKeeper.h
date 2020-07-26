@@ -12,7 +12,7 @@ public:
 
     time_t now();
     time_t next(int hour, int minute);
-    void update();
+    bool update();
 };
 
 #endif

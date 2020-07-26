@@ -188,7 +188,7 @@ void WebServer::handlePOSTSchedule() {
         return;
     }
     int hour = atoi(timeString.substr(0, timeString.find(":")).c_str());
-    int minute = atoi(timeString.substr(timeString.find(":")).c_str());
+    int minute = atoi(timeString.substr(timeString.find(":") + 1).c_str());
     if((hour < 0 || hour > 23) || (minute < 0 || minute > 59)) {
         sendResponse(HTTP_BAD_REQUEST);
         return;

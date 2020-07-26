@@ -7,7 +7,6 @@ public:
     MotorControl(const int containersPerRotation);
     void feed();
 private:
-    float minimumDispenceAmount;
     int containersPerRotation;
 };
 
