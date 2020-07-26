@@ -84,7 +84,7 @@ void WebServer::sendResponse(int code, const char* contentType = "", std::string
 }
 
 void WebServer::handleNotFound() {
-    sendResponse(HTTP_NOT_FOUND, CONTENT_TYPE, "{ 'error' : { 'code' : 404, 'message' : 'Not Found' } }");
+    sendResponse(HTTP_NOT_FOUND, CONTENT_TYPE, "{ \"error\" : { \"code\" : 404, \"message\" : \"Not Found\" } }");
 }
 
 void WebServer::handleGETSettings() {
