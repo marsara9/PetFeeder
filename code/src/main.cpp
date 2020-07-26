@@ -7,8 +7,6 @@
 #include "scheduler.h"
 #include "timeKeeper.h"
 
-#include <ESP8266WiFi.h>
-
 Settings getSettings();
 void setSettings(Settings settings);
 
@@ -59,9 +57,13 @@ void setup() {
 
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
+    
     webServer->isValidFeedAmount(isValidFeedAmount);
     webServer->onFeed(feed);
     webServer->onGetFeedings(std::bind(&DataStore::getAllFeedings, dataStore));
+
+    webServer->onGetAllScheduledFeedings(std::bind(&DataStore::getAllSchedules, dataStore));
+    webServer->onAddScheduledFeeding(addScheduledFeeding);
 
     webServer->startServer();
 }

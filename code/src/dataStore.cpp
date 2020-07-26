@@ -36,16 +36,18 @@ template<typename T> void DataStore::writeBytesToFile(fs::File file, T data) {
 template<typename T> std::vector<T> DataStore::enumerateFiles(std::string folder, std::function<T(fs::File)> read) {
     std::vector<T> vector;
 
-    fs::File root = SD.open(folder.c_str());
-    fs::File file = root.openNextFile();
-    while(file) {
-        vector.push_back(read(file));
-        
-        file.close();
-        file = root.openNextFile();
-    }
+    if(SD.exists(folder.c_str())) {
+        fs::File root = SD.open(folder.c_str());
+        fs::File file = root.openNextFile();
+        while(file) {
+            vector.push_back(read(file));
+            
+            file.close();
+            file = root.openNextFile();
+        }
 
-    root.close();
+        root.close();
+    }
 
     return vector;
 }

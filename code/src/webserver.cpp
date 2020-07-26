@@ -13,6 +13,7 @@ std::function<std::vector<Feeding>()> onGetFeedingsCallback;
 std::function<void(Feeding)> onFeedCallback;
 std::function<bool(float)> isValidFeedAmountCallback;
 
+std::function<std::vector<Schedule>()> onGetAllScheduledFeedingsCallback;
 std::function<void(Schedule)> onAddScheduledFeedingCallback;
 
 const char* CONTENT_TYPE = "application/json";
@@ -37,6 +38,8 @@ void WebServer::startServer() {
     server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
     server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
+    server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
+    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));
 }
 
 void WebServer::handleClient() {
@@ -61,6 +64,10 @@ void WebServer::onFeed(std::function<void(Feeding)> callback) {
 
 void WebServer::isValidFeedAmount(std::function<bool(float)> callback) {
     isValidFeedAmountCallback = callback;
+}
+
+void WebServer::onGetAllScheduledFeedings(std::function<std::vector<Schedule>()> callback) {
+    onGetAllScheduledFeedingsCallback = callback;
 }
 
 void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
@@ -119,7 +126,7 @@ void WebServer::handleGETFeed() {
     std::vector<Feeding> feedings = onGetFeedingsCallback();
     std::function<std::string(Feeding)> toJson = &feedingToJson;
 
-    sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(feedings, toJson).c_str());
+    sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(feedings, toJson));
 }
 
 void WebServer::handlePOSTFeed() {
@@ -152,7 +159,12 @@ void WebServer::handlePOSTFeed() {
 }
 
 void WebServer::handleGETSchedules() {
+    printRequest();
 
+    std::vector<Schedule> scheduledFeedings = onGetAllScheduledFeedingsCallback();
+    std::function<std::string(Schedule)> toJson = &scheduleToJson;
+
+    sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(scheduledFeedings, toJson));
 }
 
 void WebServer::handlePOSTSchedule() {
@@ -189,7 +201,7 @@ void WebServer::handlePOSTSchedule() {
         .minute = minute
     };
 
-    sendResponse(HTTP_OK, CONTENT_TYPE, nullptr); // TODO
+    sendResponse(HTTP_OK, CONTENT_TYPE, scheduleToJson(schedule));
 
     onAddScheduledFeedingCallback(schedule);
 }
