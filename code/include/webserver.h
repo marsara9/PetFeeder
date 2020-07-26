@@ -20,13 +20,14 @@ class WebServer {
         void startServer();
         void handleClient();
 
-        void onGetSettings(std::function<Settings()> callback);
-        void onSettingsChanged(std::function<void(Settings)> callback);
+        void onGetSettings(std::function<Settings()>);
+        void onSettingsChanged(std::function<void(Settings)>);
+        void onDeleteSettings(std::function<void()>);
 
-        void onGetFeedings(std::function<std::vector<Feeding>()> callback);
+        void onGetFeedings(std::function<std::vector<Feeding>()>);
 
-        void onFeed(std::function<void(Feeding)> callback);
-        void isValidFeedAmount(std::function<bool(float)> callback);
+        void onFeed(std::function<void(Feeding)>);
+        void isValidFeedAmount(std::function<bool(float)>);
 
         void onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>);
         void onAddScheduledFeeding(std::function<void(Schedule)>);
@@ -41,6 +42,7 @@ class WebServer {
 
         void handleGETSettings();
         void handlePUTSettings();
+        void handleDELETESettings();
 
         void handleGETFeed();
         void handlePOSTFeed();

@@ -9,6 +9,7 @@
 
 Settings getSettings();
 void setSettings(Settings settings);
+void restoreFactoryDefaults();
 
 bool isValidFeedAmount(float cups);
 void feed(Feeding feeding);
@@ -56,6 +57,7 @@ void setup() {
 
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
+    webServer->onDeleteSettings(restoreFactoryDefaults);
     
     webServer->isValidFeedAmount(isValidFeedAmount);
     webServer->onFeed(feed);
@@ -108,6 +110,12 @@ void setSettings(Settings settings) {
     };
     
     dataStore->put(_settings);
+    wifi->begin(_settings);
+}
+
+void restoreFactoryDefaults() {
+    dataStore->restoreToFactoryDefaults();
+    _settings = dataStore->getSettings();
     wifi->begin(_settings);
 }
 

@@ -8,6 +8,7 @@ ESP8266WebServer *server = nullptr;
 
 std::function<Settings()> onGetSettingsCallback;
 std::function<void(Settings)> onSettingsChangedCallback;
+std::function<void()> onDeleteSettingsCallback;
 
 std::function<std::vector<Feeding>()> onGetFeedingsCallback;
 std::function<void(Feeding)> onFeedCallback;
@@ -36,6 +37,7 @@ void WebServer::startServer() {
     server->onNotFound(std::bind(&WebServer::handleNotFound, this));
     server->on("/settings", HTTP_GET, std::bind(&WebServer::handleGETSettings, this));
     server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
+    server->on("/settings", HTTP_DELETE, std::bind(&WebServer::handleDELETESettings, this));
     server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
     server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
@@ -52,6 +54,10 @@ void WebServer::onGetSettings(std::function<Settings()> callback) {
 
 void WebServer::onSettingsChanged(std::function<void(Settings)> callback) {
     onSettingsChangedCallback = callback;
+}
+
+void WebServer::onDeleteSettings(std::function<void()> callback) {
+    onDeleteSettingsCallback = callback;
 }
 
 void WebServer::onGetFeedings(std::function<std::vector<Feeding>()> callback) {
@@ -118,6 +124,14 @@ void WebServer::handlePUTSettings() {
         .password = password,
         .name = name
     });
+}
+
+void WebServer::handleDELETESettings() {
+    printRequest();
+
+    onDeleteSettingsCallback();
+
+    sendResponse(HTTP_NO_CONTENT);
 }
 
 void WebServer::handleGETFeed() {
