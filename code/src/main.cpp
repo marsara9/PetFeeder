@@ -45,6 +45,7 @@ void setup() {
     webServer->onSettingsChanged(setSettings);
     webServer->isValidFeedAmount(isValidFeedAmount);
     webServer->onFeed(feed);
+    webServer->onGetFeedings(std::bind(&DataStore::getAllFeedings, dataStore));
 
     webServer->startServer();
 }
@@ -68,7 +69,6 @@ std::string nullCoalesceString(std::string a, std::string b) {
 
 void setSettings(Settings settings) {
     Serial.println(settings.name.c_str());
-
 
     std::string ssid = nullCoalesceString(settings.ssid, _settings.ssid);
     std::string password = nullCoalesceString(settings.password, _settings.password);
