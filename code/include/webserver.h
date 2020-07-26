@@ -1,12 +1,14 @@
 #include "models/settings.h"
 #include "models/feeding.h"
+#include "timeKeeper.h"
 
 #ifndef PET_WEBSERVER
 #define PET_WEBSERVER
 
 class WebServer {
     public:
-        WebServer(int port);
+        WebServer(int port, TimeKeeper* timeKeeper);
+        
         void startServer();
         void handleClient();
 
@@ -16,6 +18,8 @@ class WebServer {
         void onFeed(void callback(Feeding));
         void isValidFeedAmount(bool callback(float));
     private:
+        TimeKeeper* timeKeeper;
+
         void handleNotFound();
 
         void handleGETSettings();

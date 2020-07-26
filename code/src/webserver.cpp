@@ -2,12 +2,6 @@
 #include "models/feeding.h"
 
 #include <ESP8266WebServer.h>
-#include <WiFiUDP.h>
-#include <NTPClient.h>
-#include <Time.h>
-
-WiFiUDP ntpUDP;
-NTPClient *timeClient = new NTPClient(ntpUDP);
 
 ESP8266WebServer *server = nullptr;
 Settings (*onGetSettingsCallback)();
@@ -23,13 +17,12 @@ const int HTTP_BAD_REQUEST = 400;
 const int HTTP_NOT_FOUND = 404;
 const int HTTP_NOT_ACCEPTABLE = 406;
 
-WebServer::WebServer(int port) {
+WebServer::WebServer(int port, TimeKeeper* timeKeeper) {
     server = new ESP8266WebServer(port);
+    this->timeKeeper = timeKeeper;
 }
 
 void WebServer::startServer() {
-    timeClient->begin();
-
     server->stop();
     server->begin();
 
@@ -40,8 +33,6 @@ void WebServer::startServer() {
 }
 
 void WebServer::handleClient() {
-    timeClient->update();
-
     server->handleClient();
 }
 
@@ -115,7 +106,7 @@ void WebServer::handlePOSTFeed() {
         return;
     }
 
-    time_t now = timeClient->getEpochTime();
+    time_t now = timeKeeper->now();
     //String id = ESPRandom::uuidToString(ESPRandom::uuid());
 
     Feeding feeding = {

@@ -4,21 +4,28 @@
 #include "wifi.h"
 #include "motorcontrol.h"
 #include "dataStore.h"
+#include "scheduler.h"
+#include "timeKeeper.h"
 
 #include <ESP8266WiFi.h>
 
 Settings getSettings();
 void setSettings(Settings settings);
+
 bool isValidFeedAmount(float cups);
 void feed(Feeding feeding);
 
 const float MINIMUM_DISPENCE_AMOUNT = 0.125;
 const int CONTAINERS_PER_ROTATION = 2;
 
+TimeKeeper *timeKeeper = new TimeKeeper();
+
 WiFiConnection* wifi = new WiFiConnection();
-WebServer *webServer = new WebServer(80);
+WebServer *webServer = new WebServer(80, timeKeeper);
 MotorControl *motorControl = new MotorControl(CONTAINERS_PER_ROTATION);
 DataStore *dataStore = new DataStore();
+Scheduler *scheduler = new Scheduler(timeKeeper);
+
 Settings _settings;
 
 void setup() {
@@ -41,6 +48,8 @@ void setup() {
     Serial.print(_settings.name.c_str());
     Serial.println("'");
 
+    timeKeeper->begin();
+
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
     webServer->isValidFeedAmount(isValidFeedAmount);
@@ -52,6 +61,8 @@ void setup() {
 void loop() {
     wifi->checkStatus();
     webServer->handleClient();
+    timeKeeper->update();
+    scheduler->update();
 }
 
 Settings getSettings() {
@@ -68,7 +79,6 @@ std::string nullCoalesceString(std::string a, std::string b) {
 
 void setSettings(Settings settings) {
     Serial.println(settings.name.c_str());
-
 
     std::string ssid = nullCoalesceString(settings.ssid, _settings.ssid);
     std::string password = nullCoalesceString(settings.password, _settings.password);
