@@ -100,6 +100,24 @@
 			"response": []
 		},
 		{
+			"name": "AP - Get Feedings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/feed",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"feed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "AP - POST Feed - Failure Incorrect Cup Size",
 			"request": {
 				"method": "POST",
@@ -142,6 +160,52 @@
 							"key": "cups",
 							"value": "1"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - POST Schedule - Success",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/schedule?cups=0.125&time=12:10",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"schedule"
+					],
+					"query": [
+						{
+							"key": "cups",
+							"value": "0.125"
+						},
+						{
+							"key": "time",
+							"value": "12:10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AP - Get Schedules - Success",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ipaddr}}/schedule",
+					"protocol": "http",
+					"host": [
+						"{{ipaddr}}"
+					],
+					"path": [
+						"schedule"
 					]
 				}
 			},
