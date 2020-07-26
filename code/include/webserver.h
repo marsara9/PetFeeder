@@ -1,5 +1,10 @@
 #include "models/settings.h"
 #include "models/feeding.h"
+#include "models/schedule.h"
+#include "timeKeeper.h"
+
+#include <functional>
+#include <vector>
 
 #include <vector>
 #include <string>
@@ -10,7 +15,8 @@
 
 class WebServer {
     public:
-        WebServer(int port);
+        WebServer(int port, TimeKeeper* timeKeeper);
+        
         void startServer();
         void handleClient();
 
@@ -21,7 +27,13 @@ class WebServer {
 
         void onFeed(std::function<void(Feeding)> callback);
         void isValidFeedAmount(std::function<bool(float)> callback);
+
+        void onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>);
+        void onAddScheduledFeeding(std::function<void(Schedule)>);
+
     private:
+        TimeKeeper* timeKeeper;
+
         void printRequest();
         void sendResponse(int code, const char* contentType, std::string response);
 
@@ -32,6 +44,9 @@ class WebServer {
 
         void handleGETFeed();
         void handlePOSTFeed();
+
+        void handleGETSchedules();
+        void handlePOSTSchedule();
 };
 
 #endif

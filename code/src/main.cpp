@@ -4,21 +4,32 @@
 #include "wifi.h"
 #include "motorcontrol.h"
 #include "dataStore.h"
-
-#include <ESP8266WiFi.h>
+#include "scheduler.h"
+#include "timeKeeper.h"
 
 Settings getSettings();
 void setSettings(Settings settings);
+
 bool isValidFeedAmount(float cups);
 void feed(Feeding feeding);
 
+Schedule getNextScheduledFeeding();
+void scheduledFeed(Schedule schedule);
+void scheduleNextFeeding();
+void addScheduledFeeding(Schedule schedule);
+
 const float MINIMUM_DISPENCE_AMOUNT = 0.125;
 const int CONTAINERS_PER_ROTATION = 2;
+bool timeKeeperAvailable = false;
+
+TimeKeeper *timeKeeper = new TimeKeeper();
 
 WiFiConnection* wifi = new WiFiConnection();
-WebServer *webServer = new WebServer(80);
+WebServer *webServer = new WebServer(80, timeKeeper);
 MotorControl *motorControl = new MotorControl(CONTAINERS_PER_ROTATION);
 DataStore *dataStore = new DataStore();
+Scheduler *scheduler = new Scheduler(timeKeeper);
+
 Settings _settings;
 
 void setup() {
@@ -41,11 +52,17 @@ void setup() {
     Serial.print(_settings.name.c_str());
     Serial.println("'");
 
+    timeKeeper->begin();
+
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
+    
     webServer->isValidFeedAmount(isValidFeedAmount);
     webServer->onFeed(feed);
     webServer->onGetFeedings(std::bind(&DataStore::getAllFeedings, dataStore));
+
+    webServer->onGetAllScheduledFeedings(std::bind(&DataStore::getAllSchedules, dataStore));
+    webServer->onAddScheduledFeeding(addScheduledFeeding);
 
     webServer->startServer();
 }
@@ -53,6 +70,12 @@ void setup() {
 void loop() {
     wifi->checkStatus();
     webServer->handleClient();
+    scheduler->update();
+
+    if(timeKeeper->update() && !timeKeeperAvailable) {
+        timeKeeperAvailable = true;
+        scheduleNextFeeding();
+    }
 }
 
 Settings getSettings() {
@@ -105,4 +128,53 @@ void feed(Feeding feeding) {
     Serial.println();
 
     dataStore->put(feeding);
+}
+
+Schedule getNextScheduledFeeding() {
+    std::vector<Schedule> scheduledFeedings = dataStore->getAllSchedules();
+
+    if(scheduledFeedings.size() > 0) {
+        return *std::min_element(scheduledFeedings.begin(), scheduledFeedings.end(), [](Schedule const& lhs, Schedule const& rhs) {
+            time_t ltime = timeKeeper->next(lhs.hour, lhs.minute);
+            time_t rtime = timeKeeper->next(rhs.hour, rhs.minute);
+
+            return ltime < rtime;
+        });
+    } else {
+        return Schedule {
+            .id = "",
+            .cups = 0,
+            .hour = 0,
+            .minute = 0
+        };
+    }
+}
+
+void scheduledFeed(Schedule schedule) {
+    Feeding feeding = {
+        .id = "00000000-0000-0000-0000-000000000000", // TODO
+        .cups = schedule.cups,
+        .date = timeKeeper->now(),
+    };
+
+    feed(feeding);
+}
+
+void scheduleNextFeeding() {
+    Schedule nextFeeding = getNextScheduledFeeding();
+    if(nextFeeding.id == "") {
+        return;
+    }
+
+    scheduler->scheduleEvent(timeKeeper->next(nextFeeding.hour, nextFeeding.minute), [nextFeeding]{
+        scheduledFeed(nextFeeding);
+        scheduleNextFeeding();
+    });
+}
+
+void addScheduledFeeding(Schedule schedule) {
+    dataStore->put(schedule);
+
+    scheduler->cancelEvent();
+    scheduleNextFeeding();
 }
