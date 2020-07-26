@@ -22,6 +22,9 @@ class WebServer {
         void onFeed(std::function<void(Feeding)> callback);
         void isValidFeedAmount(std::function<bool(float)> callback);
     private:
+        void printRequest();
+        void sendResponse(int code, const char* contentType, std::string response);
+
         void handleNotFound();
 
         void handleGETSettings();

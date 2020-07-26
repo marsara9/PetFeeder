@@ -30,7 +30,7 @@ template<typename T> void DataStore::writeBytesToFile(fs::File file, T data) {
 
     converter.data = data;
 
-    file.print(converter.bytes);
+    file.write(converter.bytes, sizeof(T));
 }
 
 template<typename T> std::vector<T> DataStore::enumerateFiles(std::string folder, std::function<T(fs::File)> read) {

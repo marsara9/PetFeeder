@@ -68,15 +68,24 @@ void WebServer::isValidFeedAmount(std::function<bool(float)> callback) {
     isValidFeedAmountCallback = callback;
 }
 
-void printRequest() {
+void WebServer::printRequest() {
     Serial.print("REQUEST: ");
     Serial.print(server->method());
     Serial.print(" ");
     Serial.println(server->uri());
 }
 
+void WebServer::sendResponse(int code, const char* contentType = "", std::string response = "") {
+    Serial.print("RESPONSE: ");
+    Serial.print(code);
+    Serial.print(" ");
+    Serial.println(response.c_str());
+
+    server->send(code, contentType, response.c_str());
+}
+
 void WebServer::handleNotFound() {
-    server->send(HTTP_NOT_FOUND, CONTENT_TYPE, "{ 'error' : { 'code' : 404, 'message' : 'Not Found' } }");
+    sendResponse(HTTP_NOT_FOUND, CONTENT_TYPE, "{ 'error' : { 'code' : 404, 'message' : 'Not Found' } }");
 }
 
 void WebServer::handleGETSettings() {
@@ -84,7 +93,7 @@ void WebServer::handleGETSettings() {
 
     Settings settings = onGetSettingsCallback();
 
-    server->send(HTTP_OK, CONTENT_TYPE, settingsToJson(settings).c_str());
+    sendResponse(HTTP_OK, CONTENT_TYPE, settingsToJson(settings).c_str());
 }
 
 void WebServer::handlePUTSettings() {
@@ -94,7 +103,7 @@ void WebServer::handlePUTSettings() {
     const char* password = server->arg("password").c_str();
     const char* name = server->arg("name").c_str();
 
-    server->send(HTTP_NO_CONTENT);
+    sendResponse(HTTP_NO_CONTENT);
 
     delay(100);
 
@@ -111,9 +120,7 @@ void WebServer::handleGETFeed() {
     std::vector<Feeding> feedings = onGetFeedingsCallback();
     std::function<std::string(Feeding)> toJson = &feedingToJson;
 
-    std::string json = toJsonArray(feedings, toJson);
-
-    server->send(HTTP_OK, json.c_str());
+    sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(feedings, toJson).c_str());
 }
 
 void WebServer::handlePOSTFeed() {
@@ -121,13 +128,13 @@ void WebServer::handlePOSTFeed() {
 
     const char* cupsString = server->arg("cups").c_str();
     if(strlen(cupsString) == 0) {
-        server->send(HTTP_BAD_REQUEST);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
 
     float cups = atof(cupsString);
     if(cups < 0 || !isValidFeedAmountCallback(cups)) {
-        server->send(HTTP_NOT_ACCEPTABLE);
+        sendResponse(HTTP_NOT_ACCEPTABLE);
         return;
     }
 
@@ -140,7 +147,7 @@ void WebServer::handlePOSTFeed() {
         .date = now
     };
 
-    server->send(HTTP_OK, CONTENT_TYPE, feedingToJson(feeding).c_str());
+    sendResponse(HTTP_OK, CONTENT_TYPE, feedingToJson(feeding).c_str());
 
     onFeedCallback(feeding);
 }
