@@ -1,13 +1,17 @@
 #include "webserver.h"
+#include "jsonUtils.h"
 
 #include <ESP8266WebServer.h>
 #include <string>
 
 ESP8266WebServer *server = nullptr;
-Settings (*onGetSettingsCallback)();
-void (*onSettingsChangedCallback)(Settings);
-void (*onFeedCallback)(Feeding);
-bool (*isValidFeedAmountCallback)(float);
+
+std::function<Settings()> onGetSettingsCallback;
+std::function<void(Settings)> onSettingsChangedCallback;
+
+std::function<std::vector<Feeding>()> onGetFeedingsCallback;
+std::function<void(Feeding)> onFeedCallback;
+std::function<bool(float)> isValidFeedAmountCallback;
 
 std::function<void(Schedule)> onAddScheduledFeedingCallback;
 
@@ -18,7 +22,6 @@ const int HTTP_CREATED = 201;
 const int HTTP_NO_CONTENT = 204;
 const int HTTP_BAD_REQUEST = 400;
 const int HTTP_NOT_FOUND = 404;
-const int HTTP_NOT_ACCEPTABLE = 406;
 
 WebServer::WebServer(int port, TimeKeeper* timeKeeper) {
     server = new ESP8266WebServer(port);
@@ -32,6 +35,7 @@ void WebServer::startServer() {
     server->onNotFound(std::bind(&WebServer::handleNotFound, this));
     server->on("/settings", HTTP_GET, std::bind(&WebServer::handleGETSettings, this));
     server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
+    server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
 }
 
@@ -39,19 +43,23 @@ void WebServer::handleClient() {
     server->handleClient();
 }
 
-void WebServer::onGetSettings(Settings callback()) {
+void WebServer::onGetSettings(std::function<Settings()> callback) {
     onGetSettingsCallback = callback;
 }
 
-void WebServer::onSettingsChanged(void callback(Settings)) {
+void WebServer::onSettingsChanged(std::function<void(Settings)> callback) {
     onSettingsChangedCallback = callback;
 }
 
-void WebServer::onFeed(void callback(Feeding)) {
+void WebServer::onGetFeedings(std::function<std::vector<Feeding>()> callback) {
+    onGetFeedingsCallback = callback;
+}
+
+void WebServer::onFeed(std::function<void(Feeding)> callback) {
     onFeedCallback = callback;
 }
 
-void WebServer::isValidFeedAmount(bool callback(float)) {
+void WebServer::isValidFeedAmount(std::function<bool(float)> callback) {
     isValidFeedAmountCallback = callback;
 }
 
@@ -59,15 +67,24 @@ void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
     onAddScheduledFeedingCallback = callback;
 }
 
-void printRequest() {
+void WebServer::printRequest() {
     Serial.print("REQUEST: ");
     Serial.print(server->method());
     Serial.print(" ");
     Serial.println(server->uri());
 }
 
+void WebServer::sendResponse(int code, const char* contentType = "", std::string response = "") {
+    Serial.print("RESPONSE: ");
+    Serial.print(code);
+    Serial.print(" ");
+    Serial.println(response.c_str());
+
+    server->send(code, contentType, response.c_str());
+}
+
 void WebServer::handleNotFound() {
-    server->send(HTTP_NOT_FOUND, CONTENT_TYPE, "{ 'error' : { 'code' : 404, 'message' : 'Not Found' } }");
+    sendResponse(HTTP_NOT_FOUND, CONTENT_TYPE, "{ 'error' : { 'code' : 404, 'message' : 'Not Found' } }");
 }
 
 void WebServer::handleGETSettings() {
@@ -75,9 +92,7 @@ void WebServer::handleGETSettings() {
 
     Settings settings = onGetSettingsCallback();
 
-    std::string response = "{ \"ssid\" : \"" + std::string(settings.ssid) + "\", \"name\" : \"" + std::string(settings.name) + "\" }";
-
-    server->send(HTTP_OK, CONTENT_TYPE, response.c_str());
+    sendResponse(HTTP_OK, CONTENT_TYPE, settingsToJson(settings).c_str());
 }
 
 void WebServer::handlePUTSettings() {
@@ -87,7 +102,7 @@ void WebServer::handlePUTSettings() {
     const char* password = server->arg("password").c_str();
     const char* name = server->arg("name").c_str();
 
-    server->send(HTTP_NO_CONTENT);
+    sendResponse(HTTP_NO_CONTENT);
 
     delay(100);
 
@@ -98,18 +113,27 @@ void WebServer::handlePUTSettings() {
     });
 }
 
+void WebServer::handleGETFeed() {
+    printRequest();
+
+    std::vector<Feeding> feedings = onGetFeedingsCallback();
+    std::function<std::string(Feeding)> toJson = &feedingToJson;
+
+    sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(feedings, toJson).c_str());
+}
+
 void WebServer::handlePOSTFeed() {
     printRequest();
 
     const char* cupsString = server->arg("cups").c_str();
     if(strlen(cupsString) == 0) {
-        server->send(HTTP_BAD_REQUEST);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
 
     float cups = atof(cupsString);
     if(cups < 0 || !isValidFeedAmountCallback(cups)) {
-        server->send(HTTP_NOT_ACCEPTABLE);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
 
@@ -122,20 +146,10 @@ void WebServer::handlePOSTFeed() {
         .date = now
     };
 
-    char time_buf[21]; // YYYY-MM-DDTHH:mm:ssZ
-    struct tm ts = *gmtime(&now);
-    strftime(time_buf, sizeof(time_buf), "%FT%TZ", &ts);
-
-    char cupsString2[6]; // 0.000
-    snprintf(cupsString2, sizeof(cups), "%f", feeding.cups);
-
-    std::string response = "{ \"id\" : \"" + feeding.id + "\", \"cups\" : " + cupsString2 + ", \"time\" : \"" + time_buf + "\" }";
-
-    server->send(HTTP_OK, CONTENT_TYPE, response.c_str());
+    sendResponse(HTTP_OK, CONTENT_TYPE, feedingToJson(feeding).c_str());
 
     onFeedCallback(feeding);
 }
-
 
 void WebServer::handleGETSchedules() {
 
@@ -146,25 +160,25 @@ void WebServer::handlePOSTSchedule() {
 
     const char* cupsString = server->arg("cups").c_str();
     if(strlen(cupsString) == 0) {
-        server->send(HTTP_BAD_REQUEST);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
 
     float cups = atof(cupsString);
     if(cups < 0 || !isValidFeedAmountCallback(cups)) {
-        server->send(HTTP_BAD_REQUEST);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
 
     std::string timeString = server->arg("time").c_str();
     if(timeString.find(":") < 0) {
-        server->send(HTTP_BAD_REQUEST);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
     int hour = atoi(timeString.substr(0, timeString.find(":")).c_str());
     int minute = atoi(timeString.substr(timeString.find(":")).c_str());
     if((hour < 0 || hour > 23) || (minute < 0 || minute > 59)) {
-        server->send(HTTP_BAD_REQUEST);
+        sendResponse(HTTP_BAD_REQUEST);
         return;
     }
 
@@ -175,7 +189,7 @@ void WebServer::handlePOSTSchedule() {
         .minute = minute
     };
 
-    server->send(HTTP_OK, CONTENT_TYPE, nullptr); // TODO
+    sendResponse(HTTP_OK, CONTENT_TYPE, nullptr); // TODO
 
     onAddScheduledFeedingCallback(schedule);
 }

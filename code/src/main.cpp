@@ -61,6 +61,7 @@ void setup() {
     webServer->onSettingsChanged(setSettings);
     webServer->isValidFeedAmount(isValidFeedAmount);
     webServer->onFeed(feed);
+    webServer->onGetFeedings(std::bind(&DataStore::getAllFeedings, dataStore));
 
     webServer->startServer();
 }
