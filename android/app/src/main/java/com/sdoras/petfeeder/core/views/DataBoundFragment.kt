@@ -18,8 +18,10 @@ abstract class DataBoundFragment<Binding : ViewDataBinding> : Fragment() {
 
     protected abstract val viewModel : BaseViewModel
 
+    protected lateinit var binding: Binding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<Binding>(inflater, layoutId, container, false)
+        binding = DataBindingUtil.inflate<Binding>(inflater, layoutId, container, false)
         binding.setVariable(BR.viewModel, viewModel)
         binding.lifecycleOwner = this
 

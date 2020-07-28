@@ -1,7 +1,6 @@
 package com.sdoras.petfeeder.settings.viewModels
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.settings.services.SettingsServices
@@ -36,5 +35,17 @@ class SettingsViewModelImpl(private val settingsServices: SettingsServices) : Vi
     override fun setName(name: String) {
         this.name.postValue(name)
         settingsServices.setSettings(name = name)
+                .doOnSubscribe { showLoading.postValue(true) }
+                .doAfterTerminate { showLoading.postValue(false) }
+                .observeOn(Schedulers.io())
+                .subscribe()
+    }
+
+    override fun restoreFactoryDefaults() {
+        settingsServices.deleteSettings()
+                .doOnSubscribe { showLoading.postValue(true) }
+                .doAfterTerminate { showLoading.postValue(false) }
+                .observeOn(Schedulers.io())
+                .subscribe()
     }
 }

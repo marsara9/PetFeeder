@@ -14,4 +14,5 @@ interface SettingsViewModel : BaseViewModel {
 
     fun setName(name: String)
 
+    fun restoreFactoryDefaults()
 }
