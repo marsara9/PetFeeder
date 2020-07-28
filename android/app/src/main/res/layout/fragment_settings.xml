@@ -5,26 +5,33 @@
         <variable
             name="viewModel"
             type="com.sdoras.petfeeder.settings.viewModels.SettingsViewModel" />
+        <variable
+            name="clickHandler"
+            type="com.sdoras.petfeeder.settings.views.SettingsClickHandler" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="8dp">
 
         <include layout="@layout/item_simple"
-            bind:title="@string/setting_wifi_ssid"
+            bind:title="@{@string/setting_wifi_ssid}"
             bind:subtitle="@{viewModel.ssid}"
+            bind:onClick="@{clickHandler::onEditSSID}"
             />
 
         <include layout="@layout/item_simple"
-            bind:title="@string/setting_wifi_password"
-            bind:subtitle="@string/setting_masked_password"
+            bind:title="@{@string/setting_wifi_password}"
+            bind:subtitle="@{@string/setting_masked_password}"
+            bind:onClick="@{clickHandler::onEditPassword}"
             />
 
         <include layout="@layout/item_simple"
-            bind:title="@string/setting_nickname"
+            bind:title="@{@string/setting_nickname}"
             bind:subtitle="@{viewModel.name}"
+            bind:onClick="@{clickHandler::onEditName}"
             />
 
     </LinearLayout>

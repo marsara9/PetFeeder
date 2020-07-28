@@ -1,6 +1,7 @@
 package com.sdoras.petfeeder.settings.viewModels
 
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.settings.services.SettingsServices
@@ -14,6 +15,10 @@ class SettingsViewModelImpl(private val settingsServices: SettingsServices) : Vi
     override val name = MutableLiveData<String>()
 
     init {
+        refresh()
+    }
+
+    override fun refresh() {
         settingsServices.getSettings()
                 .doOnSubscribe { showLoading.postValue(true) }
                 .doAfterTerminate { showLoading.postValue(false) }
@@ -27,7 +32,7 @@ class SettingsViewModelImpl(private val settingsServices: SettingsServices) : Vi
                 })
     }
 
-    override fun setWifi(ssid: String, password: String) {
+    override fun setWifi(ssid: String, password: String?) {
         this.ssid.postValue(ssid)
         settingsServices.setSettings(ssid = ssid, password = password)
     }

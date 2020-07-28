@@ -9,6 +9,6 @@ import com.sdoras.petfeeder.R
 
 class ProgressFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_progress, container, false)
+        return inflater.inflate(R.layout.dialog_progress, container, false)
     }
 }

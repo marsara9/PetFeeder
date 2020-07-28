@@ -10,9 +10,12 @@ interface SettingsViewModel : BaseViewModel {
     val ssid : LiveData<String>
     val name : LiveData<String>
 
-    fun setWifi(ssid : String, password : String)
+    fun refresh()
+
+    fun setWifi(ssid : String, password : String?)
 
     fun setName(name: String)
 
     fun restoreFactoryDefaults()
+
 }
