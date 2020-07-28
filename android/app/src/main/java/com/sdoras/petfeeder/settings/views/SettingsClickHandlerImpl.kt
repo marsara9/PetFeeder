@@ -1,8 +1,6 @@
 package com.sdoras.petfeeder.settings.views
 
-import android.app.AlertDialog
 import android.view.View
-import android.widget.EditText
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.EditTextDialog
 import com.sdoras.petfeeder.settings.viewModels.SettingsViewModel

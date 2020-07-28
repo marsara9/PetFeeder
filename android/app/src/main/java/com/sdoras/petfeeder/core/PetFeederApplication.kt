@@ -3,7 +3,6 @@ package com.sdoras.petfeeder.core
 import android.app.Application
 import com.sdoras.petfeeder.core.services.ServiceCall
 import com.sdoras.petfeeder.settings.services.SettingsServices
-import com.sdoras.petfeeder.settings.viewModels.SettingsViewModel
 import com.sdoras.petfeeder.settings.viewModels.SettingsViewModelImpl
 import com.sdoras.petfeeder.settings.views.SettingsClickHandler
 import com.sdoras.petfeeder.settings.views.SettingsClickHandlerImpl
