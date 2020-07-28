@@ -5,20 +5,25 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.dashboard.views.DashboardFragment
+import com.sdoras.petfeeder.settings.views.SettingsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_home -> {
                 supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, DashboardFragment.newInstance())
+                        .replace(R.id.frame, DashboardFragment())
                         .commit()
                 true
             }
-            R.id.navigation_dashboard -> true
-            R.id.navigation_notifications -> true
+            R.id.navigation_settings -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame, SettingsFragment())
+                        .commit()
+                true
+            }
             else -> false
         }
     }
@@ -27,6 +32,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
     }
 }

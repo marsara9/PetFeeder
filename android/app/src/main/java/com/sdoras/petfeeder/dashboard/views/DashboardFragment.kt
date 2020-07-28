@@ -14,16 +14,6 @@ import com.sdoras.petfeeder.R
  */
 class DashboardFragment : Fragment() {
 
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-                DashboardFragment().apply {
-                    arguments = Bundle().apply {
-
-                    }
-                }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }

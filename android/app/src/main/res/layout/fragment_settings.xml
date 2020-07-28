@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.sdoras.petfeeder.settings.viewModels.SettingsViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include layout="@layout/item_simple"
+            bind:title="@string/setting_wifi_ssid"
+            bind:subtitle="@{viewModel.ssid}"
+            />
+
+        <include layout="@layout/item_simple"
+            bind:title="@string/setting_wifi_password"
+            bind:subtitle="@string/setting_masked_password"
+            />
+
+        <include layout="@layout/item_simple"
+            bind:title="@string/setting_nickname"
+            bind:subtitle="@{viewModel.name}"
+            />
+
+    </LinearLayout>
+
+</layout>
+
