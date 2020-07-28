@@ -8,26 +8,28 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 import com.sdoras.petfeeder.core.views.dialogs.ProgressDialog
+import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.DefinitionParameters
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.parameter.parametersOf
 
-abstract class DataBoundFragment<Binding : ViewDataBinding> : Fragment() {
+abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> : Fragment() {
 
-    protected abstract val layoutId : Int
-    protected abstract val viewModel : BaseViewModel
-    protected abstract val clickHandler : Any?
+    abstract val layoutId : Int
+    abstract val viewModel : VM
+    abstract val clickHandler : ClickHandler<VM>?
 
     protected lateinit var binding: Binding
 
     private var progressDialog : ProgressDialog? = null
 
-    protected fun injectViewModel() : ParametersDefinition {
-        return object : ParametersDefinition {
-            override fun invoke(): DefinitionParameters = parametersOf(viewModel)
+    protected inline fun <reified T : ClickHandler<in VM>> clickHandler() = lazy {
+        getKoin().get<T> {
+            parametersOf(viewModel)
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.dashboard.views.DashboardFragment
+import com.sdoras.petfeeder.schedules.views.SchedulesFragment
 import com.sdoras.petfeeder.settings.views.SettingsFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -16,6 +17,15 @@ class MainActivity : AppCompatActivity() {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.frame, DashboardFragment())
                         .commit()
+                true
+            }
+            R.id.navigation_schedules -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame, SchedulesFragment())
+                        .commit()
+                true
+            }
+            R.id.navigation_history -> {
                 true
             }
             R.id.navigation_settings -> {

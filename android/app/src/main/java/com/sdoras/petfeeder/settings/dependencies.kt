@@ -13,6 +13,6 @@ fun settingsModule() : Module {
     return module {
         single { ServiceCall("http://192.168.86.204").create(SettingsServices::class.java) }
         viewModel { SettingsViewModelImpl(get()) }
-        single<SettingsClickHandler> { SettingsClickHandlerImpl() }
+        single<SettingsClickHandler> { args -> SettingsClickHandlerImpl(args[0]) }
     }
 }

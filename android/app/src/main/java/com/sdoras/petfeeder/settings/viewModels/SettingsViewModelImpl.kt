@@ -27,7 +27,7 @@ class SettingsViewModelImpl(private val settingsServices: SettingsServices) : Vi
                     ssid.postValue(it.ssid)
                     name.postValue(it.name)
                 }, {
-                    Log.e("", "", it);
+
                 })
     }
 
