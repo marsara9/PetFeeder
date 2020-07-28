@@ -16,5 +16,5 @@ interface ScheduleServices {
             @Query("minute") minute : Byte) : Completable
 
     @GET("schedule")
-    fun getAllScheduledFeedings() : Single<ScheduledFeeding>
+    fun getAllScheduledFeedings() : Single<List<ScheduledFeeding>>
 }
