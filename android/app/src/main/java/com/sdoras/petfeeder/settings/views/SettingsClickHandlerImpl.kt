@@ -2,7 +2,7 @@ package com.sdoras.petfeeder.settings.views
 
 import android.view.View
 import com.sdoras.petfeeder.R
-import com.sdoras.petfeeder.core.views.EditTextDialog
+import com.sdoras.petfeeder.core.views.dialogs.EditTextDialog
 import com.sdoras.petfeeder.settings.viewModels.SettingsViewModel
 
 class SettingsClickHandlerImpl : SettingsClickHandler {

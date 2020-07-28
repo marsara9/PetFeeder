@@ -1,4 +1,4 @@
-package com.sdoras.petfeeder.core.views
+package com.sdoras.petfeeder.core.views.dialogs
 
 import android.app.AlertDialog
 import android.content.Context
