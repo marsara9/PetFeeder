@@ -18,6 +18,7 @@ class EditTextDialog(context : Context, titleId : Int) {
 
     fun setPositiveButton(textId : Int, callback : (String) -> Unit) {
         dialogBuilder = dialogBuilder.setPositiveButton(textId) { _, _ ->
+            dialog?.dismiss()
             dialog?.findViewById<EditText>(android.R.id.edit)
                     ?.text
                     ?.toString()
@@ -27,8 +28,8 @@ class EditTextDialog(context : Context, titleId : Int) {
 
     fun setNegativeButton(textId : Int, callback : (() -> Unit)? = null) {
         dialogBuilder = dialogBuilder.setNegativeButton(textId) { dialog, _ ->
-            callback?.invoke()
             dialog.cancel()
+            callback?.invoke()
         }
     }
 

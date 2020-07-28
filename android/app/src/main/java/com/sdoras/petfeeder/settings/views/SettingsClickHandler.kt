@@ -8,4 +8,5 @@ interface SettingsClickHandler : ClickHandler<SettingsViewModel> {
     fun onEditSSID(view : View)
     fun onEditPassword(view : View)
     fun onEditName(view : View)
+    fun onResetToFactorySettings(view: View)
 }

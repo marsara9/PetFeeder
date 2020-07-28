@@ -7,15 +7,17 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="loading">Loading…</string>
 
     <string name="settings_header_feeders">Feeder Settings</string>
     <string name="setting_nickname">Nickname</string>
     <string name="setting_wifi_ssid">SSID</string>
     <string name="setting_wifi_password">Network Security Key</string>
     <string name="setting_masked_password">********</string>
-    <string name="loading">Loading…</string>
     <string name="setting_edit_ssid">Edit SSID</string>
     <string name="setting_edit_password">Edit Network Security Key</string>
     <string name="setting_edit_name">Edit Name</string>
+    <string name="setting_reset_factory">Reset to Factory Settings</string>
+    <string name="setting_reset_warning">Warning! all settings will be erased!</string>
 
 </resources>

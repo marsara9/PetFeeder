@@ -2,15 +2,14 @@ package com.sdoras.petfeeder.settings.viewModels
 
 import androidx.lifecycle.LiveData
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
+import io.reactivex.rxjava3.core.Completable
 
 interface SettingsViewModel : BaseViewModel {
-
-    override val showLoading : LiveData<Boolean>
 
     val ssid : LiveData<String>
     val name : LiveData<String>
 
-    fun refresh()
+    fun refresh() : Completable
 
     fun setWifi(ssid : String, password : String?)
 

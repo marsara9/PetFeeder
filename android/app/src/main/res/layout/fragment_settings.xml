@@ -19,20 +19,22 @@
         <include layout="@layout/item_simple"
             bind:title="@{@string/setting_wifi_ssid}"
             bind:subtitle="@{viewModel.ssid}"
-            bind:onClick="@{clickHandler::onEditSSID}"
-            />
+            bind:onClick="@{clickHandler::onEditSSID}" />
 
         <include layout="@layout/item_simple"
             bind:title="@{@string/setting_wifi_password}"
             bind:subtitle="@{@string/setting_masked_password}"
-            bind:onClick="@{clickHandler::onEditPassword}"
-            />
+            bind:onClick="@{clickHandler::onEditPassword}" />
 
         <include layout="@layout/item_simple"
             bind:title="@{@string/setting_nickname}"
             bind:subtitle="@{viewModel.name}"
-            bind:onClick="@{clickHandler::onEditName}"
-            />
+            bind:onClick="@{clickHandler::onEditName}" />
+
+        <include layout="@layout/item_simple"
+            bind:title="@{@string/setting_reset_factory}"
+            bind:subtitle="@{@string/setting_reset_warning}"
+            bind:onClick="@{clickHandler::onResetToFactorySettings}" />
 
     </LinearLayout>
 
