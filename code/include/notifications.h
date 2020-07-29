@@ -23,6 +23,8 @@ private:
     std::string authorizationKey;
 
     std::string createNotification(Settings settings, Feeding feeding);
+
+    void sendFCMNotification(std::string token, std::string message);
 };
 
 #endif

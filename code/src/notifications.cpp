@@ -33,40 +33,16 @@ void Notifications::onGetAllRegisteredDevices(std::function<std::vector<Registra
 }
 
 void Notifications::send(Settings settings, Feeding feeding) {
+
+    std::vector<Registration> devices = onGetAllRegisteredDevicesCallback();
+
     std::string message = createNotification(settings, feeding);
 
-    std::vector<Registration> tokens = onGetAllRegisteredDevicesCallback();
-
-    Serial.println("Sending Notification...");
-    for(const auto &token : tokens) {
-        std::stringstream ss;
-        ss << "{";
-        ss << "\"to\": \"" << token.token << "\",";
-        ss << "\"notification\": {";
-        ss << "\"body\": \"" << message << "\",";
-        ss << "\"title\": \"PetFeeder\",";
-        ss << "}";
-        ss << "}";
-
-        const char* payload = ss.str().c_str();
-
-        http.begin(url);
-        http.addHeader("Authorization", ("key=" + authorizationKey).c_str());
-        http.addHeader("Content-Type", "application/json");
-        int code = http.POST(payload);
-        const char* response = http.getString().c_str();
-        http.end();
-
-        Serial.print("REQUEST: ");
-        Serial.print("POST");
-        Serial.print(" ");
-        Serial.println(url);
-        Serial.println(payload);
-
-        Serial.print("RESPONSE: ");
-        Serial.print(code);
-        Serial.print(" ");
-        Serial.println(response);
+    Serial.println("Sending Notifications...");
+    for(const auto &device : devices) {
+        if(device.deviceType == "Android") {
+            sendFCMNotification(device.token, message);
+        }
     }
 }
 
@@ -76,4 +52,37 @@ std::string Notifications::createNotification(Settings settings, Feeding feeding
     snprintf(result, sizeof(result), "%s dispensed %.3f cups of food.", settings.name.c_str(), feeding.cups);
 
     return std::string(result);
+}
+
+void Notifications::sendFCMNotification(std::string token, std::string message) {
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"to\": \"" << token << "\",";
+    ss << "\"notification\": {";
+    ss << "\"body\": \"" << message << "\",";
+    ss << "\"title\": \"PetFeeder\",";
+    ss << "}";
+    ss << "}";
+
+    const char* payload = ss.str().c_str();
+
+    WiFiClient client;
+
+    http.begin(client, url);
+    http.addHeader("Authorization", ("key=" + authorizationKey).c_str());
+    http.addHeader("Content-Type", "application/json");
+    int code = http.POST(payload);
+    const char* response = http.getString().c_str();
+    http.end();
+
+    Serial.print("REQUEST: ");
+    Serial.print("POST");
+    Serial.print(" ");
+    Serial.println(url);
+    Serial.println(payload);
+
+    Serial.print("RESPONSE: ");
+    Serial.print(code);
+    Serial.print(" ");
+    Serial.println(response);
 }

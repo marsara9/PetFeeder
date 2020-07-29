@@ -43,7 +43,7 @@ void WebServer::startServer() {
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
 
     server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
-    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));
+    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));    
 
     server->on("/register", HTTP_POST, std::bind(&WebServer::handlePOSTRegister, this));
     server->on("/register", HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
@@ -211,8 +211,8 @@ void WebServer::handlePOSTSchedule() {
     Schedule schedule = {
         .id = createUUID(),
         .cups = cups,
-        .hour = hour,
-        .minute = minute
+        .hour = (uint8_t)hour,
+        .minute = (uint8_t)minute
     };
 
     sendResponse(HTTP_OK, CONTENT_TYPE, scheduleToJson(schedule));
