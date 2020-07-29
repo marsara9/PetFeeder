@@ -8,13 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 import com.sdoras.petfeeder.core.views.dialogs.ProgressDialog
 import org.koin.android.ext.android.getKoin
-import org.koin.core.parameter.DefinitionParameters
-import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.parameter.parametersOf
 
 abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> : Fragment() {

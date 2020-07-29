@@ -2,8 +2,6 @@ package com.sdoras.petfeeder.settings.viewModels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.sdoras.petfeeder.core.services.ServiceCall
-import com.sdoras.petfeeder.history.models.Feeding
 import com.sdoras.petfeeder.settings.services.SettingsServices
 import io.reactivex.rxjava3.core.Completable
 

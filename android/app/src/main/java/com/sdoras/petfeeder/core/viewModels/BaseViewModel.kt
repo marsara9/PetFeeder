@@ -6,7 +6,6 @@ import io.reactivex.rxjava3.core.CompletableTransformer
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.core.SingleTransformer
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 interface BaseViewModel {
     val showLoading : MutableLiveData<Boolean>

@@ -2,7 +2,6 @@ package com.sdoras.petfeeder.settings.viewModels
 
 import androidx.lifecycle.LiveData
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
-import io.reactivex.rxjava3.core.Completable
 
 interface SettingsViewModel : BaseViewModel {
 

@@ -4,6 +4,4 @@ import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 
 interface SchedulesViewModel : BaseViewModel {
 
-    fun refresh()
-
 }
