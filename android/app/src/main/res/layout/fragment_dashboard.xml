@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModel" />
     </data>
 
     <FrameLayout
@@ -12,6 +14,7 @@
         tools:context=".dashboard.views.DashboardFragment">
 
         <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

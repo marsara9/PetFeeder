@@ -19,5 +19,7 @@
     <string name="setting_edit_name">Edit Name</string>
     <string name="setting_reset_factory">Reset to Factory Settings</string>
     <string name="setting_reset_warning">Warning! all settings will be erased!</string>
+    <string name="feedings">Feedings</string>
+    <string name="cups">Cups</string>
 
 </resources>

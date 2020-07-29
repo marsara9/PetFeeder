@@ -1,6 +1,7 @@
 package com.sdoras.petfeeder.main.views
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
@@ -43,5 +44,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.frame, DashboardFragment())
+                .commit()
     }
 }

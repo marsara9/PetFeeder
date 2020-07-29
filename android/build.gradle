@@ -20,6 +20,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url = 'http://repo.adamjak.net/nexus/content/repositories/adamjak_net_releases/' }
     }
 }
 

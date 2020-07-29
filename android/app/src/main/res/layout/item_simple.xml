@@ -7,33 +7,35 @@
 
         <variable name="title" type="String" />
         <variable name="subtitle" type="String" />
-        <variable name="onClick" type="kotlin.jvm.functions.Function1&lt;android.view.View, kotlin.Unit>" />
+        <variable name="onClick"
+            type="kotlin.jvm.functions.Function1&lt;android.view.View, kotlin.Unit>" />
+
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:minHeight="?attr/listPreferredItemHeight"
         android:background="@android:drawable/list_selector_background"
         android:clickable="true"
-        android:paddingStart="?attr/listPreferredItemPaddingStart"
+        android:minHeight="?attr/listPreferredItemHeight"
+        android:onClick="@{(v) -> onClick.invoke(v)}"
+        android:orientation="vertical"
         android:paddingEnd="?attr/listPreferredItemPaddingEnd"
-        android:onClick="@{(v) -> onClick.invoke(v)}">
+        android:paddingStart="?attr/listPreferredItemPaddingStart">
 
         <TextView
-            android:textAppearance="?attr/textAppearanceListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@{title}"
+            android:textAppearance="?attr/textAppearanceListItem"
             tools:text="Title" />
 
         <TextView
-            android:textAppearance="?attr/textAppearanceListItemSecondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{subtitle}"
+            android:textAppearance="?attr/textAppearanceListItemSecondary"
             tools:text="Subtitle" />
 
     </LinearLayout>

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:bind="http://schemas.android.com/apk/res-auto">
+
     <data>
         <variable
             name="viewModel"
             type="com.sdoras.petfeeder.settings.viewModels.SettingsViewModel" />
+
         <variable
             name="clickHandler"
             type="com.sdoras.petfeeder.settings.views.SettingsClickHandler" />
@@ -16,25 +18,29 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <include layout="@layout/item_simple"
-            bind:title="@{@string/setting_wifi_ssid}"
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onEditSSID}"
             bind:subtitle="@{viewModel.ssid}"
-            bind:onClick="@{clickHandler::onEditSSID}" />
+            bind:title="@{@string/setting_wifi_ssid}" />
 
-        <include layout="@layout/item_simple"
-            bind:title="@{@string/setting_wifi_password}"
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onEditPassword}"
             bind:subtitle="@{@string/setting_masked_password}"
-            bind:onClick="@{clickHandler::onEditPassword}" />
+            bind:title="@{@string/setting_wifi_password}" />
 
-        <include layout="@layout/item_simple"
-            bind:title="@{@string/setting_nickname}"
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onEditName}"
             bind:subtitle="@{viewModel.name}"
-            bind:onClick="@{clickHandler::onEditName}" />
+            bind:title="@{@string/setting_nickname}" />
 
-        <include layout="@layout/item_simple"
-            bind:title="@{@string/setting_reset_factory}"
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onResetToFactorySettings}"
             bind:subtitle="@{@string/setting_reset_warning}"
-            bind:onClick="@{clickHandler::onResetToFactorySettings}" />
+            bind:title="@{@string/setting_reset_factory}" />
 
     </LinearLayout>
 
