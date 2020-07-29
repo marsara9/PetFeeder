@@ -145,10 +145,9 @@ void WebServer::handlePOSTFeed() {
     }
 
     time_t now = timeKeeper->now();
-    //String id = ESPRandom::uuidToString(ESPRandom::uuid());
 
     Feeding feeding = {
-        .id = "00000000-0000-0000-0000-000000000000",
+        .id = createUUID(),
         .cups = cups,
         .date = now
     };
@@ -195,7 +194,7 @@ void WebServer::handlePOSTSchedule() {
     }
 
     Schedule schedule = {
-        .id = "00000000-0000-0000-0000-000000000000",
+        .id = createUUID(),
         .cups = cups,
         .hour = hour,
         .minute = minute

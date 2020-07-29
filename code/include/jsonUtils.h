@@ -29,4 +29,6 @@ std::string feedingToJson(Feeding feeding);
 std::string scheduleToJson(Schedule schedule);
 std::string settingsToJson(Settings settings);
 
+std::string createUUID();
+
 #endif
