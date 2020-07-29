@@ -8,7 +8,7 @@ import com.sdoras.petfeeder.history.services.FeedingServices
 import io.reactivex.rxjava3.core.Completable
 
 class DashboardPageViewModelImpl(private val feedingServices: FeedingServices) : ViewModel(), DashboardPageViewModel {
-    override val showLoading = MutableLiveData<Boolean>()
+    override val showLoading = MutableLiveData<Int>()
     override val numberOfFeedingsToday = MutableLiveData<Int>()
     override val totalCupsDispensedToday = MutableLiveData<Double>()
 

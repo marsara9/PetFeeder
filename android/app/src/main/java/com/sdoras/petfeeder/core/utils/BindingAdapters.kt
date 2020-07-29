@@ -14,7 +14,7 @@ object BindingAdapters {
             return
         }
 
-        val whole = floor(double)
+        val whole = floor(double).toInt()
         val fraction = Fraction.createFraction(double - whole)
 
         textView.text = if(whole > 0) {

@@ -1,6 +1,8 @@
 package com.sdoras.petfeeder.core.views
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,17 +39,21 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
         binding.lifecycleOwner = this
 
         viewModel.showLoading.observe(this, Observer {
-            activity?.runOnUiThread {
-                if(it) {
+            if(it > 0) {
+                Handler(Looper.getMainLooper()).post {
                     context?.let {
                         if(progressDialog == null) {
                             progressDialog = ProgressDialog(it)
                         }
                         progressDialog?.show()
                     }
-                } else {
-                    progressDialog?.dismiss()
                 }
+            } else {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if(it == 0) {
+                        progressDialog?.dismiss()
+                    }
+                }, 100)
             }
         })
 

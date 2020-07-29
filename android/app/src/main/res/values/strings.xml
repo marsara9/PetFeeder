@@ -9,6 +9,9 @@
     <string name="cancel">Cancel</string>
     <string name="loading">Loading…</string>
 
+    <string name="feedings">Feedings</string>
+    <string name="cups">Cups</string>
+
     <string name="settings_header_feeders">Feeder Settings</string>
     <string name="setting_nickname">Nickname</string>
     <string name="setting_wifi_ssid">SSID</string>
@@ -19,7 +22,8 @@
     <string name="setting_edit_name">Edit Name</string>
     <string name="setting_reset_factory">Reset to Factory Settings</string>
     <string name="setting_reset_warning">Warning! all settings will be erased!</string>
-    <string name="feedings">Feedings</string>
-    <string name="cups">Cups</string>
-
+    <string name="settings_cloud_messaging_token">Cloud Messaging Token</string>
+    <string name="settings_title_app">App Settings</string>
+    <string name="settings_title_feeder">Feeder Settings</string>
+    
 </resources>

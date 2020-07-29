@@ -7,7 +7,7 @@ import io.reactivex.rxjava3.core.Completable
 
 class HistoryViewModelImpl(private val feedingServices: FeedingServices) : ViewModel(), HistoryViewModel {
 
-    override val showLoading = MutableLiveData<Boolean>()
+    override val showLoading = MutableLiveData<Int>()
 
     init {
         refresh()

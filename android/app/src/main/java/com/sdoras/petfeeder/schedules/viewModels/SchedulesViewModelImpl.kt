@@ -7,7 +7,7 @@ import io.reactivex.rxjava3.core.Completable
 
 class SchedulesViewModelImpl(private val schedulesServices: ScheduleServices) : ViewModel(), SchedulesViewModel {
 
-    override val showLoading = MutableLiveData<Boolean>()
+    override val showLoading = MutableLiveData<Int>()
 
     init {
         refresh()

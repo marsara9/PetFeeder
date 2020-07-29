@@ -15,29 +15,71 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:orientation="vertical">
+
+        <TextView
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="@string/settings_title_app" />
 
         <include
             layout="@layout/item_simple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            bind:subtitle="@{viewModel.cloudMessagingToken}"
+            bind:title="@{@string/settings_cloud_messaging_token}" />
+
+        <TextView
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="@string/settings_title_feeder" />
+
+        <include
+            layout="@layout/item_simple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             bind:onClick="@{clickHandler::onEditSSID}"
             bind:subtitle="@{viewModel.ssid}"
             bind:title="@{@string/setting_wifi_ssid}" />
 
         <include
             layout="@layout/item_simple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             bind:onClick="@{clickHandler::onEditPassword}"
             bind:subtitle="@{@string/setting_masked_password}"
             bind:title="@{@string/setting_wifi_password}" />
 
         <include
             layout="@layout/item_simple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             bind:onClick="@{clickHandler::onEditName}"
             bind:subtitle="@{viewModel.name}"
             bind:title="@{@string/setting_nickname}" />
 
         <include
             layout="@layout/item_simple"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             bind:onClick="@{clickHandler::onResetToFactorySettings}"
             bind:subtitle="@{@string/setting_reset_warning}"
             bind:title="@{@string/setting_reset_factory}" />

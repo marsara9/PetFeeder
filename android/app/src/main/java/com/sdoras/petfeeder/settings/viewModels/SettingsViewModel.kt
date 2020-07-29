@@ -7,6 +7,7 @@ interface SettingsViewModel : BaseViewModel {
 
     val ssid : LiveData<String>
     val name : LiveData<String>
+    val cloudMessagingToken : LiveData<String>
 
     fun setWifi(ssid : String, password : String?)
 
