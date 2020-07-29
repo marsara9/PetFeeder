@@ -6,8 +6,8 @@
 struct Schedule {
     std::string id;
     const float cups;
-    const int hour;
-    const int minute;
+    const uint8_t hour;
+    const uint8_t minute;
 };
 
 #endif

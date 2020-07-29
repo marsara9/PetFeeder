@@ -6,6 +6,7 @@
 #include "dataStore.h"
 #include "scheduler.h"
 #include "timeKeeper.h"
+#include "jsonUtils.h"
 
 Settings getSettings();
 void setSettings(Settings settings);
@@ -36,6 +37,8 @@ void setup() {
     Serial.begin(115200);
     delay(10);
     Serial.print('\n');
+
+    randomSeed(analogRead(0));
 
     if(!dataStore->begin()) {
         Serial.println("SD Card initialization failed.");
@@ -152,7 +155,7 @@ Schedule getNextScheduledFeeding() {
 
 void scheduledFeed(Schedule schedule) {
     Feeding feeding = {
-        .id = "00000000-0000-0000-0000-000000000000", // TODO
+        .id =createUUID(),
         .cups = schedule.cups,
         .date = timeKeeper->now(),
     };

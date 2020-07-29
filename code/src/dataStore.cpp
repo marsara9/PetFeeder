@@ -153,8 +153,8 @@ Schedule DataStore::scheduleFromFile(fs::File file) {
     return Schedule {
         .id = std::string(file.name()),
         .cups = readBytesFromFile<float>(file),
-        .hour = readBytesFromFile<int>(file),
-        .minute = readBytesFromFile<int>(file)
+        .hour = readBytesFromFile<uint8_t>(file),
+        .minute = readBytesFromFile<uint8_t>(file)
     };
 }
 
