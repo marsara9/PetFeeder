@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.sdoras.petfeeder.settings.viewModels.SettingsViewModel" />
+
+        <variable
+            name="clickHandler"
+            type="com.sdoras.petfeeder.settings.views.SettingsClickHandler" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onEditSSID}"
+            bind:subtitle="@{viewModel.ssid}"
+            bind:title="@{@string/setting_wifi_ssid}" />
+
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onEditPassword}"
+            bind:subtitle="@{@string/setting_masked_password}"
+            bind:title="@{@string/setting_wifi_password}" />
+
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onEditName}"
+            bind:subtitle="@{viewModel.name}"
+            bind:title="@{@string/setting_nickname}" />
+
+        <include
+            layout="@layout/item_simple"
+            bind:onClick="@{clickHandler::onResetToFactorySettings}"
+            bind:subtitle="@{@string/setting_reset_warning}"
+            bind:title="@{@string/setting_reset_factory}" />
+
+    </LinearLayout>
+
+</layout>
+

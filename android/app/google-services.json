@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "522011111635",
+    "firebase_url": "https://petfeeder-20c68.firebaseio.com",
+    "project_id": "petfeeder-20c68",
+    "storage_bucket": "petfeeder-20c68.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522011111635:android:f603a4cd790c74decfe426",
+        "android_client_info": {
+          "package_name": "com.sdoras.petfeeder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "522011111635-mhikv0jkjfuee1dbhvetht4r189nnh45.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQQmed_HnL48k32ZzO5IUK2P4MAXLSRlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "522011111635-mhikv0jkjfuee1dbhvetht4r189nnh45.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
