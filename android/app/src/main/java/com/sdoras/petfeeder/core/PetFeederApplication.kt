@@ -1,6 +1,7 @@
 package com.sdoras.petfeeder.core
 
 import android.app.Application
+import com.sdoras.petfeeder.dashboard.dashboardModule
 import com.sdoras.petfeeder.history.historyModule
 import com.sdoras.petfeeder.schedules.schedulesModule
 import com.sdoras.petfeeder.settings.settingsModule
@@ -15,6 +16,7 @@ class PetFeederApplication : Application() {
         startKoin {
             androidContext(this@PetFeederApplication)
             modules(listOf(
+                    dashboardModule(),
                     settingsModule(),
                     schedulesModule(),
                     historyModule()

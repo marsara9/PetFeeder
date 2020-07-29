@@ -1,24 +1,15 @@
 package com.sdoras.petfeeder.dashboard.views
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.sdoras.petfeeder.R
+import com.sdoras.petfeeder.core.views.ClickHandler
+import com.sdoras.petfeeder.core.views.DataBoundFragment
+import com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModel
+import com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModelImpl
+import com.sdoras.petfeeder.databinding.FragmentDashboardBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-/**
- * A simple [Fragment] subclass.
- * Use the [DashboardFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class DashboardFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_dashboard, container, false)
-    }
+class DashboardFragment : DataBoundFragment<DashboardViewModel, FragmentDashboardBinding>() {
+    override val layoutId = R.layout.fragment_dashboard
+    override val viewModel by viewModel<DashboardViewModelImpl>()
+    override val clickHandler: ClickHandler<DashboardViewModel>? = null
 }

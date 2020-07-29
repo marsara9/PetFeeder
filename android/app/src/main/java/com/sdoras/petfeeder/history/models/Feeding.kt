@@ -4,6 +4,6 @@ import java.util.*
 
 data class Feeding(
         val id : String,
-        val cups : Float,
+        val cups : Double,
         val date: Date
 )

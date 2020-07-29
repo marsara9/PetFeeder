@@ -1,12 +1,11 @@
 package com.sdoras.petfeeder.settings.viewModels
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.sdoras.petfeeder.core.services.ServiceCall
+import com.sdoras.petfeeder.history.models.Feeding
 import com.sdoras.petfeeder.settings.services.SettingsServices
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 class SettingsViewModelImpl(private val settingsServices: SettingsServices) : ViewModel(), SettingsViewModel {
 
@@ -20,7 +19,7 @@ class SettingsViewModelImpl(private val settingsServices: SettingsServices) : Vi
                 .subscribe()
     }
 
-    override fun refresh() : Completable {
+    private fun refresh() : Completable {
         return settingsServices.getSettings()
                 .doOnSuccess {
                     ssid.postValue(it.ssid)
