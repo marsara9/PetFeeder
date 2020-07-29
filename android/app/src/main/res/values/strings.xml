@@ -25,5 +25,5 @@
     <string name="settings_cloud_messaging_token">Cloud Messaging Token</string>
     <string name="settings_title_app">App Settings</string>
     <string name="settings_title_feeder">Feeder Settings</string>
-    
+
 </resources>

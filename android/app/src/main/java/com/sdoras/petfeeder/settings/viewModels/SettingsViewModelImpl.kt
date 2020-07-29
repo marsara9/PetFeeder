@@ -1,6 +1,5 @@
 package com.sdoras.petfeeder.settings.viewModels
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.settings.services.SettingsDataSource
@@ -13,8 +12,11 @@ class SettingsViewModelImpl(private val settingsServices: SettingsServices, sett
     override val ssid = MutableLiveData<String>()
     override val name = MutableLiveData<String>()
     override val cloudMessagingToken = MutableLiveData<String>()
+    override val showCloudMessagingToken = MutableLiveData<Boolean>()
 
     init {
+        showCloudMessagingToken.value = true
+
         refresh()
                 .compose(applyDefaultCompletableRxSettings())
                 .subscribe()
