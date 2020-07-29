@@ -1,6 +1,7 @@
 #include "models/settings.h"
 #include "models/feeding.h"
 #include "models/schedule.h"
+#include "models/registration.h"
 #include "timeKeeper.h"
 
 #include <functional>
@@ -31,6 +32,9 @@ class WebServer {
         void onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>);
         void onAddScheduledFeeding(std::function<void(Schedule)>);
 
+        void onRegisterDevice(std::function<void(Registration)>);
+        void onDeleteRegistration(std::function<void(std::string)>);
+
     private:
         TimeKeeper* timeKeeper;
 
@@ -47,6 +51,9 @@ class WebServer {
 
         void handleGETSchedules();
         void handlePOSTSchedule();
+
+        void handlePOSTRegister();
+        void handleDELETERegister();
 };
 
 #endif

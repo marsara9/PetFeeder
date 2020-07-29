@@ -15,6 +15,8 @@ std::function<bool(float)> isValidFeedAmountCallback;
 
 std::function<std::vector<Schedule>()> onGetAllScheduledFeedingsCallback;
 std::function<void(Schedule)> onAddScheduledFeedingCallback;
+std::function<void(Registration)> onRegisterDeviceCallback;
+std::function<void(std::string)> onDeleteRegistrationCallback;
 
 const char* CONTENT_TYPE = "application/json";
 
@@ -36,10 +38,15 @@ void WebServer::startServer() {
     server->onNotFound(std::bind(&WebServer::handleNotFound, this));
     server->on("/settings", HTTP_GET, std::bind(&WebServer::handleGETSettings, this));
     server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
+
     server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
+
     server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
     server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));
+
+    server->on("/register", HTTP_POST, std::bind(&WebServer::handlePOSTRegister, this));
+    server->on("/register", HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
 }
 
 void WebServer::handleClient() {
@@ -72,6 +79,14 @@ void WebServer::onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>
 
 void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
     onAddScheduledFeedingCallback = callback;
+}
+
+void WebServer::onRegisterDevice(std::function<void(Registration)> callback) {
+    onRegisterDeviceCallback = callback;
+}
+
+void WebServer::onDeleteRegistration(std::function<void(std::string)> callback) {
+    onDeleteRegistrationCallback = callback;
 }
 
 void WebServer::printRequest() {
@@ -203,4 +218,25 @@ void WebServer::handlePOSTSchedule() {
     sendResponse(HTTP_OK, CONTENT_TYPE, scheduleToJson(schedule));
 
     onAddScheduledFeedingCallback(schedule);
+}
+
+void WebServer::handlePOSTRegister() {
+    printRequest();
+
+    const char* json = server->arg("plain").c_str();
+
+    onRegisterDeviceCallback(registrationFromJson(json));
+
+    sendResponse(HTTP_CREATED, CONTENT_TYPE);
+}
+
+void WebServer::handleDELETERegister() {
+    printRequest();
+
+    std::string id;
+    
+    onDeleteRegistrationCallback(id);
+
+    sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
+
 }

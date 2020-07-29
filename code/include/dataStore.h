@@ -1,10 +1,12 @@
 #include "models/feeding.h"
 #include "models/schedule.h"
 #include "models/settings.h"
+#include "models/registration.h"
 
 #include <FS.h>
 #include <vector>
 #include <functional>
+#include <string>
 
 #ifndef PET_DATASTORE
 #define PET_DATASTORE
@@ -17,17 +19,20 @@ public:
     void put(Feeding);
     void put(Schedule);
     void put(Settings);
+    void putRegistration(Registration);
 
     std::vector<Feeding> getAllFeedings();
     std::vector<Schedule> getAllSchedules();
+    std::vector<Registration> getAllRegisteredDevices();
 
-    Feeding getFeeding(std::string id);
-    Schedule getSchedule(std::string id);
     Settings getSettings();
+
+    void deleteRegistration(std::string id);
 
     void deleteAllFeedings();
     void deleteAllSchedules();
     void deleteSettings();
+    void deleteAllRegisteredDevices();
     
     void restoreToFactoryDefaults();
 private:
@@ -40,10 +45,12 @@ private:
     Feeding feedingFromFile(fs::File);
     Schedule scheduleFromFile(fs::File);
     Settings settingsFromFile(fs::File);
+    Registration registrationFromFile(fs::File);
 
     void feedingToFile(Feeding, fs::File);
     void scheduleToFile(Schedule, fs::File);
     void settingsToFile(Settings, fs::File);
+    void registrationToFile(Registration, fs::File);
 
     Settings getFactoryDefaultSettings();
 };

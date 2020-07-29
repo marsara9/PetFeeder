@@ -33,6 +33,10 @@ std::string settingsToJson(Settings settings) {
     return "{ \"ssid\" : \"" + settings.ssid + "\", \"name\" : \"" + settings.name + "\" }";
 }
 
+Registration registrationFromJson(std::string json) {
+    // TODO
+}
+
 std::string createUUID() {
     uint8_t bytes[16];
     for(int i = 0; i < 16; i++) {

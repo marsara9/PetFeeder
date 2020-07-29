@@ -83,6 +83,11 @@ void DataStore::put(Settings settings) {
     save(settings, "0", "", func);
 }
 
+void DataStore::putRegistration(Registration registration) {
+    std::function<void(Registration, fs::File)> func = std::bind(&DataStore::registrationToFile, this, std::placeholders::_1, std::placeholders::_2);
+    save(registration, registration.id, "registrations", func);
+}
+
 std::vector<Feeding> DataStore::getAllFeedings() {
     std::function<Feeding(fs::File)> func = std::bind(&DataStore::feedingFromFile, this, std::placeholders::_1);
     return enumerateFiles("feedings", func);
@@ -93,14 +98,9 @@ std::vector<Schedule> DataStore::getAllSchedules() {
     return enumerateFiles("schedules", func);
 }
 
-Feeding DataStore::getFeeding(std::string id) {
-    std::function<Feeding(fs::File)> func = std::bind(&DataStore::feedingFromFile, this, std::placeholders::_1);
-    return read(id, "feedings", func);
-}
-
-Schedule DataStore::getSchedule(std::string id) {
-    std::function<Schedule(fs::File)> func = std::bind(&DataStore::scheduleFromFile, this, std::placeholders::_1);
-    return read(id, "schedules", func);
+std::vector<Registration> DataStore::getAllRegisteredDevices() {
+    std::function<Registration(fs::File)> func = std::bind(&DataStore::registrationFromFile, this, std::placeholders::_1);
+    return enumerateFiles("registrations", func);
 }
 
 Settings DataStore::getSettings() {
@@ -114,6 +114,10 @@ Settings DataStore::getSettings() {
         put(settings);
         return settings;
     }
+}
+
+void DataStore::deleteRegistration(std::string id) {
+    SD.remove(("registrations/" + id).c_str());
 }
 
 void DataStore::deleteAllFeedings() {
@@ -130,6 +134,13 @@ void DataStore::deleteAllSchedules() {
     });
 }
 
+void DataStore::deleteAllRegisteredDevices() {
+    enumerateFiles<void*>("registrations", [](fs::File file){
+        SD.remove(file.fullName());
+        return nullptr;
+    });
+}
+
 void DataStore::deleteSettings() {
     SD.remove("0");
     put(getFactoryDefaultSettings());
@@ -138,6 +149,7 @@ void DataStore::deleteSettings() {
 void DataStore::restoreToFactoryDefaults() {
     deleteAllFeedings();
     deleteAllSchedules();
+    deleteAllRegisteredDevices();
     deleteSettings();
 }
 
@@ -155,6 +167,14 @@ Schedule DataStore::scheduleFromFile(fs::File file) {
         .cups = readBytesFromFile<float>(file),
         .hour = readBytesFromFile<uint8_t>(file),
         .minute = readBytesFromFile<uint8_t>(file)
+    };
+}
+
+Registration DataStore::registrationFromFile(fs::File file) {    
+    return Registration {
+        .id = std::string(file.name()),
+        .token = std::string(file.readStringUntil('\n').c_str()),
+        .deviceType = std::string(file.readStringUntil('\n').c_str())
     };
 }
 
@@ -177,12 +197,20 @@ void DataStore::scheduleToFile(Schedule schedule, fs::File file) {
     writeBytesToFile(file, schedule.minute);
 }
 
+void DataStore::registrationToFile(Registration registration, fs::File file) {
+    file.write(registration.token.c_str());
+    file.write("\n");
+    file.write(registration.deviceType.c_str());
+    file.write("\n");
+}
+
 void DataStore::settingsToFile(Settings settings, fs::File file) {
     file.write(settings.ssid.c_str());
     file.write("\n");
     file.write(settings.password.c_str());
     file.write("\n");
     file.write(settings.name.c_str());
+    file.write("\n");
 }
 
 Settings DataStore::getFactoryDefaultSettings() {

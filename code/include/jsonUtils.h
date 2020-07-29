@@ -2,6 +2,7 @@
 #include "models/feeding.h"
 #include "models/schedule.h"
 #include "models/settings.h"
+#include "models/registration.h"
 
 #include <string>
 #include <vector>
@@ -28,6 +29,8 @@ template<typename T> std::string toJsonArray(std::vector<T> items, std::function
 std::string feedingToJson(Feeding feeding);
 std::string scheduleToJson(Schedule schedule);
 std::string settingsToJson(Settings settings);
+
+Registration registrationFromJson(std::string json);
 
 std::string createUUID();
 
