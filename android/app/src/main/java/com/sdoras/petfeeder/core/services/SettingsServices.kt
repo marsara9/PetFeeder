@@ -1,6 +1,6 @@
-package com.sdoras.petfeeder.settings.services
+package com.sdoras.petfeeder.core.services
 
-import com.sdoras.petfeeder.settings.models.Settings
+import com.sdoras.petfeeder.core.models.Settings
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.DELETE

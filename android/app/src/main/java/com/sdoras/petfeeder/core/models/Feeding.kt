@@ -1,9 +1,9 @@
-package com.sdoras.petfeeder.history.models
+package com.sdoras.petfeeder.core.models
 
 import java.util.*
 
 data class Feeding(
-        val id : String,
+        val id : UUID,
         val cups : Double,
         val date: Date
 )

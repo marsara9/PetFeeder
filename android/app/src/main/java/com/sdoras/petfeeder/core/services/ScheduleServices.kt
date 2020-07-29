@@ -1,6 +1,6 @@
-package com.sdoras.petfeeder.schedules.services
+package com.sdoras.petfeeder.core.services
 
-import com.sdoras.petfeeder.schedules.models.ScheduledFeeding
+import com.sdoras.petfeeder.core.models.ScheduledFeeding
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET

@@ -1,7 +1,5 @@
 package com.sdoras.petfeeder.history
 
-import com.sdoras.petfeeder.core.services.ServiceCall
-import com.sdoras.petfeeder.history.services.FeedingServices
 import com.sdoras.petfeeder.history.viewModels.HistoryViewModelImpl
 import com.sdoras.petfeeder.history.views.HistoryClickHandler
 import com.sdoras.petfeeder.history.views.HistoryClickHandlerImpl
@@ -11,7 +9,6 @@ import org.koin.dsl.module
 
 fun historyModule() : Module {
     return module {
-        single { ServiceCall("http://192.168.86.204").create(FeedingServices::class.java) }
         viewModel { HistoryViewModelImpl(get()) }
         single<HistoryClickHandler> { args -> HistoryClickHandlerImpl(args[0]) }
     }

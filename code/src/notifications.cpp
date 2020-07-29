@@ -55,23 +55,15 @@ std::string Notifications::createNotification(Settings settings, Feeding feeding
 }
 
 void Notifications::sendFCMNotification(std::string token, std::string message) {
-    std::stringstream ss;
-    ss << "{";
-    ss << "\"to\": \"" << token << "\",";
-    ss << "\"notification\": {";
-    ss << "\"body\": \"" << message << "\",";
-    ss << "\"title\": \"PetFeeder\",";
-    ss << "}";
-    ss << "}";
 
-    const char* payload = ss.str().c_str();
+    std::string payload = "{ \"to\": \"" + token + "\", \"notification\": { \"body\": \"" + message + "\", \"title\": \"PetFeeder\" } }";
 
     WiFiClient client;
 
     http.begin(client, url);
     http.addHeader("Authorization", ("key=" + authorizationKey).c_str());
     http.addHeader("Content-Type", "application/json");
-    int code = http.POST(payload);
+    int code = http.POST(payload.c_str());
     const char* response = http.getString().c_str();
     http.end();
 
@@ -79,7 +71,8 @@ void Notifications::sendFCMNotification(std::string token, std::string message) 
     Serial.print("POST");
     Serial.print(" ");
     Serial.println(url);
-    Serial.println(payload);
+    Serial.print("\t");
+    Serial.println(payload.c_str());
 
     Serial.print("RESPONSE: ");
     Serial.print(code);

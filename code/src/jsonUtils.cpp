@@ -3,8 +3,8 @@
 #include <time.h>
 #include <stdio.h>
 #include <sstream>
-#include <random>
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 std::string feedingToJson(Feeding feeding) {
 
@@ -29,12 +29,29 @@ std::string scheduleToJson(Schedule schedule) {
     return "{ \"id\" : \"" + schedule.id + "\", \"cups\" : " + cupsString + ", \"time\" : \"" + ss.str() + "\" }";
 }
 
+std::string registrationToJson(Registration registration) {
+    return "{ \"id\" : \"" + registration.id + "\", \"token\" : " + registration.token + ", \"deviceType\" : \"" +registration.deviceType + "\" }";
+}
+
 std::string settingsToJson(Settings settings) {
     return "{ \"ssid\" : \"" + settings.ssid + "\", \"name\" : \"" + settings.name + "\" }";
 }
 
 Registration registrationFromJson(std::string json) {
-    // TODO
+
+    StaticJsonBuffer<512> jsonBuffer;
+
+    JsonObject& parsed = jsonBuffer.parseObject(json.c_str());
+
+    std::string id = parsed["id"].as<char*>();
+    std::string token = parsed["token"].as<char*>();
+    std::string deviceType = parsed["deviceType"].as<char*>();
+
+    return Registration {
+        .id = id,
+        .token = token,
+        .deviceType = deviceType
+    };
 }
 
 std::string createUUID() {

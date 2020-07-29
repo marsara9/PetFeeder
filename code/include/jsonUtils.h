@@ -28,6 +28,7 @@ template<typename T> std::string toJsonArray(std::vector<T> items, std::function
 
 std::string feedingToJson(Feeding feeding);
 std::string scheduleToJson(Schedule schedule);
+std::string registrationToJson(Registration registration);
 std::string settingsToJson(Settings settings);
 
 Registration registrationFromJson(std::string json);

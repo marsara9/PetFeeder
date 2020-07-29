@@ -2,7 +2,7 @@ package com.sdoras.petfeeder.schedules.viewModels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.sdoras.petfeeder.schedules.services.ScheduleServices
+import com.sdoras.petfeeder.core.services.ScheduleServices
 import io.reactivex.rxjava3.core.Completable
 
 class SchedulesViewModelImpl(private val schedulesServices: ScheduleServices) : ViewModel(), SchedulesViewModel {

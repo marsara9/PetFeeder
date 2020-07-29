@@ -1,6 +1,8 @@
 #include "webserver.h"
 #include "jsonUtils.h"
 
+#include <uri/UriBraces.h>
+
 #include <ESP8266WebServer.h>
 #include <string>
 
@@ -46,7 +48,7 @@ void WebServer::startServer() {
     server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));    
 
     server->on("/register", HTTP_POST, std::bind(&WebServer::handlePOSTRegister, this));
-    server->on("/register", HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
+    server->on(UriBraces("/register/{}"), HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
 }
 
 void WebServer::handleClient() {
@@ -225,15 +227,17 @@ void WebServer::handlePOSTRegister() {
 
     const char* json = server->arg("plain").c_str();
 
+    Serial.print(json);
+
     onRegisterDeviceCallback(registrationFromJson(json));
 
-    sendResponse(HTTP_CREATED, CONTENT_TYPE);
+    sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
 }
 
 void WebServer::handleDELETERegister() {
     printRequest();
 
-    std::string id;
+    std::string id = server->pathArg(0).c_str();
     
     onDeleteRegistrationCallback(id);
 
