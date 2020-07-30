@@ -4,7 +4,7 @@
 #include "models/settings.h"
 
 #include <ESP8266HTTPClient.h>
-#include <ESP8266WiFi.h>
+#include <WiFiClientSecureBearSSL.h>
 #include <stdio.h>
 #include <sstream>
 
@@ -16,9 +16,9 @@
 //     }
 // }
 
-HTTPClient http;
 const char* url = "https://fcm.googleapis.com/fcm/send";
 std::function<std::vector<Registration>()> onGetAllRegisteredDevicesCallback;
+const uint8_t fingerprint[20] = {0x41, 0x2a, 0x92, 0xb9, 0x66, 0x42, 0x21, 0xd6, 0xc9, 0x91, 0x39, 0x39, 0xc6, 0x03, 0x5b, 0x1d, 0x93, 0x0e, 0x0c, 0x50};
 
 Notifications::Notifications() {
 
@@ -58,14 +58,10 @@ void Notifications::sendFCMNotification(std::string token, std::string message) 
 
     std::string payload = "{ \"to\": \"" + token + "\", \"notification\": { \"body\": \"" + message + "\", \"title\": \"PetFeeder\" } }";
 
-    WiFiClient client;
+    HTTPClient http;
+    BearSSL::WiFiClientSecure client;
 
-    http.begin(client, url);
-    http.addHeader("Authorization", ("key=" + authorizationKey).c_str());
-    http.addHeader("Content-Type", "application/json");
-    int code = http.POST(payload.c_str());
-    const char* response = http.getString().c_str();
-    http.end();
+    client.setFingerprint(fingerprint);
 
     Serial.print("REQUEST: ");
     Serial.print("POST");
@@ -74,8 +70,24 @@ void Notifications::sendFCMNotification(std::string token, std::string message) 
     Serial.print("\t");
     Serial.println(payload.c_str());
 
+    http.begin(client, url);
+    http.addHeader("Authorization", ("key=" + authorizationKey).c_str());
+    http.addHeader("Content-Type", "application/json");
+
+    int code = http.POST(payload.c_str());
+
     Serial.print("RESPONSE: ");
     Serial.print(code);
-    Serial.print(" ");
-    Serial.println(response);
+    if(code > 0) {
+
+        const char* response = http.getString().c_str();
+
+        Serial.print(" ");
+        Serial.println(response);
+    } else {
+        Serial.println(http.errorToString(code));
+    }
+    http.end();
+
+    
 }
