@@ -228,7 +228,7 @@ Settings DataStore::getFactoryDefaultSettings() {
     return Settings {
         .ssid = std::string(""),
         .password = std::string(""),
-        .name = std::string("ESP8266_"+random(9999)),
+        .name = std::string("PetFeeder_"+random(9999)),
         .fcm_fingerprint = {0x41, 0x2a, 0x92, 0xb9, 0x66, 0x42, 0x21, 0xd6, 0xc9, 0x91, 0x39, 0x39, 0xc6, 0x03, 0x5b, 0x1d, 0x93, 0x0e, 0x0c, 0x50}
     };
 }

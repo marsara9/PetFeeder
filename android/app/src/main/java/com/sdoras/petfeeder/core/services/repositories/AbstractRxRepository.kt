@@ -8,7 +8,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
-abstract class AbstractRxRepository<S, T>(private val feederUrlRepository: FeederUrlRepository) : AbstractRepository<T>() {
+abstract class AbstractRxRepository<S, T>(private val feederUrlRepository: FeederUrlRepository) : Repository<T> {
 
     private val subject = BehaviorSubject.create<T>()
     protected var service : S? = null
@@ -22,14 +22,9 @@ abstract class AbstractRxRepository<S, T>(private val feederUrlRepository: Feede
                 .subscribe()
     }
 
-    final override fun setFeederUrl(url : String) {
-        feederUrlRepository.setFeederUrl(url)
-    }
-
     fun refresh() : Completable {
-        return service?.let {
-            getServiceCall(it)
-        }?.observeOn(AndroidSchedulers.mainThread())
+        return service?.let(this::getServiceCall)
+                ?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribeOn(Schedulers.io())
                 ?.doOnSuccess { subject.onNext(it) }
                 ?.doOnError { subject.onError(it) }
@@ -38,7 +33,7 @@ abstract class AbstractRxRepository<S, T>(private val feederUrlRepository: Feede
     }
 
     final override fun get() : Observable<T> {
-        return subject
+        return subject.distinctUntilChanged()
     }
 
     protected abstract fun getServiceClass() : Class<S>

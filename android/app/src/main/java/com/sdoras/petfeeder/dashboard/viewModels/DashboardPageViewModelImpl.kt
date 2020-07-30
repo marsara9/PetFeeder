@@ -5,10 +5,13 @@ import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.core.models.Registration
 import com.sdoras.petfeeder.core.services.NotificationServices
 import com.sdoras.petfeeder.core.services.RegistrationServices
+import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 
 class DashboardPageViewModelImpl(
+        feederFinderRepository: FeederFinderRepository,
+        feederUrlRepository: FeederUrlRepository,
         settingsRepository : SettingsRepository,
         registrationServices : RegistrationServices,
         notificationServices: NotificationServices
@@ -19,7 +22,8 @@ class DashboardPageViewModelImpl(
 
     init {
 
-        settingsRepository.setFeederUrl("http://192.168.86.204")
+        feederFinderRepository.get()
+                .subscribe()
 
         settingsRepository.get()
                 .subscribe({

@@ -8,7 +8,7 @@ import org.koin.dsl.module
 
 fun dashboardModule() : Module {
     return module {
-        viewModel { DashboardViewModelImpl(get()) }
-        viewModel { DashboardPageViewModelImpl(get(), get(), get()) }
+        viewModel { DashboardViewModelImpl(get(), get(), get()) }
+        viewModel { DashboardPageViewModelImpl(get(), get(), get(), get(), get()) }
     }
 }

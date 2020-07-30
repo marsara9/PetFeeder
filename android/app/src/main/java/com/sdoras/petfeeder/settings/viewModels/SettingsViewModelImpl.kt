@@ -4,8 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.core.services.NotificationServices
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 class SettingsViewModelImpl(
         private val settingsRepository: SettingsRepository,
