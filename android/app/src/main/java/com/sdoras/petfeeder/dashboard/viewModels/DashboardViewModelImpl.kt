@@ -4,5 +4,5 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class DashboardViewModelImpl() : ViewModel(), DashboardViewModel {
-    override val showLoading = MutableLiveData<Boolean>()
+    override val showLoading = MutableLiveData<Int>()
 }

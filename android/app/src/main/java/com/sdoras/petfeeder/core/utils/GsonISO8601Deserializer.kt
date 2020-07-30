@@ -1,4 +1,4 @@
-package com.sdoras.petfeeder.core.services
+package com.sdoras.petfeeder.core.utils
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

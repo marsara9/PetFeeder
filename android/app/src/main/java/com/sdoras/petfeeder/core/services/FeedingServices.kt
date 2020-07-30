@@ -1,6 +1,6 @@
-package com.sdoras.petfeeder.history.services
+package com.sdoras.petfeeder.core.services
 
-import com.sdoras.petfeeder.history.models.Feeding
+import com.sdoras.petfeeder.core.models.Feeding
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET

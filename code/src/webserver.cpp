@@ -1,8 +1,11 @@
 #include "webserver.h"
 #include "jsonUtils.h"
 
+#include <uri/UriBraces.h>
+
 #include <ESP8266WebServer.h>
 #include <string>
+#include <math.h>
 
 ESP8266WebServer *server = nullptr;
 
@@ -15,6 +18,8 @@ std::function<bool(float)> isValidFeedAmountCallback;
 
 std::function<std::vector<Schedule>()> onGetAllScheduledFeedingsCallback;
 std::function<void(Schedule)> onAddScheduledFeedingCallback;
+std::function<void(Registration)> onRegisterDeviceCallback;
+std::function<void(std::string)> onDeleteRegistrationCallback;
 
 const char* CONTENT_TYPE = "application/json";
 
@@ -36,10 +41,15 @@ void WebServer::startServer() {
     server->onNotFound(std::bind(&WebServer::handleNotFound, this));
     server->on("/settings", HTTP_GET, std::bind(&WebServer::handleGETSettings, this));
     server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
+
     server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
+
     server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
-    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));
+    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));    
+
+    server->on("/register", HTTP_POST, std::bind(&WebServer::handlePOSTRegister, this));
+    server->on(UriBraces("/register/{}"), HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
 }
 
 void WebServer::handleClient() {
@@ -72,6 +82,14 @@ void WebServer::onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>
 
 void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
     onAddScheduledFeedingCallback = callback;
+}
+
+void WebServer::onRegisterDevice(std::function<void(Registration)> callback) {
+    onRegisterDeviceCallback = callback;
+}
+
+void WebServer::onDeleteRegistration(std::function<void(std::string)> callback) {
+    onDeleteRegistrationCallback = callback;
 }
 
 void WebServer::printRequest() {
@@ -108,16 +126,25 @@ void WebServer::handlePUTSettings() {
     const char* ssid = server->arg("ssid").c_str();
     const char* password = server->arg("password").c_str();
     const char* name = server->arg("name").c_str();
+    const char* fcm = server->arg("fcm_fingerprint").c_str();
 
     sendResponse(HTTP_NO_CONTENT);
 
     delay(100);
 
-    onSettingsChangedCallback({
+    Settings settings = {
         .ssid = ssid,
         .password = password,
         .name = name
-    });
+    };
+
+    for(unsigned int i = 0; i < min<unsigned int>(strlen(fcm), sizeof(settings.fcm_fingerprint)*2); i+=2) {
+        char byteString[] = { fcm[i], fcm[i+1] };
+        uint8_t byte = (uint8_t) strtol(byteString, nullptr, 16);
+        settings.fcm_fingerprint[i/2] = byte;
+    }
+
+    onSettingsChangedCallback(settings);
 }
 
 void WebServer::handleGETFeed() {
@@ -196,11 +223,33 @@ void WebServer::handlePOSTSchedule() {
     Schedule schedule = {
         .id = createUUID(),
         .cups = cups,
-        .hour = hour,
-        .minute = minute
+        .hour = (uint8_t)hour,
+        .minute = (uint8_t)minute
     };
 
     sendResponse(HTTP_OK, CONTENT_TYPE, scheduleToJson(schedule));
 
     onAddScheduledFeedingCallback(schedule);
+}
+
+void WebServer::handlePOSTRegister() {
+    printRequest();
+
+    const char* json = server->arg("plain").c_str();
+
+    Serial.print(json);
+
+    onRegisterDeviceCallback(registrationFromJson(json));
+
+    sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
+}
+
+void WebServer::handleDELETERegister() {
+    printRequest();
+
+    std::string id = server->pathArg(0).c_str();
+    
+    onDeleteRegistrationCallback(id);
+
+    sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
 }

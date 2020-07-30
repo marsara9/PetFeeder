@@ -2,6 +2,7 @@ package com.sdoras.petfeeder.core.services
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.sdoras.petfeeder.core.utils.GsonISO8601Deserializer
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -15,7 +16,7 @@ class ServiceCall(baseUrl : String) {
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .build()
 
-    fun gson() : Gson {
+    private fun gson() : Gson {
         return GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .registerTypeAdapter(Date::class.java, GsonISO8601Deserializer())

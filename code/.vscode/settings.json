@@ -36,6 +36,17 @@
         "typeinfo": "cpp",
         "string": "cpp",
         "memory": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "chrono": "cpp",
+        "complex": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "iomanip": "cpp",
+        "iostream": "cpp",
+        "mutex": "cpp",
+        "ratio": "cpp",
+        "system_error": "cpp",
+        "algorithm": "cpp",
+        "*.inc": "cpp"
     }
 }

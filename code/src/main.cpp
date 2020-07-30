@@ -7,6 +7,7 @@
 #include "scheduler.h"
 #include "timeKeeper.h"
 #include "jsonUtils.h"
+#include "notifications.h"
 
 Settings getSettings();
 void setSettings(Settings settings);
@@ -22,14 +23,16 @@ void addScheduledFeeding(Schedule schedule);
 const float MINIMUM_DISPENCE_AMOUNT = 0.125;
 const int CONTAINERS_PER_ROTATION = 2;
 bool timeKeeperAvailable = false;
+const char* notificationsAuthorizationKey = "AAAAeYpJcNM:APA91bFW0WSI91TuBrMvtgt3ZmRwlKOnXR4raZKxMiwWuW1Ps1-rb53FSQ9IC9OJMvWAsIVkFPjYtcO7tb3wFIDm_TGXRtCoEh__pI_esTSglCDiwFKcXl-87Zw4dBP1rizDf6tvmn0-";
 
 TimeKeeper *timeKeeper = new TimeKeeper();
 
 WiFiConnection* wifi = new WiFiConnection();
-WebServer *webServer = new WebServer(80, timeKeeper);
-MotorControl *motorControl = new MotorControl(CONTAINERS_PER_ROTATION);
-DataStore *dataStore = new DataStore();
-Scheduler *scheduler = new Scheduler(timeKeeper);
+WebServer* webServer = new WebServer(80, timeKeeper);
+MotorControl* motorControl = new MotorControl(CONTAINERS_PER_ROTATION);
+DataStore* dataStore = new DataStore();
+Scheduler* scheduler = new Scheduler(timeKeeper);
+Notifications* notifications = new Notifications();
 
 Settings _settings;
 
@@ -57,6 +60,9 @@ void setup() {
 
     timeKeeper->begin();
 
+    notifications->begin(notificationsAuthorizationKey);
+    notifications->onGetAllRegisteredDevices(std::bind(&DataStore::getAllRegisteredDevices, dataStore));
+
     webServer->onGetSettings(getSettings);
     webServer->onSettingsChanged(setSettings);
     
@@ -66,6 +72,9 @@ void setup() {
 
     webServer->onGetAllScheduledFeedings(std::bind(&DataStore::getAllSchedules, dataStore));
     webServer->onAddScheduledFeeding(addScheduledFeeding);
+
+    webServer->onRegisterDevice(std::bind(&DataStore::putRegistration, dataStore, std::placeholders::_1));
+    webServer->onDeleteRegistration(std::bind(&DataStore::deleteRegistration, dataStore, std::placeholders::_1));
 
     webServer->startServer();
 }
@@ -104,11 +113,27 @@ void setSettings(Settings settings) {
         password = "";
     }
 
+    uint8_t fcm[sizeof(_settings.fcm_fingerprint)];
+    memcpy(fcm, _settings.fcm_fingerprint, sizeof(fcm));
+
     _settings = {
         .ssid = ssid,
         .password = password,
         .name = name
     };
+
+    bool isFCMEmpty = true;
+    for(unsigned int i = 0; i < sizeof(settings.fcm_fingerprint); i++) {
+        if(settings.fcm_fingerprint[i] != 0) {
+            isFCMEmpty = false;
+            break;
+        }
+    }
+    if(isFCMEmpty) {
+        memcpy(_settings.fcm_fingerprint, fcm, sizeof(_settings.fcm_fingerprint));
+    } else {
+        memcpy(_settings.fcm_fingerprint, settings.fcm_fingerprint, sizeof(_settings.fcm_fingerprint));
+    }
     
     dataStore->put(_settings);
     wifi->begin(_settings);
@@ -129,6 +154,8 @@ void feed(Feeding feeding) {
         delay(1000);
     }
     Serial.println();
+
+    notifications->send(_settings, feeding);
 
     dataStore->put(feeding);
 }

@@ -1,6 +1,6 @@
-package com.sdoras.petfeeder.settings.services
+package com.sdoras.petfeeder.core.services
 
-import com.sdoras.petfeeder.settings.models.Settings
+import com.sdoras.petfeeder.core.models.Settings
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.DELETE
@@ -16,7 +16,9 @@ interface SettingsServices {
     @PUT("settings")
     fun setSettings(@Query("ssid") ssid : String? = null,
                     @Query("password") password : String? = null,
-                    @Query("name") name: String? = null) : Completable
+                    @Query("name") name: String? = null,
+                    @Query("fcm_fingerprint") fingerprint : String? = null
+    ) : Completable
 
     @DELETE("settings")
     fun deleteSettings() : Completable

@@ -1,4 +1,4 @@
-package com.sdoras.petfeeder.settings.models
+package com.sdoras.petfeeder.core.models
 
 data class Settings(
         val ssid : String,

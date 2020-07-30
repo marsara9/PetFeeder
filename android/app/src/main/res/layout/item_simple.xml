@@ -3,13 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View" />
-
         <variable name="title" type="String" />
         <variable name="subtitle" type="String" />
-        <variable name="onClick"
-            type="kotlin.jvm.functions.Function1&lt;android.view.View, kotlin.Unit>" />
-
+        <variable name="onClick" type="kotlin.jvm.functions.Function1&lt;android.view.View, kotlin.Unit>" />
     </data>
 
     <LinearLayout
@@ -34,6 +30,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@{subtitle}"
             android:textAppearance="?attr/textAppearanceListItemSecondary"
             tools:text="Subtitle" />

@@ -2,19 +2,32 @@ package com.sdoras.petfeeder.settings.viewModels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.sdoras.petfeeder.settings.services.SettingsServices
+import com.sdoras.petfeeder.core.services.NotificationServices
+import com.sdoras.petfeeder.core.services.SettingsServices
 import io.reactivex.rxjava3.core.Completable
 
-class SettingsViewModelImpl(private val settingsServices: SettingsServices) : ViewModel(), SettingsViewModel {
+class SettingsViewModelImpl(private val settingsServices: SettingsServices, notificationServices: NotificationServices) : ViewModel(), SettingsViewModel {
 
-    override val showLoading = MutableLiveData<Boolean>()
+    override val showLoading = MutableLiveData<Int>()
     override val ssid = MutableLiveData<String>()
     override val name = MutableLiveData<String>()
+    override val cloudMessagingToken = MutableLiveData<String>()
+    override val showCloudMessagingToken = MutableLiveData<Boolean>()
 
     init {
+        showCloudMessagingToken.value = true
+
         refresh()
                 .compose(applyDefaultCompletableRxSettings())
                 .subscribe()
+
+        notificationServices.getCloudMessagingToken()
+                .compose(applyDefaultSingleRxSettings())
+                .subscribe({
+                    cloudMessagingToken.value = it
+                }, {
+
+                })
     }
 
     private fun refresh() : Completable {
