@@ -5,6 +5,7 @@ import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 
 interface DashboardViewModel : BaseViewModel {
     val feeders : LiveData<Set<String>>
+    val isLoading : LiveData<Boolean>
     val numberOfFeedingsToday : LiveData<Int>
     val totalCupsDispensedToday : LiveData<Double>
 

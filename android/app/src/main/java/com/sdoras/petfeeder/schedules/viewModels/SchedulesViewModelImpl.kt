@@ -1,17 +1,14 @@
 package com.sdoras.petfeeder.schedules.viewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.core.services.repositories.ScheduleRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
 class SchedulesViewModelImpl(
         schedulesRepository: ScheduleRepository
-) : ViewModel(), SchedulesViewModel {
-
-    override val showLoading = MutableLiveData<Int>()
+) : AbstractViewModel(), SchedulesViewModel {
 
     init {
-        schedulesRepository.get()
-                .subscribe()
+        disposables.add(schedulesRepository.get()
+                .subscribe())
     }
 }

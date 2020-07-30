@@ -1,16 +1,15 @@
 package com.sdoras.petfeeder.settings.viewModels
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.core.services.NotificationServices
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
 class SettingsViewModelImpl(
         private val settingsRepository: SettingsRepository,
         notificationServices: NotificationServices
-) : ViewModel(), SettingsViewModel {
+) : AbstractViewModel(), SettingsViewModel {
 
-    override val showLoading = MutableLiveData<Int>()
     override val ssid = MutableLiveData<String>()
     override val name = MutableLiveData<String>()
     override val cloudMessagingToken = MutableLiveData<String>()
@@ -19,38 +18,38 @@ class SettingsViewModelImpl(
     init {
         showCloudMessagingToken.value = true
 
-        settingsRepository.get()
+        disposables.add(settingsRepository.get()
                 .subscribe({
                     ssid.value = it.ssid
                     name.value = it.name
                 }, {
 
-                })
+                }))
 
-        notificationServices.getCloudMessagingToken()
+        disposables.add(notificationServices.getCloudMessagingToken()
                 .compose(applyDefaultSingleRxSettings())
                 .subscribe({
                     cloudMessagingToken.value = it
                 }, {
 
-                })
+                }))
     }
 
     override fun setWifi(ssid: String, password: String?) {
-        settingsRepository.setWiFiSettings(ssid, password)
+        disposables.add(settingsRepository.setWiFiSettings(ssid, password)
                 ?.andThen(settingsRepository.refresh())
-                ?.subscribe()
+                ?.subscribe())
     }
 
     override fun setName(name: String) {
-        settingsRepository.setFeederName(name)
+        disposables.add(settingsRepository.setFeederName(name)
                 ?.andThen(settingsRepository.refresh())
-                ?.subscribe()
+                ?.subscribe())
     }
 
     override fun restoreFactoryDefaults() {
-        settingsRepository.deleteSettings()
+        disposables.add(settingsRepository.deleteSettings()
                 ?.andThen(settingsRepository.refresh())
-                ?.subscribe()
+                ?.subscribe())
     }
 }

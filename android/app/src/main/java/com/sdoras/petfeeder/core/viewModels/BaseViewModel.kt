@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.core.SingleTransformer
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 interface BaseViewModel {
+
     val showLoading : MutableLiveData<Int>
 
     fun applyCompletableShowLoading() : CompletableTransformer {

@@ -8,7 +8,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.net.InetAddress
 
-class FeederFinderRepository(context: Context) : Repository<Map<String, InetAddress>> {
+class FeederFinderRepository(context: Context) : Repository<Set<String>> {
 
     private val discoveryListener = object : NsdManager.DiscoveryListener {
         override fun onServiceFound(serviceInfo: NsdServiceInfo?) {
@@ -65,7 +65,11 @@ class FeederFinderRepository(context: Context) : Repository<Map<String, InetAddr
         nsdManager.discoverServices("_petfeeder._tcp", NsdManager.PROTOCOL_DNS_SD, discoveryListener)
     }
 
-    override fun get(): Observable<Map<String, InetAddress>> {
-        return subject
+    override fun get(): Observable<Set<String>> {
+        return subject.map { map ->
+            map.values.map {
+                "http://${it.hostAddress}"
+            }
+        }.map { it.toSet() }
     }
 }

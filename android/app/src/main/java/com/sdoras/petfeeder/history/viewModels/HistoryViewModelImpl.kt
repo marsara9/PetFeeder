@@ -1,17 +1,14 @@
 package com.sdoras.petfeeder.history.viewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
 class HistoryViewModelImpl(
         feedingRepository: FeedingRepository
-) : ViewModel(), HistoryViewModel {
-
-    override val showLoading = MutableLiveData<Int>()
+) : AbstractViewModel(), HistoryViewModel {
 
     init {
-        feedingRepository.get()
-                .subscribe()
+        disposables.add(feedingRepository.get()
+                .subscribe())
     }
 }

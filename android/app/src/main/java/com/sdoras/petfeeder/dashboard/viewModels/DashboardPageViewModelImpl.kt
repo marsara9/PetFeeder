@@ -1,13 +1,13 @@
 package com.sdoras.petfeeder.dashboard.viewModels
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.sdoras.petfeeder.core.models.Registration
 import com.sdoras.petfeeder.core.services.NotificationServices
 import com.sdoras.petfeeder.core.services.RegistrationServices
 import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
 class DashboardPageViewModelImpl(
         feederFinderRepository: FeederFinderRepository,
@@ -15,32 +15,31 @@ class DashboardPageViewModelImpl(
         settingsRepository : SettingsRepository,
         registrationServices : RegistrationServices,
         notificationServices: NotificationServices
-) : ViewModel(), DashboardPageViewModel {
+) : AbstractViewModel(), DashboardPageViewModel {
 
-    override val showLoading = MutableLiveData<Int>()
     override val name = MutableLiveData<String>()
 
     init {
 
-        feederFinderRepository.get()
-                .subscribe()
+        disposables.add(feederFinderRepository.get()
+                .subscribe())
 
-        settingsRepository.get()
+        disposables.add(settingsRepository.get()
                 .subscribe({
                     name.value = it.name
                 }, {
 
-                })
+                }))
 
         if(notificationServices.isNotificationTokenUpdated()) {
-            notificationServices.getCloudMessagingToken()
+            disposables.add(notificationServices.getCloudMessagingToken()
                     .compose(applyDefaultSingleRxSettings())
                     .map { Registration(notificationServices.getDeviceId(), it,"Android") }
                     .flatMapCompletable { registrationServices.registerDevice(it) }
                     .subscribe({
                         notificationServices.setTokenUpdated(false)
                     }, {
-                    })
+                    }))
         }
     }
 }
