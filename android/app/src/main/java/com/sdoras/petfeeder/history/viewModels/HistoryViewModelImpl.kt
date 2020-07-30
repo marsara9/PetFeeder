@@ -1,24 +1,14 @@
 package com.sdoras.petfeeder.history.viewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.sdoras.petfeeder.core.services.FeedingServices
-import io.reactivex.rxjava3.core.Completable
+import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
-class HistoryViewModelImpl(private val feedingServices: FeedingServices) : ViewModel(), HistoryViewModel {
-
-    override val showLoading = MutableLiveData<Int>()
+class HistoryViewModelImpl(
+        feedingRepository: FeedingRepository
+) : AbstractViewModel(), HistoryViewModel {
 
     init {
-        refresh()
-                .compose(applyDefaultCompletableRxSettings())
-                .subscribe()
-    }
-
-    private fun refresh() : Completable {
-        return feedingServices.getFeedingHistory()
-                .doOnSuccess {
-
-                }.ignoreElement()
+        disposables.add(feedingRepository.get()
+                .subscribe())
     }
 }

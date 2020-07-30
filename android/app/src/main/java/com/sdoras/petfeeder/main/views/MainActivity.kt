@@ -12,33 +12,43 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private var currentTab = R.id.navigation_home
+
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_home -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, DashboardFragment())
-                        .commit()
-                true
+        if(item.itemId == currentTab) {
+            true
+        } else {
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame, DashboardFragment())
+                            .commit()
+                    currentTab = item.itemId
+                    true
+                }
+                R.id.navigation_schedules -> {
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame, SchedulesFragment())
+                            .commit()
+                    currentTab = item.itemId
+                    true
+                }
+                R.id.navigation_history -> {
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame, HistoryFragment())
+                            .commit()
+                    currentTab = item.itemId
+                    true
+                }
+                R.id.navigation_settings -> {
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.frame, SettingsFragment())
+                            .commit()
+                    currentTab = item.itemId
+                    true
+                }
+                else -> false
             }
-            R.id.navigation_schedules -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, SchedulesFragment())
-                        .commit()
-                true
-            }
-            R.id.navigation_history -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, HistoryFragment())
-                        .commit()
-                true
-            }
-            R.id.navigation_settings -> {
-                supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, SettingsFragment())
-                        .commit()
-                true
-            }
-            else -> false
         }
     }
 

@@ -1,63 +1,45 @@
 package com.sdoras.petfeeder.dashboard.viewModels
 
-import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.sdoras.petfeeder.core.models.Feeding
 import com.sdoras.petfeeder.core.models.Registration
-import com.sdoras.petfeeder.core.services.FeedingServices
 import com.sdoras.petfeeder.core.services.NotificationServices
 import com.sdoras.petfeeder.core.services.RegistrationServices
-import com.sdoras.petfeeder.core.services.SettingsServices
-import io.reactivex.rxjava3.core.Completable
+import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
+import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
+import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
-class DashboardPageViewModelImpl(private val feedingServices: FeedingServices,
-                                 private val settingsServices: SettingsServices,
-                                 registrationServices : RegistrationServices,
-                                 notificationServices: NotificationServices
-) : ViewModel(), DashboardPageViewModel {
-    override val showLoading = MutableLiveData<Int>()
-    override val numberOfFeedingsToday = MutableLiveData<Int>()
-    override val totalCupsDispensedToday = MutableLiveData<Double>()
+class DashboardPageViewModelImpl(
+        feederFinderRepository: FeederFinderRepository,
+        feederUrlRepository: FeederUrlRepository,
+        settingsRepository : SettingsRepository,
+        registrationServices : RegistrationServices,
+        notificationServices: NotificationServices
+) : AbstractViewModel(), DashboardPageViewModel {
+
     override val name = MutableLiveData<String>()
 
     init {
-        refreshFeedingHistory()
-                .compose(applyDefaultCompletableRxSettings())
-                .subscribe()
 
-        refreshName()
-                .compose(applyDefaultCompletableRxSettings())
-                .subscribe()
+        disposables.add(feederFinderRepository.get()
+                .subscribe())
+
+        disposables.add(settingsRepository.get()
+                .subscribe({
+                    name.value = it.name
+                }, {
+
+                }))
 
         if(notificationServices.isNotificationTokenUpdated()) {
-            notificationServices.getCloudMessagingToken()
+            disposables.add(notificationServices.getCloudMessagingToken()
                     .compose(applyDefaultSingleRxSettings())
                     .map { Registration(notificationServices.getDeviceId(), it,"Android") }
                     .flatMapCompletable { registrationServices.registerDevice(it) }
                     .subscribe({
                         notificationServices.setTokenUpdated(false)
                     }, {
-                    })
+                    }))
         }
-    }
-
-    private fun refreshName() : Completable {
-        return settingsServices.getSettings()
-                .doOnSuccess {
-                    name.postValue(it.name)
-                }.ignoreElement()
-    }
-
-    private fun refreshFeedingHistory() : Completable {
-        return feedingServices.getFeedingHistory()
-                .map {
-                    it.filter { feeding ->
-                        DateUtils.isToday(feeding.date.time)
-                    }
-                }.doOnSuccess {
-                    numberOfFeedingsToday.postValue(it.size)
-                    totalCupsDispensedToday.postValue(it.sumByDouble(Feeding::cups))
-                }.ignoreElement()
     }
 }

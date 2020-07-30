@@ -1,24 +1,14 @@
 package com.sdoras.petfeeder.schedules.viewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.sdoras.petfeeder.core.services.ScheduleServices
-import io.reactivex.rxjava3.core.Completable
+import com.sdoras.petfeeder.core.services.repositories.ScheduleRepository
+import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 
-class SchedulesViewModelImpl(private val schedulesServices: ScheduleServices) : ViewModel(), SchedulesViewModel {
-
-    override val showLoading = MutableLiveData<Int>()
+class SchedulesViewModelImpl(
+        schedulesRepository: ScheduleRepository
+) : AbstractViewModel(), SchedulesViewModel {
 
     init {
-        refresh()
-                .compose(applyDefaultCompletableRxSettings())
-                .subscribe()
-    }
-
-    private fun refresh() : Completable {
-        return schedulesServices.getAllScheduledFeedings()
-                .doOnSuccess {
-
-                }.ignoreElement()
+        disposables.add(schedulesRepository.get()
+                .subscribe())
     }
 }

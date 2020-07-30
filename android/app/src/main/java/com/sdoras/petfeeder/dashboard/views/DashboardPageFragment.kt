@@ -12,5 +12,4 @@ class DashboardPageFragment : DataBoundFragment<DashboardPageViewModel, Fragment
     override val layoutId = R.layout.fragment_page_dashboard
     override val viewModel by viewModel<DashboardPageViewModelImpl>()
     override val clickHandler: ClickHandler<DashboardPageViewModel>? = null
-
 }

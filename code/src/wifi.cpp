@@ -9,7 +9,7 @@ const int NUMBER_OF_CONNECTION_ATTEMPTS = 10;
 WiFiConnection::WiFiConnection() {
 
     std::stringstream ss;
-    ss << "esp8266_" << random(9999);
+    ss << "petfeeder_" << random(9999);
     defaultName = ss.str();
 
     settings = {
@@ -51,8 +51,12 @@ void WiFiConnection::checkStatus() {
         WiFi.softAPdisconnect(true);
         delay(1000);
 
-        MDNS.begin(defaultName.c_str());
-        MDNS.addService("http", "tcp", 80);
+        WiFi.hostname(defaultName.c_str());
+        if(MDNS.begin(defaultName.c_str()) && MDNS.addService("petfeeder", "tcp", 80)) {
+            Serial.println("mDNS is running...");
+        } else {
+            Serial.println("mDNS failed.");
+        }
 
     } else if(!WiFi.isConnected() && (WiFi.getMode() & WIFI_AP) == 0) {
         Serial.println("Setting up Access Point...");
