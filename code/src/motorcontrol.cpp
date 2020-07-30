@@ -24,4 +24,3 @@ void MotorControl::feed() {
     }
     stepper->step(totalStepsRequired - stepsPerSecond * totalLoops);
 }
-

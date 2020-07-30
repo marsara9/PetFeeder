@@ -252,5 +252,4 @@ void WebServer::handleDELETERegister() {
     onDeleteRegistrationCallback(id);
 
     sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
-
 }
