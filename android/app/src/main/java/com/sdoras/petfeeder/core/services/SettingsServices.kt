@@ -16,7 +16,9 @@ interface SettingsServices {
     @PUT("settings")
     fun setSettings(@Query("ssid") ssid : String? = null,
                     @Query("password") password : String? = null,
-                    @Query("name") name: String? = null) : Completable
+                    @Query("name") name: String? = null,
+                    @Query("fcm_fingerprint") fingerprint : String? = null
+    ) : Completable
 
     @DELETE("settings")
     fun deleteSettings() : Completable

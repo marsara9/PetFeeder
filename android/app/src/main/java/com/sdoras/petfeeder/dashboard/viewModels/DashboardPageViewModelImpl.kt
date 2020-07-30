@@ -12,8 +12,7 @@ import com.sdoras.petfeeder.core.services.RegistrationServices
 import com.sdoras.petfeeder.core.services.SettingsServices
 import io.reactivex.rxjava3.core.Completable
 
-class DashboardPageViewModelImpl(application : Application,
-                                 private val feedingServices: FeedingServices,
+class DashboardPageViewModelImpl(private val feedingServices: FeedingServices,
                                  private val settingsServices: SettingsServices,
                                  registrationServices : RegistrationServices,
                                  notificationServices: NotificationServices
@@ -40,7 +39,6 @@ class DashboardPageViewModelImpl(application : Application,
                     .subscribe({
                         notificationServices.setTokenUpdated(false)
                     }, {
-                        notificationServices.setTokenUpdated(true)
                     })
         }
     }
