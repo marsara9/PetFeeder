@@ -1,6 +1,5 @@
 package com.sdoras.petfeeder.dashboard.viewModels
 
-import android.app.Application
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
