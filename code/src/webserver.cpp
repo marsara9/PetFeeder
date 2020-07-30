@@ -5,6 +5,7 @@
 
 #include <ESP8266WebServer.h>
 #include <string>
+#include <math.h>
 
 ESP8266WebServer *server = nullptr;
 
@@ -125,16 +126,25 @@ void WebServer::handlePUTSettings() {
     const char* ssid = server->arg("ssid").c_str();
     const char* password = server->arg("password").c_str();
     const char* name = server->arg("name").c_str();
+    const char* fcm = server->arg("fcm_fingerprint").c_str();
 
     sendResponse(HTTP_NO_CONTENT);
 
     delay(100);
 
-    onSettingsChangedCallback({
+    Settings settings = {
         .ssid = ssid,
         .password = password,
         .name = name
-    });
+    };
+
+    for(unsigned int i = 0; i < min<unsigned int>(strlen(fcm), sizeof(settings.fcm_fingerprint)*2); i+=2) {
+        char byteString[] = { fcm[i], fcm[i+1] };
+        uint8_t byte = (uint8_t) strtol(byteString, nullptr, 16);
+        settings.fcm_fingerprint[i/2] = byte;
+    }
+
+    onSettingsChangedCallback(settings);
 }
 
 void WebServer::handleGETFeed() {

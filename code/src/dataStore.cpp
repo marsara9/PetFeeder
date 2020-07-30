@@ -179,11 +179,21 @@ Registration DataStore::registrationFromFile(fs::File file) {
 }
 
 Settings DataStore::settingsFromFile(fs::File file) {    
-    return Settings {
+
+    Settings settings = Settings {
         .ssid = std::string(file.readStringUntil('\n').c_str()),
         .password = std::string(file.readStringUntil('\n').c_str()),
         .name = std::string(file.readStringUntil('\n').c_str())
     };
+
+    char fcm[sizeof(Settings::fcm_fingerprint)];
+    file.readBytes(fcm, sizeof(fcm));
+
+    for(unsigned int i = 0; i < sizeof(fcm); i++) {
+        settings.fcm_fingerprint[i] = (uint8_t)fcm[i];
+    }
+
+    return settings;
 }
 
 void DataStore::feedingToFile(Feeding feeding, fs::File file) {
@@ -211,12 +221,14 @@ void DataStore::settingsToFile(Settings settings, fs::File file) {
     file.write("\n");
     file.write(settings.name.c_str());
     file.write("\n");
+    file.write(settings.fcm_fingerprint, sizeof(settings.fcm_fingerprint));
 }
 
 Settings DataStore::getFactoryDefaultSettings() {
     return Settings {
         .ssid = std::string(""),
         .password = std::string(""),
-        .name = std::string("ESP8266_"+random(9999))
+        .name = std::string("ESP8266_"+random(9999)),
+        .fcm_fingerprint = {0x41, 0x2a, 0x92, 0xb9, 0x66, 0x42, 0x21, 0xd6, 0xc9, 0x91, 0x39, 0x39, 0xc6, 0x03, 0x5b, 0x1d, 0x93, 0x0e, 0x0c, 0x50}
     };
 }

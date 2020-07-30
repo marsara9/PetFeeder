@@ -45,6 +45,8 @@
         "iostream": "cpp",
         "mutex": "cpp",
         "ratio": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "algorithm": "cpp",
+        "*.inc": "cpp"
     }
 }

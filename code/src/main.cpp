@@ -113,11 +113,27 @@ void setSettings(Settings settings) {
         password = "";
     }
 
+    uint8_t fcm[sizeof(_settings.fcm_fingerprint)];
+    memcpy(fcm, _settings.fcm_fingerprint, sizeof(fcm));
+
     _settings = {
         .ssid = ssid,
         .password = password,
         .name = name
     };
+
+    bool isFCMEmpty = true;
+    for(unsigned int i = 0; i < sizeof(settings.fcm_fingerprint); i++) {
+        if(settings.fcm_fingerprint[i] != 0) {
+            isFCMEmpty = false;
+            break;
+        }
+    }
+    if(isFCMEmpty) {
+        memcpy(_settings.fcm_fingerprint, fcm, sizeof(_settings.fcm_fingerprint));
+    } else {
+        memcpy(_settings.fcm_fingerprint, settings.fcm_fingerprint, sizeof(_settings.fcm_fingerprint));
+    }
     
     dataStore->put(_settings);
     wifi->begin(_settings);

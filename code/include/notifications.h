@@ -24,7 +24,7 @@ private:
 
     std::string createNotification(Settings settings, Feeding feeding);
 
-    void sendFCMNotification(std::string token, std::string message);
+    void sendFCMNotification(std::string token, std::string message, const uint8_t fingerprin0t[20]);
 };
 
 #endif

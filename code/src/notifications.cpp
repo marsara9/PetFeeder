@@ -18,7 +18,7 @@
 
 const char* url = "https://fcm.googleapis.com/fcm/send";
 std::function<std::vector<Registration>()> onGetAllRegisteredDevicesCallback;
-const uint8_t fingerprint[20] = {0x41, 0x2a, 0x92, 0xb9, 0x66, 0x42, 0x21, 0xd6, 0xc9, 0x91, 0x39, 0x39, 0xc6, 0x03, 0x5b, 0x1d, 0x93, 0x0e, 0x0c, 0x50};
+//const uint8_t fingerprint[20] = {0x41, 0x2a, 0x92, 0xb9, 0x66, 0x42, 0x21, 0xd6, 0xc9, 0x91, 0x39, 0x39, 0xc6, 0x03, 0x5b, 0x1d, 0x93, 0x0e, 0x0c, 0x50};
 
 Notifications::Notifications() {
 
@@ -41,7 +41,7 @@ void Notifications::send(Settings settings, Feeding feeding) {
     Serial.println("Sending Notifications...");
     for(const auto &device : devices) {
         if(device.deviceType == "Android") {
-            sendFCMNotification(device.token, message);
+            sendFCMNotification(device.token, message, settings.fcm_fingerprint);
         }
     }
 }
@@ -54,7 +54,7 @@ std::string Notifications::createNotification(Settings settings, Feeding feeding
     return std::string(result);
 }
 
-void Notifications::sendFCMNotification(std::string token, std::string message) {
+void Notifications::sendFCMNotification(std::string token, std::string message, const uint8_t fingerprint[20]) {
 
     std::string payload = "{ \"to\": \"" + token + "\", \"notification\": { \"body\": \"" + message + "\", \"title\": \"PetFeeder\" } }";
 
@@ -88,6 +88,4 @@ void Notifications::sendFCMNotification(std::string token, std::string message) 
         Serial.println(http.errorToString(code));
     }
     http.end();
-
-    
 }
