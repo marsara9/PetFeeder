@@ -28,6 +28,7 @@ public:
     Settings getSettings();
 
     void deleteRegistration(std::string id);
+    void deleteSchedule(std::string id);
 
     void deleteAllFeedings();
     void deleteAllSchedules();
