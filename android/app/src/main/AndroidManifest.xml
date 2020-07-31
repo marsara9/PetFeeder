@@ -32,7 +32,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".setup.views.SetupActivity" />
+        <activity android:name=".setup.views.SetupActivity"
+            android:label="@string/title_setup" />
     </application>
 
 </manifest>

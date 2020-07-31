@@ -1,6 +1,9 @@
 package com.sdoras.petfeeder.main.views
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
@@ -8,6 +11,7 @@ import com.sdoras.petfeeder.dashboard.views.DashboardFragment
 import com.sdoras.petfeeder.history.views.HistoryFragment
 import com.sdoras.petfeeder.schedules.views.SchedulesFragment
 import com.sdoras.petfeeder.settings.views.SettingsFragment
+import com.sdoras.petfeeder.setup.views.SetupActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -61,5 +65,21 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.frame, DashboardFragment())
                 .commit()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu);
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.setup -> {
+                val intent = Intent(this, SetupActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
