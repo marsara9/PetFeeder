@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.Path
+import java.util.*
 
 interface RegistrationServices {
 
@@ -13,6 +14,6 @@ interface RegistrationServices {
     fun registerDevice(@Body registration : Registration) : Completable
 
     @DELETE("register/{id}")
-    fun deleteRegistration(@Path("id") id : String) : Completable
+    fun deleteRegistration(@Path("id") id : UUID) : Completable
 
 }
