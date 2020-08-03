@@ -4,35 +4,24 @@ import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
-import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.ArrayList
 
-class NsdHelper(context: Context,
-                private val serviceType : String,
-                private val serviceNamePrefix : String?,
-                private val delegate : Delegate
-) {
+class NsdHelper(context: Context) {
 
     private val nsdManager: NsdManager? = context.getSystemService(Context.NSD_SERVICE) as NsdManager?
     private var discoveryListener: NsdManager.DiscoveryListener? = null
     private var resolveListener: NsdManager.ResolveListener? = null
     private var resolveListenerBusy = AtomicBoolean(false)
     private var pendingNsdServices = ConcurrentLinkedQueue<NsdServiceInfo>()
-    private var resolvedNsdServices: MutableList<NsdServiceInfo> = Collections.synchronizedList(ArrayList<NsdServiceInfo>())
 
     companion object {
         private const val TAG = "NsdHelper"
     }
 
-    init {
-        initializeResolveListener()
-    }
+    private fun createDiscoveryListener(serviceType : String, serviceNamePrefix : String?, delegate: Delegate) : NsdManager.DiscoveryListener {
 
-    private fun initializeDiscoveryListener() {
-
-        discoveryListener = object : NsdManager.DiscoveryListener {
+        return object : NsdManager.DiscoveryListener {
 
             override fun onDiscoveryStarted(regType: String) {
                 Log.d(TAG, "Service discovery started: $regType")
@@ -41,15 +30,13 @@ class NsdHelper(context: Context,
             override fun onServiceFound(service: NsdServiceInfo) {
                 Log.d(TAG, "Service discovery success: $service")
 
-                if ( service.serviceType == serviceType && (serviceNamePrefix?.let { service.serviceName.startsWith(it) } != false)) {
+                if (service.serviceType == serviceType && (serviceNamePrefix?.let { service.serviceName.startsWith(it) } != false)) {
                     if (resolveListenerBusy.compareAndSet(false, true)) {
                         nsdManager?.resolveService(service, resolveListener)
-                    }
-                    else {
+                    } else {
                         pendingNsdServices.add(service)
                     }
-                }
-                else {
+                } else {
                     Log.d(TAG, "Not our Service - Name: ${service.serviceName}, Type: ${service.serviceType}")
                 }
             }
@@ -57,19 +44,10 @@ class NsdHelper(context: Context,
             override fun onServiceLost(service: NsdServiceInfo) {
                 Log.d(TAG, "Service lost: $service")
 
-                var iterator = pendingNsdServices.iterator()
+                val iterator = pendingNsdServices.iterator()
                 while (iterator.hasNext()) {
                     if (iterator.next().serviceName == service.serviceName) {
                         iterator.remove()
-                    }
-                }
-
-                synchronized(resolvedNsdServices) {
-                    iterator = resolvedNsdServices.iterator()
-                    while (iterator.hasNext()) {
-                        if (iterator.next().serviceName == service.serviceName) {
-                            iterator.remove()
-                        }
                     }
                 }
 
@@ -92,13 +70,12 @@ class NsdHelper(context: Context,
         }
     }
 
-    private fun initializeResolveListener() {
-        resolveListener =  object : NsdManager.ResolveListener {
+    private fun createResolveListener(delegate: Delegate) : NsdManager.ResolveListener {
+        return object : NsdManager.ResolveListener {
 
             override fun onServiceResolved(service: NsdServiceInfo) {
                 Log.d(TAG, "Resolve Succeeded: $service")
 
-                resolvedNsdServices.add(service)
                 delegate.onServiceResolved(service)
 
                 resolveNextInQueue()
@@ -111,9 +88,11 @@ class NsdHelper(context: Context,
         }
     }
 
-    fun discoverServices() {
-        stopDiscovery()
-        initializeDiscoveryListener()
+    fun discoverServices(serviceType : String, serviceNamePrefix : String?, delegate: Delegate) {
+        check(discoveryListener == null) { "Discovery Services are already running.  Please stop the current discovery if you wish to start another." }
+
+        resolveListener = createResolveListener(delegate)
+        discoveryListener = createDiscoveryListener(serviceType, serviceNamePrefix, delegate)
         nsdManager?.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
     }
 
@@ -121,6 +100,8 @@ class NsdHelper(context: Context,
         discoveryListener?.let {
             nsdManager?.stopServiceDiscovery(discoveryListener)
             discoveryListener = null
+            resolveListener = null
+            resolveListenerBusy.set(false)
         }
     }
 
@@ -128,7 +109,7 @@ class NsdHelper(context: Context,
         val nextNsdService = pendingNsdServices.poll()
         nextNsdService?.let {
             nsdManager?.resolveService(nextNsdService, resolveListener)
-        }
+        } ?: resolveListenerBusy.set(false)
     }
 
     interface Delegate {
