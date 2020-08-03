@@ -31,6 +31,7 @@ class WebServer {
 
         void onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>);
         void onAddScheduledFeeding(std::function<void(Schedule)>);
+        void onDeleteScheduledFeeding(std::function<void(std::string)>);
 
         void onRegisterDevice(std::function<void(Registration)>);
         void onDeleteRegistration(std::function<void(std::string)>);
@@ -51,6 +52,7 @@ class WebServer {
 
         void handleGETSchedules();
         void handlePOSTSchedule();
+        void handleDELETESchedule();
 
         void handlePOSTRegister();
         void handleDELETERegister();

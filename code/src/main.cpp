@@ -19,6 +19,7 @@ Schedule getNextScheduledFeeding();
 void scheduledFeed(Schedule schedule);
 void scheduleNextFeeding();
 void addScheduledFeeding(Schedule schedule);
+void deleteScheduledFeeding(std::string id);
 
 const float MINIMUM_DISPENCE_AMOUNT = 0.125;
 const int CONTAINERS_PER_ROTATION = 2;
@@ -72,6 +73,7 @@ void setup() {
 
     webServer->onGetAllScheduledFeedings(std::bind(&DataStore::getAllSchedules, dataStore));
     webServer->onAddScheduledFeeding(addScheduledFeeding);
+    webServer->onDeleteScheduledFeeding(deleteScheduledFeeding);
 
     webServer->onRegisterDevice(std::bind(&DataStore::putRegistration, dataStore, std::placeholders::_1));
     webServer->onDeleteRegistration(std::bind(&DataStore::deleteRegistration, dataStore, std::placeholders::_1));
@@ -204,6 +206,13 @@ void scheduleNextFeeding() {
 
 void addScheduledFeeding(Schedule schedule) {
     dataStore->put(schedule);
+
+    scheduler->cancelEvent();
+    scheduleNextFeeding();
+}
+
+void deleteScheduledFeeding(std::string id) {
+    dataStore->deleteSchedule(id);
 
     scheduler->cancelEvent();
     scheduleNextFeeding();

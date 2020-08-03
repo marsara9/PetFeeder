@@ -18,6 +18,8 @@ std::function<bool(float)> isValidFeedAmountCallback;
 
 std::function<std::vector<Schedule>()> onGetAllScheduledFeedingsCallback;
 std::function<void(Schedule)> onAddScheduledFeedingCallback;
+std::function<void(std::string)> onDeleteScheduledFeedingCallback;
+
 std::function<void(Registration)> onRegisterDeviceCallback;
 std::function<void(std::string)> onDeleteRegistrationCallback;
 
@@ -46,7 +48,8 @@ void WebServer::startServer() {
     server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
 
     server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
-    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));    
+    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));
+    server->on(UriBraces("/schedule/{}"), HTTP_DELETE, std::bind(&WebServer::handleDELETESchedule, this));
 
     server->on("/register", HTTP_POST, std::bind(&WebServer::handlePOSTRegister, this));
     server->on(UriBraces("/register/{}"), HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
@@ -82,6 +85,10 @@ void WebServer::onGetAllScheduledFeedings(std::function<std::vector<Schedule>()>
 
 void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
     onAddScheduledFeedingCallback = callback;
+}
+
+void WebServer::onDeleteScheduledFeeding(std::function<void(std::string)> callback) {
+    onDeleteScheduledFeedingCallback = callback;
 }
 
 void WebServer::onRegisterDevice(std::function<void(Registration)> callback) {
@@ -232,6 +239,16 @@ void WebServer::handlePOSTSchedule() {
     onAddScheduledFeedingCallback(schedule);
 }
 
+void WebServer::handleDELETESchedule() {
+    printRequest();
+
+    std::string id = server->pathArg(0).c_str();
+
+    sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
+
+    onDeleteScheduledFeedingCallback(id);
+}
+
 void WebServer::handlePOSTRegister() {
     printRequest();
 
@@ -248,8 +265,8 @@ void WebServer::handleDELETERegister() {
     printRequest();
 
     std::string id = server->pathArg(0).c_str();
-    
-    onDeleteRegistrationCallback(id);
 
     sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
+
+    onDeleteRegistrationCallback(id);
 }

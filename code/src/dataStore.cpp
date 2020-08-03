@@ -120,6 +120,10 @@ void DataStore::deleteRegistration(std::string id) {
     SD.remove(("registrations/" + id).c_str());
 }
 
+void DataStore::deleteSchedule(std::string id) {
+    SD.remove(("schedules/" + id).c_str());
+}
+
 void DataStore::deleteAllFeedings() {
     enumerateFiles<void*>("feedings", [](fs::File file){
         SD.remove(file.fullName());
