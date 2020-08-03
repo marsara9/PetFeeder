@@ -8,6 +8,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="loading">Loading…</string>
+    <string name="next">Next</string>
 
     <string name="feedings">Feedings</string>
     <string name="cups">Cups</string>
@@ -26,7 +27,6 @@
     <string name="settings_title_app">App Settings</string>
     <string name="settings_title_feeder">Feeder Settings</string>
     <string name="title_setup">Setup</string>
-    <string name="cancel">Cancel</string>
-    <string name="next">Next</string>
+
 
 </resources>
