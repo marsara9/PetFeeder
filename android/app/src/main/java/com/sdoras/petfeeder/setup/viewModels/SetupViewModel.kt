@@ -12,4 +12,6 @@ interface SetupViewModel : BaseViewModel {
     val isCancelVisible : LiveData<Boolean>
     val isNextEnabled : LiveData<Boolean>
     val isCancelEnabled : LiveData<Boolean>
+
+    fun onNext()
 }

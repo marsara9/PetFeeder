@@ -15,9 +15,12 @@ import androidx.lifecycle.MutableLiveData
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
+import com.sdoras.petfeeder.setup.viewModels.steps.IntroductionStep
+import com.sdoras.petfeeder.setup.viewModels.steps.ScanStep
+import com.sdoras.petfeeder.setup.viewModels.steps.SetupStep
 import io.reactivex.rxjava3.core.Completable
 
-class SetupViewModelImpl(context : Context, settingsRepository: SettingsRepository) : AbstractViewModel(), SetupViewModel {
+class SetupViewModelImpl(private val context : Context, settingsRepository: SettingsRepository) : AbstractViewModel(), SetupViewModel {
 
     override val image = MutableLiveData<Drawable>()
     override val status = MutableLiveData<String>()
@@ -27,19 +30,34 @@ class SetupViewModelImpl(context : Context, settingsRepository: SettingsReposito
     override val isNextEnabled = MutableLiveData<Boolean>()
     override val isCancelEnabled = MutableLiveData<Boolean>()
 
-    init {
-        image.value = context.getDrawable(R.drawable.picture2)
+    private val steps = listOf(
+            IntroductionStep(),
+            ScanStep()
+    )
+    private var stepIndex = 0
 
-        message.value = "Lets get your feeder setup..."
+    init {
+        initializeStep(steps[stepIndex])
+    }
+
+    fun initializeStep(setupStep: SetupStep) {
+        message.value = setupStep.message
+        image.value = setupStep.image?.let {
+            context.getDrawable(it)
+        }
+
         status.value = ""
         isNextVisible.value = true
         isCancelVisible.value = false
         isNextEnabled.value = true
         isCancelEnabled.value = true
+
+        setupStep.onStart(context)
     }
 
-    fun onNext() {
-
+    override fun onNext() {
+        stepIndex++
+        initializeStep(steps[stepIndex])
     }
 
     private fun connectToFeederAccessPoint(context: Context, ssid: String) : Completable {

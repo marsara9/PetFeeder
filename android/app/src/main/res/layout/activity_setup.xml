@@ -10,6 +10,9 @@
         <variable
             name="viewModel"
             type="com.sdoras.petfeeder.setup.viewModels.SetupViewModel" />
+        <variable
+            name="clickHandler"
+            type="com.sdoras.petfeeder.setup.views.SetupClickHandler" />
     </data>
 
     <LinearLayout
@@ -60,6 +63,7 @@
                     android:enabled="@{viewModel.isCancelEnabled}"
                     android:text="@string/cancel"
                     android:visibility="@{viewModel.isCancelVisible ? View.VISIBLE : View.GONE}"
+                    android:onClick="@{clickHandler::onCancel}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text" />
@@ -71,6 +75,7 @@
                     android:enabled="@{viewModel.isNextEnabled}"
                     android:text="@string/next"
                     android:visibility="@{viewModel.isNextVisible ? View.VISIBLE : View.GONE}"
+                    android:onClick="@{clickHandler::onNext}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/text" />

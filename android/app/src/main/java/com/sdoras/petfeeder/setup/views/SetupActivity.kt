@@ -1,18 +1,16 @@
 package com.sdoras.petfeeder.setup.views
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.sdoras.petfeeder.R
+import com.sdoras.petfeeder.core.views.ClickHandler
+import com.sdoras.petfeeder.core.views.DataBoundActivity
+import com.sdoras.petfeeder.databinding.ActivitySetupBinding
 import com.sdoras.petfeeder.setup.viewModels.SetupViewModel
 import com.sdoras.petfeeder.setup.viewModels.SetupViewModelImpl
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SetupActivity : AppCompatActivity() {
+class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>() {
 
-    private val viewModel by viewModel<SetupViewModelImpl>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setup)
-    }
+    override val layoutId = R.layout.activity_setup
+    override val viewModel by viewModel<SetupViewModelImpl>()
+    override val clickHandler by clickHandler<SetupClickHandler>()
 }
