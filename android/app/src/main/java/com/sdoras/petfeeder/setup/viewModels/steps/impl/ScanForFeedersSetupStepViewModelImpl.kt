@@ -1,19 +1,28 @@
-package com.sdoras.petfeeder.setup.viewModels.steps
+package com.sdoras.petfeeder.setup.viewModels.steps.impl
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
+import com.sdoras.petfeeder.setup.viewModels.steps.ScanForFeedersSetupStepViewModel
+import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
 import io.reactivex.rxjava3.core.Single
 import java.util.concurrent.TimeUnit
 
-class ScanStep : SetupStep {
-    override val message = ""
-    override val image: Int? = null
+class ScanForFeedersSetupStepViewModelImpl(context: Context) : AbstractSetupStepViewModel(), ScanForFeedersSetupStepViewModel {
 
-    fun findFeeders(context: Context) : Single<List<String>> {
+    init {
+        findFeeders(context)
+                .timeout(10, TimeUnit.SECONDS)
+                .subscribe({
+                    val s = it
+                }, {
+
+                })
+    }
+
+    private fun findFeeders(context: Context) : Single<List<String>> {
         return Single.create { emitter ->
             val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
@@ -32,17 +41,5 @@ class ScanStep : SetupStep {
             context.registerReceiver(broadcastReceiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
             wifiManager.startScan()
         }
-    }
-
-    override fun onStart(context: Context) {
-
-        findFeeders(context)
-                .timeout(10, TimeUnit.SECONDS)
-                .subscribe({
-                    val s = it
-                }, {
-
-                })
-
     }
 }

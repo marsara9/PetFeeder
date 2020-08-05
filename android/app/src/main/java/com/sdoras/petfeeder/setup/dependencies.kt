@@ -1,6 +1,6 @@
 package com.sdoras.petfeeder.setup
 
-import com.sdoras.petfeeder.setup.viewModels.SetupViewModelImpl
+import com.sdoras.petfeeder.setup.viewModels.impl.SetupViewModelImpl
 import com.sdoras.petfeeder.setup.views.SetupClickHandler
 import com.sdoras.petfeeder.setup.views.SetupClickHandlerImpl
 import org.koin.androidx.viewmodel.dsl.viewModel

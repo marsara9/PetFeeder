@@ -1,4 +1,4 @@
-package com.sdoras.petfeeder.dashboard.viewModels
+package com.sdoras.petfeeder.dashboard.viewModels.impl
 
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
@@ -7,6 +7,7 @@ import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
+import com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModel
 
 class DashboardViewModelImpl(
         feederFinderRepository: FeederFinderRepository,

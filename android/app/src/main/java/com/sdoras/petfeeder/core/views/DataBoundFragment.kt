@@ -23,6 +23,7 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
     abstract val clickHandler : ClickHandler<VM>?
 
     protected lateinit var binding: Binding
+        private set
 
     private var progressDialog : ProgressDialog? = null
 
