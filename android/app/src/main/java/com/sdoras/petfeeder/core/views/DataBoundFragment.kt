@@ -15,6 +15,7 @@ import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 import com.sdoras.petfeeder.core.views.dialogs.ProgressDialog
 import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.parametersOf
+import kotlin.reflect.KClass
 
 abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> : Fragment() {
 
@@ -29,6 +30,12 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
 
     protected inline fun <reified T : ClickHandler<in VM>> clickHandler() = lazy {
         getKoin().get<T> {
+            parametersOf(viewModel)
+        }
+    }
+
+    protected fun <T : ClickHandler<in VM>> clickHandler(clazz: KClass<T>) = lazy {
+        getKoin().get<T>(clazz, null) {
             parametersOf(viewModel)
         }
     }
