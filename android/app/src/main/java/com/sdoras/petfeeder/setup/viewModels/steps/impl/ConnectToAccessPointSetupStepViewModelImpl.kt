@@ -25,8 +25,8 @@ class ConnectToAccessPointSetupStepViewModelImpl(private val context: Context) :
         connectToFeederAccessPoint(context, ssid, bssid)
     }
 
-    override fun onNext() {
-
+    override fun onNext() : Completable {
+        return Completable.complete()
     }
 
     private fun connectToFeederAccessPoint(context: Context, ssid: String, bssid: MacAddress?) : Completable {

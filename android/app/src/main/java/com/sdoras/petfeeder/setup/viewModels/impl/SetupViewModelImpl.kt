@@ -13,7 +13,7 @@ class SetupViewModelImpl() : AbstractViewModel(), SetupViewModel {
 
     override val currentStepFragment = MutableLiveData<Fragment>()
 
-    private val steps = listOf<AbstractSetupStepFragment.Factory<*>>(
+    private val steps = listOf<AbstractSetupStepFragment.Factory<*, *>>(
             IntroductionSetupStepFragment.Factory(),
             ScanForFeedersSetupStepFragment.Factory(),
             ConnectToAccessPointSetupStepFragment.Factory()

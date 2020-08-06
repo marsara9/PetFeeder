@@ -1,9 +1,9 @@
 package com.sdoras.petfeeder.setup.viewModels.steps.impl
 
 import android.content.Context
-import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.setup.viewModels.steps.IntroductionSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
+import io.reactivex.rxjava3.core.Completable
 
 class IntroductionSetupStepViewModelImpl(context: Context) : AbstractSetupStepViewModel(), IntroductionSetupStepViewModel {
 
@@ -12,7 +12,7 @@ class IntroductionSetupStepViewModelImpl(context: Context) : AbstractSetupStepVi
 //        image.value = context.getDrawable(R.drawable.picture2)
     }
 
-    override fun onNext() {
-
+    override fun onNext() : Completable {
+        return Completable.complete()
     }
 }

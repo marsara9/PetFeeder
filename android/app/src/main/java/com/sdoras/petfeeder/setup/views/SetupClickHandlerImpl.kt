@@ -2,11 +2,18 @@ package com.sdoras.petfeeder.setup.views
 
 import android.view.View
 import com.sdoras.petfeeder.setup.viewModels.SetupViewModel
+import com.sdoras.petfeeder.setup.viewModels.steps.base.SetupStepViewModel
 
 class SetupClickHandlerImpl(override val viewModel : SetupViewModel) : SetupClickHandler {
 
-    override fun onNext(view: View) {
-        viewModel.onNext()
+    override fun onNext(view: View, setupStepViewModel: SetupStepViewModel) {
+
+        setupStepViewModel.onNext()
+                .subscribe({
+                    viewModel.onNext()
+                }, {
+
+                })
     }
 
     override fun onCancel(view: View) {
