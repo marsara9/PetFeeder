@@ -12,6 +12,7 @@ import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 import com.sdoras.petfeeder.core.views.dialogs.ProgressDialog
 import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.parametersOf
+import kotlin.reflect.KClass
 
 abstract class DataBoundActivity<VM : BaseViewModel, Binding : ViewDataBinding> : AppCompatActivity() {
 
@@ -23,8 +24,10 @@ abstract class DataBoundActivity<VM : BaseViewModel, Binding : ViewDataBinding> 
 
     private var progressDialog : ProgressDialog? = null
 
-    protected inline fun <reified T : ClickHandler<in VM>> clickHandler() = lazy {
-        getKoin().get<T> {
+    protected inline fun <reified T : ClickHandler<in VM>> clickHandler() = clickHandler(T::class)
+
+    protected fun <T : ClickHandler<in VM>> clickHandler(clazz: KClass<T>) = lazy {
+        getKoin().get<T>(clazz, null) {
             parametersOf(viewModel)
         }
     }
@@ -32,7 +35,7 @@ abstract class DataBoundActivity<VM : BaseViewModel, Binding : ViewDataBinding> 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = DataBindingUtil.setContentView<Binding>(this, layoutId)
+        binding = DataBindingUtil.setContentView(this, layoutId)
         binding.setVariable(BR.viewModel, viewModel)
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this

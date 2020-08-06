@@ -28,11 +28,7 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
 
     private var progressDialog : ProgressDialog? = null
 
-    protected inline fun <reified T : ClickHandler<in VM>> clickHandler() = lazy {
-        getKoin().get<T> {
-            parametersOf(viewModel)
-        }
-    }
+    protected inline fun <reified T : ClickHandler<in VM>> clickHandler() = clickHandler(T::class)
 
     protected fun <T : ClickHandler<in VM>> clickHandler(clazz: KClass<T>) = lazy {
         getKoin().get<T>(clazz, null) {

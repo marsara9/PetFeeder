@@ -21,7 +21,7 @@ class SetupViewModelImpl() : AbstractViewModel(), SetupViewModel {
     private var stepIndex = 0
 
     init {
-        currentStepFragment.value = steps[stepIndex++].build()
+        currentStepFragment.value = steps[stepIndex].build()
     }
 
     override fun onNext() {

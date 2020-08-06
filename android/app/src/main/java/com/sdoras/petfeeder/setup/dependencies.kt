@@ -1,7 +1,6 @@
 package com.sdoras.petfeeder.setup
 
 import com.sdoras.petfeeder.setup.viewModels.impl.SetupViewModelImpl
-import com.sdoras.petfeeder.setup.viewModels.steps.base.SetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.impl.ConnectToAccessPointSetupStepViewModelImpl
 import com.sdoras.petfeeder.setup.viewModels.steps.impl.IntroductionSetupStepViewModelImpl
 import com.sdoras.petfeeder.setup.viewModels.steps.impl.ScanForFeedersSetupStepViewModelImpl

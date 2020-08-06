@@ -22,6 +22,10 @@ class ScanForFeedersSetupStepViewModelImpl(context: Context) : AbstractSetupStep
                 })
     }
 
+    override fun onNext() {
+
+    }
+
     private fun findFeeders(context: Context) : Single<List<String>> {
         return Single.create { emitter ->
             val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager

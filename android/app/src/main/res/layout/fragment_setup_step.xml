@@ -21,7 +21,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="20dp"
-            android:src="@{viewModel.image}"
             tools:src="@drawable/picture2" />
 
         <com.google.android.material.card.MaterialCardView
@@ -45,7 +44,6 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:text="@{viewModel.message}"
                     tools:text="Lets get your feeder setup..." />
 
                 <Button

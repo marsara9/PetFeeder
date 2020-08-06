@@ -8,7 +8,11 @@ import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewMod
 class IntroductionSetupStepViewModelImpl(context: Context) : AbstractSetupStepViewModel(), IntroductionSetupStepViewModel {
 
     init {
-        message.value = "Lets get your feeder setup..."
-        image.value = context.getDrawable(R.drawable.picture2)
+//        message.value = "Lets get your feeder setup..."
+//        image.value = context.getDrawable(R.drawable.picture2)
+    }
+
+    override fun onNext() {
+
     }
 }
