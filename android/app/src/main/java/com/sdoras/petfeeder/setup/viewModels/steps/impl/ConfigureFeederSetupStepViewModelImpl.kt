@@ -16,7 +16,7 @@ class ConfigureFeederSetupStepViewModelImpl(private val settingsRepository: Sett
 
     }
 
-    override fun onNext() : Completable {
+    fun onNext() {
 
         val ssid = ssid.value
         val password = password.value
@@ -24,12 +24,17 @@ class ConfigureFeederSetupStepViewModelImpl(private val settingsRepository: Sett
 
         requireNotNull(ssid)
 
-        return settingsRepository.setWiFiSettings(ssid, password)
+        disposables.add(settingsRepository.setWiFiSettings(ssid, password)
                 ?.compose(applyCompletableShowLoading())
                 ?.andThen {
                     name?.let {
                         settingsRepository.setFeederName(it)
                     } ?: Completable.complete()
-                } ?: Completable.complete()
+                }?.subscribe({
+                    delegate?.goToNextStep()
+                }, {
+
+                }))
+
     }
 }

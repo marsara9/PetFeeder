@@ -1,6 +1,5 @@
 package com.sdoras.petfeeder.setup.viewModels.impl
 
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 import com.sdoras.petfeeder.setup.viewModels.SetupViewModel
@@ -11,7 +10,7 @@ import com.sdoras.petfeeder.setup.views.steps.ScanForFeedersSetupStepFragment
 
 class SetupViewModelImpl() : AbstractViewModel(), SetupViewModel {
 
-    override val currentStepFragment = MutableLiveData<Fragment>()
+    override val currentStepFragment = MutableLiveData<AbstractSetupStepFragment<*, *>>()
 
     private val steps = listOf<AbstractSetupStepFragment.Factory<*, *>>(
             IntroductionSetupStepFragment.Factory(),
@@ -25,6 +24,7 @@ class SetupViewModelImpl() : AbstractViewModel(), SetupViewModel {
     }
 
     override fun onNext() {
-        currentStepFragment.value = steps[stepIndex++].build()
+        currentStepFragment.value?.viewModel?.delegate = null
+        currentStepFragment.value = steps[++stepIndex].build()
     }
 }

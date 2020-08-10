@@ -4,7 +4,6 @@ import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.setup.viewModels.steps.VerifyAccessPointIsFeederSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
-import io.reactivex.rxjava3.core.Completable
 
 class VerifyAccessPointIsFeederSetupStepViewModelImpl(feederUrlRepository: FeederUrlRepository, settingsRepository: SettingsRepository) : AbstractSetupStepViewModel(), VerifyAccessPointIsFeederSetupStepViewModel {
 
@@ -17,9 +16,5 @@ class VerifyAccessPointIsFeederSetupStepViewModelImpl(feederUrlRepository: Feede
                 }, {
 
                 })
-    }
-
-    override fun onNext() : Completable {
-        return Completable.complete()
     }
 }

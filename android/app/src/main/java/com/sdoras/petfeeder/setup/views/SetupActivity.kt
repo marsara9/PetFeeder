@@ -8,9 +8,10 @@ import com.sdoras.petfeeder.core.views.DataBoundActivity
 import com.sdoras.petfeeder.databinding.ActivitySetupBinding
 import com.sdoras.petfeeder.setup.viewModels.SetupViewModel
 import com.sdoras.petfeeder.setup.viewModels.impl.SetupViewModelImpl
+import com.sdoras.petfeeder.setup.viewModels.steps.base.SetupStepViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>() {
+class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>(), SetupStepViewModel.Delegate {
 
     override val layoutId = R.layout.activity_setup
     override val viewModel by viewModel<SetupViewModelImpl>()
@@ -23,6 +24,12 @@ class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>() 
             supportFragmentManager.beginTransaction()
                     .replace(R.id.frame, it)
                     .commit()
+
+            it.viewModel.delegate = this
         })
+    }
+
+    override fun goToNextStep() {
+        viewModel.onNext()
     }
 }

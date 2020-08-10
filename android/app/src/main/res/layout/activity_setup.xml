@@ -11,9 +11,6 @@
             name="viewModel"
             type="com.sdoras.petfeeder.setup.viewModels.SetupViewModel" />
 
-<!--        <variable-->
-<!--            name="clickHandler"-->
-<!--            type="com.sdoras.petfeeder.setup.views.SetupClickHandler" />-->
     </data>
 
     <FrameLayout

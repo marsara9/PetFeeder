@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import com.sdoras.petfeeder.setup.viewModels.steps.ScanForFeedersSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import java.util.concurrent.TimeUnit
 
@@ -17,14 +16,10 @@ class ScanForFeedersSetupStepViewModelImpl(context: Context) : AbstractSetupStep
         findFeeders(context)
                 .timeout(10, TimeUnit.SECONDS)
                 .subscribe({
-                    val s = it
+                    delegate?.goToNextStep()
                 }, {
 
                 })
-    }
-
-    override fun onNext() : Completable {
-        return Completable.complete()
     }
 
     private fun findFeeders(context: Context) : Single<List<String>> {

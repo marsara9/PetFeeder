@@ -10,7 +10,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class IntroductionSetupStepFragment : AbstractSetupStepFragment<IntroductionSetupStepViewModel, FragmentSetupStepIntroductionBinding>() {
 
     override val layoutId = R.layout.fragment_setup_step_introduction
-    override val setupStepViewModel by viewModel<IntroductionSetupStepViewModelImpl>()
+    override val viewModel by viewModel<IntroductionSetupStepViewModelImpl>()
+    override val clickHandler by clickHandler<IntroductionSetupStepClickHandler>()
 
     class Factory : AbstractSetupStepFragment.Factory<IntroductionSetupStepViewModel, FragmentSetupStepIntroductionBinding> {
         override fun build(): AbstractSetupStepFragment<IntroductionSetupStepViewModel, FragmentSetupStepIntroductionBinding> {
