@@ -7,8 +7,12 @@
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="are_you_sure">Are you sure?</string>
     <string name="loading">Loading…</string>
     <string name="next">Next</string>
+    <string name="try_again">Try again</string>
 
     <string name="feedings">Feedings</string>
     <string name="cups">Cups</string>
@@ -27,8 +31,16 @@
     <string name="settings_title_app">App Settings</string>
     <string name="settings_title_feeder">Feeder Settings</string>
 
-    <string name="title_setup">Setup</string>
+    <string name="title_setup">Add a new Feeder</string>
+    <string name="setup_cancel_message">Are you sure you want to cancel setup?  You will be able to use your new feeder until you successfully set it up.</string>
     <string name="setup_introduction_caption">Begin searching for and setting up a new feeder?</string>
+    <string name="setup_scan_status_scanning">Scanning for nearby feeders…</string>
+    <string name="setup_scan_status_found_multiple">Multiple feeders found…</string>
+    <string name="setup_scan_status_no_feeders_found">No Feeders were found.</string>
+    <string name="setup_scan_status_error">An error has occurred.</string>
+    <string name="setup_scan_message_notice">Please make sure your feeder is plugged in and turned on.</string>
+    <string name="setup_scan_message_found_multiple">Please select which one you wish to configure.</string>
+    <string name="setup_scan_message_error">Please try again.</string>
 
 
 </resources>

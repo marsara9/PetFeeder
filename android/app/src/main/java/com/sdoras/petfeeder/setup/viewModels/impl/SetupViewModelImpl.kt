@@ -1,5 +1,6 @@
 package com.sdoras.petfeeder.setup.viewModels.impl
 
+import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 import com.sdoras.petfeeder.setup.viewModels.SetupViewModel
@@ -23,8 +24,9 @@ class SetupViewModelImpl() : AbstractViewModel(), SetupViewModel {
         currentStepFragment.value = steps[stepIndex].build()
     }
 
-    override fun onNext() {
+    override fun onNext(bundle: Bundle?) {
         currentStepFragment.value?.viewModel?.delegate = null
         currentStepFragment.value = steps[++stepIndex].build()
+        currentStepFragment.value?.arguments = bundle
     }
 }

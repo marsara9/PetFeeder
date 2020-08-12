@@ -10,6 +10,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConnectToAccessPointSetupStepFragment : AbstractSetupStepFragment<ConnectToAccessPointSetupStepViewModel, FragmentSetupStepConnectBinding>() {
 
+    companion object {
+        const val EXTRA_SSID = "ssid";
+    }
+
     override val layoutId = R.layout.fragment_setup_step_connect
     override val viewModel by viewModel<ConnectToAccessPointSetupStepViewModelImpl>()
     override val clickHandler: ClickHandler<ConnectToAccessPointSetupStepViewModel>? = null

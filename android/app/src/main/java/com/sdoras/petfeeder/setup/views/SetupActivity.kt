@@ -1,6 +1,7 @@
 package com.sdoras.petfeeder.setup.views
 
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.ClickHandler
@@ -29,7 +30,18 @@ class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>(),
         })
     }
 
-    override fun goToNextStep() {
-        viewModel.onNext()
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.are_you_sure)
+                .setMessage(R.string.setup_cancel_message)
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    super.onBackPressed()
+                }.setNegativeButton(R.string.no) { _, _ ->
+
+                }.show()
+    }
+
+    override fun goToNextStep(bundle: Bundle?) {
+        viewModel.onNext(bundle)
     }
 }
