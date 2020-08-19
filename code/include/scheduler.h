@@ -17,7 +17,7 @@ public:
 private:
     TimeKeeper *timeKeeper;
     time_t nextEventTime;
-    std::function<void()>nextEvent;
+    std::function<void()> nextEvent;
 };
 
 #endif

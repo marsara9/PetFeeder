@@ -39,9 +39,11 @@ std::string settingsToJson(Settings settings) {
 
 Registration registrationFromJson(std::string json) {
 
-    StaticJsonBuffer<512> jsonBuffer;
+    StaticJsonDocument<512> jsonDocument;
 
-    JsonObject& parsed = jsonBuffer.parseObject(json.c_str());
+    deserializeJson(jsonDocument, json.c_str());
+
+    JsonObject parsed = jsonDocument.as<JsonObject>();
 
     std::string id = parsed["id"].as<char*>();
     std::string token = parsed["token"].as<char*>();

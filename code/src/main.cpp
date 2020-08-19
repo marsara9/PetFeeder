@@ -184,7 +184,7 @@ Schedule getNextScheduledFeeding() {
 
 void scheduledFeed(Schedule schedule) {
     Feeding feeding = {
-        .id =createUUID(),
+        .id = createUUID(),
         .cups = schedule.cups,
         .date = timeKeeper->now(),
     };
