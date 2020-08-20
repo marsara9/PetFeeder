@@ -1,5 +1,8 @@
 package com.sdoras.petfeeder.history.views
 
+import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.Observer
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.DataBoundFragment
 import com.sdoras.petfeeder.databinding.FragmentHistoryBinding
@@ -11,4 +14,12 @@ class HistoryFragment : DataBoundFragment<HistoryViewModel, FragmentHistoryBindi
     override val layoutId = R.layout.fragment_history
     override val viewModel by viewModel<HistoryViewModelImpl>()
     override val clickHandler by clickHandler<HistoryClickHandler>()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.history.observe(viewLifecycleOwner, Observer {
+            binding.recyclerView.adapter = HistoryAdapter(it)
+        })
+    }
 }
