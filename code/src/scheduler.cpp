@@ -13,7 +13,7 @@ void Scheduler::scheduleEvent(time_t time, std::function<void()> event) {
 }
 
 void Scheduler::cancelEvent() {
-    nextEventTime = 0;
+    nextEventTime = __LONG_MAX__;
     nextEvent = nullptr;
 }
 
