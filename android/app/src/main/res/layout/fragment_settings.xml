@@ -19,15 +19,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="4dp"
-            android:text="@string/settings_title_app" />
+        <include layout="@layout/item_section_header"
+            bind:header="@{@string/settings_title_app}" />
 
         <include
             layout="@layout/item_simple"
@@ -37,15 +30,8 @@
             bind:title="@{@string/settings_cloud_messaging_token}"
             android:visibility="@{viewModel.showCloudMessagingToken ? View.VISIBLE : View.GONE}"/>
 
-        <TextView
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="4dp"
-            android:text="@string/settings_title_feeder" />
+        <include layout="@layout/item_section_header"
+            bind:header="@{@string/settings_title_feeder}" />
 
         <include
             layout="@layout/item_simple"

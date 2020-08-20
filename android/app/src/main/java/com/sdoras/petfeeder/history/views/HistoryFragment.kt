@@ -3,6 +3,7 @@ package com.sdoras.petfeeder.history.views
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.DataBoundFragment
 import com.sdoras.petfeeder.databinding.FragmentHistoryBinding
@@ -17,6 +18,8 @@ class HistoryFragment : DataBoundFragment<HistoryViewModel, FragmentHistoryBindi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
         viewModel.history.observe(viewLifecycleOwner, Observer {
             binding.recyclerView.adapter = HistoryAdapter(it)

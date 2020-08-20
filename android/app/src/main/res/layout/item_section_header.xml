@@ -7,21 +7,15 @@
             type="String" />
     </data>
 
-    <LinearLayout
+    <TextView
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        android:orientation="horizontal"
-        android:paddingVertical="2dp"
-        android:paddingHorizontal="8dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp"
+        android:text="@{header}"
+        tools:text="Section Header" />
 
-        <TextView
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:text="@{header}"
-            tools:text="Section Header" />
-
-    </LinearLayout>
 </layout>
