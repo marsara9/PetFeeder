@@ -198,7 +198,12 @@ void scheduleNextFeeding() {
         return;
     }
 
-    scheduler->scheduleEvent(timeKeeper->next(nextFeeding.hour, nextFeeding.minute), [nextFeeding]{
+    time_t time = timeKeeper->next(nextFeeding.hour, nextFeeding.minute);
+
+    Serial.print("Scheduled next feeding for: ");
+    Serial.println(time);
+
+    scheduler->scheduleEvent(time, [nextFeeding]{
         scheduledFeed(nextFeeding);
         scheduleNextFeeding();
     });

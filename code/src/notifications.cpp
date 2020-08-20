@@ -78,14 +78,14 @@ void Notifications::sendFCMNotification(std::string token, std::string message, 
 
     Serial.print("RESPONSE: ");
     Serial.print(code);
+    Serial.print(" ");
+
     if(code > 0) {
-
         const char* response = http.getString().c_str();
-
-        Serial.print(" ");
         Serial.println(response);
     } else {
         Serial.println(http.errorToString(code));
     }
+    
     http.end();
 }
