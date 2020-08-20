@@ -19,7 +19,8 @@ void Scheduler::cancelEvent() {
 
 void Scheduler::update() {
     if(nextEvent != nullptr && timeKeeper->now() >= nextEventTime) {
-        nextEvent();
+        std::function<void()> currentEvent = nextEvent;
         cancelEvent();
+        currentEvent();
     }
 }
