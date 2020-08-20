@@ -1,4 +1,4 @@
-package com.sdoras.petfeeder.dashboard.viewModels
+package com.sdoras.petfeeder.dashboard.viewModels.impl
 
 import androidx.lifecycle.MutableLiveData
 import com.sdoras.petfeeder.core.models.Registration
@@ -8,6 +8,7 @@ import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
+import com.sdoras.petfeeder.dashboard.viewModels.DashboardPageViewModel
 
 class DashboardPageViewModelImpl(
         feederFinderRepository: FeederFinderRepository,
