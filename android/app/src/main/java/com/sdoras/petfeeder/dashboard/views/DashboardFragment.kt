@@ -8,7 +8,7 @@ import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.ClickHandler
 import com.sdoras.petfeeder.core.views.DataBoundFragment
 import com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModel
-import com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModelImpl
+import com.sdoras.petfeeder.dashboard.viewModels.impl.DashboardViewModelImpl
 import com.sdoras.petfeeder.databinding.FragmentDashboardBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

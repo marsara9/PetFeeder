@@ -1,75 +1,60 @@
 package com.sdoras.petfeeder.core.services.repositories
 
 import android.content.Context
-import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
-import android.util.Log
+import com.sdoras.petfeeder.core.utils.NsdHelper
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.net.InetAddress
+import java.util.*
 
-class FeederFinderRepository(context: Context) : Repository<Set<String>> {
+class FeederFinderRepository(context: Context) : Repository<Set<String>>, NsdHelper.Delegate {
 
-    private val discoveryListener = object : NsdManager.DiscoveryListener {
-        override fun onServiceFound(serviceInfo: NsdServiceInfo?) {
-            Log.d("NSD", serviceInfo?.serviceType ?: "no service type")
-            Log.d("NSD", serviceInfo?.serviceName ?: "no service name")
-
-            nsdManager.resolveService(serviceInfo, resolveListener)
-        }
-
-        override fun onStopDiscoveryFailed(serviceType: String?, errorCode: Int) {
-            nsdManager.stopServiceDiscovery(this)
-        }
-
-        override fun onStartDiscoveryFailed(serviceType: String?, errorCode: Int) {
-            nsdManager.stopServiceDiscovery(this)
-        }
-
-        override fun onDiscoveryStarted(serviceType: String?) {
-
-        }
-
-        override fun onDiscoveryStopped(serviceType: String?) {
-
-        }
-
-        override fun onServiceLost(serviceInfo: NsdServiceInfo?) {
-            val map = (subject.value ?: emptyMap()).toMutableMap()
-            serviceInfo?.let {
-                map.remove(it.serviceName)
-            }
-            subject.onNext(map)
-        }
-    }
-
-    private val resolveListener = object : NsdManager.ResolveListener {
-        override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
-
-        }
-
-        override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
-            val map = (subject.value ?: emptyMap()).toMutableMap()
-            serviceInfo?.host?.let {
-                map[serviceInfo.serviceName] = it
-            }
-            subject.onNext(map)
-        }
-
+    companion object {
+        private const val SERVICE_TYPE = "_petfeeder._tcp."
+        private const val SERVICE_NAME_PREFIX = "petfeeder_"
     }
 
     private val subject = BehaviorSubject.create<Map<String, InetAddress>>()
-    private val nsdManager : NsdManager = (context.getSystemService(Context.NSD_SERVICE) as NsdManager)
+    private val nsdHelper = NsdHelper(context)
 
-    init {
-        nsdManager.discoverServices("_petfeeder._tcp", NsdManager.PROTOCOL_DNS_SD, discoveryListener)
+    fun pause() {
+        nsdHelper.stopDiscovery()
+    }
+
+    fun resume() {
+        nsdHelper.discoverServices(SERVICE_TYPE, SERVICE_NAME_PREFIX, this)
     }
 
     override fun get(): Observable<Set<String>> {
-        return subject.map { map ->
-            map.values.map {
-                "http://${it.hostAddress}"
+        return subject
+                .map { it.toSortedMap(Comparator { lhs, rhs -> lhs.compareTo(rhs) }) }
+                .map {
+                    it.values.map { value -> "http://${value.hostAddress}" }
+                }.map { it.toSet() }
+    }
+
+    override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
+        synchronized(this) {
+            val map = (subject.value ?: emptyMap()).toMutableMap()
+            if (!map.containsKey(serviceInfo.serviceName)) {
+                serviceInfo.host?.let {
+                    map[serviceInfo.serviceName] = it
+                }
+                subject.onNext(map)
             }
-        }.map { it.toSet() }
+        }
+    }
+
+    override fun onServiceLost(serviceInfo: NsdServiceInfo) {
+        synchronized(this) {
+            val map = (subject.value ?: emptyMap()).toMutableMap()
+            if (map.containsKey(serviceInfo.serviceName)) {
+                serviceInfo.let {
+                    map.remove(it.serviceName)
+                }
+                subject.onNext(map)
+            }
+        }
     }
 }

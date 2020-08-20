@@ -1,7 +1,7 @@
 package com.sdoras.petfeeder.dashboard
 
-import com.sdoras.petfeeder.dashboard.viewModels.DashboardPageViewModelImpl
-import com.sdoras.petfeeder.dashboard.viewModels.DashboardViewModelImpl
+import com.sdoras.petfeeder.dashboard.viewModels.impl.DashboardPageViewModelImpl
+import com.sdoras.petfeeder.dashboard.viewModels.impl.DashboardViewModelImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module

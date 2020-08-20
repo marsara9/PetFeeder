@@ -3,12 +3,9 @@ package com.sdoras.petfeeder.core.views
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
@@ -17,14 +14,13 @@ import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.parametersOf
 import kotlin.reflect.KClass
 
-abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> : Fragment() {
+abstract class DataBoundActivity<VM : BaseViewModel, Binding : ViewDataBinding> : AppCompatActivity() {
 
     abstract val layoutId : Int
     abstract val viewModel : VM
     abstract val clickHandler : ClickHandler<VM>?
 
     protected lateinit var binding: Binding
-        private set
 
     private var progressDialog : ProgressDialog? = null
 
@@ -36,8 +32,10 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, layoutId, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding = DataBindingUtil.setContentView(this, layoutId)
         binding.setVariable(BR.viewModel, viewModel)
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this
@@ -45,12 +43,10 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
         viewModel.showLoading.observe(this, Observer {
             if(it > 0) {
                 Handler(Looper.getMainLooper()).post {
-                    context?.let {
-                        if(progressDialog == null) {
-                            progressDialog = ProgressDialog(it)
-                        }
-                        progressDialog?.show()
+                    if(progressDialog == null) {
+                        progressDialog = ProgressDialog(this)
                     }
+                    progressDialog?.show()
                 }
             } else {
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -60,7 +56,5 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
                 }, 100)
             }
         })
-
-        return binding.root
     }
 }

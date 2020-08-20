@@ -52,7 +52,7 @@ void WiFiConnection::checkStatus() {
         delay(1000);
 
         WiFi.hostname(defaultName.c_str());
-        if(MDNS.begin(defaultName.c_str()) && MDNS.addService("petfeeder", "tcp", 80)) {
+        if(MDNS.begin(defaultName.c_str(), WiFi.localIP()) && MDNS.addService("petfeeder", "tcp", 80)) {
             Serial.println("mDNS is running...");
         } else {
             Serial.println("mDNS failed.");
