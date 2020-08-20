@@ -24,13 +24,14 @@ time_t TimeKeeper::next(int hour, int minute) {
 
     t.tm_hour = hour;
     t.tm_min = minute;
+    t.tm_sec = 0;
 
     time_t result = mktime(&t);
 
     // there's a buffer of 59 seconds added.  This is to account for
     // time drifting and to make sure that we just don't repeat the
     // same event over and over again.
-    if(result + 59 < now) { 
+    if(now - result > 0) { 
         result += 86400;
     }
     
