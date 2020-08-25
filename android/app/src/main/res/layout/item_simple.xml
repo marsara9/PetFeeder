@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="@{subtitle}"
+            android:textColor="@color/colorAccent"
             android:textAppearance="?attr/textAppearanceListItemSecondary"
             tools:text="Subtitle" />
 

@@ -8,25 +8,52 @@
             type="com.sdoras.petfeeder.core.models.Feeding" />
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="2dp"
-            android:textString="@{feeding.cups}"
-            tools:text="3/8" />
+            android:layout_centerInParent="true"
+            android:minHeight="?attr/listPreferredItemHeight"
+            android:orientation="vertical"
+            android:paddingEnd="?attr/listPreferredItemPaddingEnd"
+            android:paddingStart="?attr/listPreferredItemPaddingStart">
 
-        <TextView
-            android:textAppearance="?attr/textAppearanceListItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cups" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
 
-    </LinearLayout>
+                <TextView
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="2dp"
+                    android:textString="@{feeding.cups}"
+                    tools:text="3/8" />
+
+                <TextView
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cups" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textTime="@{feeding.date}"
+                android:textColor="@color/colorAccent"
+                android:textAppearance="?attr/textAppearanceListItemSecondary"
+                tools:text="8:00am" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
 </layout>

@@ -3,6 +3,9 @@ package com.sdoras.petfeeder.core.utils
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import net.adamjak.math.fractions.Fraction
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.floor
 
 object BindingAdapters {
@@ -32,5 +35,15 @@ object BindingAdapters {
         }
 
         textView.text = "$int"
+    }
+
+    @JvmStatic
+    @BindingAdapter("android:textTime")
+    fun bindDateToText(textView: TextView, date: Date?) {
+        if(date == null) {
+            return
+        }
+
+        textView.text = DateFormat.getTimeInstance().format(date)
     }
 }
