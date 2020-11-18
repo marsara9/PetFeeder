@@ -28,10 +28,9 @@ class FeederFinderRepository(context: Context) : Repository<Set<String>>, NsdHel
 
     override fun get(): Observable<Set<String>> {
         return subject
-                .map { it.toSortedMap(Comparator { lhs, rhs -> lhs.compareTo(rhs) }) }
                 .map {
                     it.values.map { value -> "http://${value.hostAddress}" }
-                }.map { it.toSet() }
+                }.map { it.toSortedSet() }
     }
 
     override fun onServiceResolved(serviceInfo: NsdServiceInfo) {

@@ -1,6 +1,7 @@
 package com.sdoras.petfeeder.core.services.repositories
 
 import com.sdoras.petfeeder.core.models.Settings
+import com.sdoras.petfeeder.core.services.ServiceCall
 import com.sdoras.petfeeder.core.services.SettingsServices
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -29,5 +30,11 @@ class SettingsRepository(feederUrlRepository: FeederUrlRepository) : AbstractRxR
 
     fun deleteSettings() : Completable? {
         return service?.deleteSettings()
+    }
+
+    fun get(feederUrl : String) : Single<Settings> {
+        return ServiceCall(feederUrl)
+                .create(getServiceClass())
+                .getSettings()
     }
 }

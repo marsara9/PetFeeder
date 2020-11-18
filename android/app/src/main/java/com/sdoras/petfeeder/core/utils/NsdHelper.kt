@@ -3,13 +3,15 @@ package com.sdoras.petfeeder.core.utils
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.net.wifi.WifiManager
 import android.util.Log
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-class NsdHelper(context: Context) {
+class NsdHelper(private val context: Context) {
 
-    private val nsdManager: NsdManager? = context.getSystemService(Context.NSD_SERVICE) as NsdManager?
+    private var nsdManager: NsdManager? = null
+    private var multicastLock : WifiManager.MulticastLock? = null
     private var discoveryListener: NsdManager.DiscoveryListener? = null
     private var resolveListener: NsdManager.ResolveListener? = null
     private var resolveListenerBusy = AtomicBoolean(false)
@@ -91,6 +93,14 @@ class NsdHelper(context: Context) {
     fun discoverServices(serviceType : String, serviceNamePrefix : String?, delegate: Delegate) {
         check(discoveryListener == null) { "Discovery Services are already running.  Please stop the current discovery if you wish to start another." }
 
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+        multicastLock = wifiManager?.createMulticastLock("nds")?.apply {
+            setReferenceCounted(true)
+            acquire()
+        }
+
+        nsdManager = context.getSystemService(Context.NSD_SERVICE) as? NsdManager
+
         resolveListener = createResolveListener(delegate)
         discoveryListener = createDiscoveryListener(serviceType, serviceNamePrefix, delegate)
         nsdManager?.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
@@ -103,6 +113,8 @@ class NsdHelper(context: Context) {
             resolveListener = null
             resolveListenerBusy.set(false)
         }
+
+        multicastLock?.release()
     }
 
     private fun resolveNextInQueue() {

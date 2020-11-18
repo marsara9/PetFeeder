@@ -8,6 +8,18 @@
     android:orientation="vertical"
     tools:context="com.sdoras.petfeeder.main.views.MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/spinner_feeders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </androidx.appcompat.widget.Toolbar>
+
     <FrameLayout
         android:id="@+id/frame"
         android:layout_width="match_parent"

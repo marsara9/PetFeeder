@@ -5,5 +5,5 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 fun mainModule() = module {
-    viewModel { MainViewModelImpl(get()) }
+    viewModel { MainViewModelImpl(get(), get(), get()) }
 }
