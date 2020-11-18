@@ -4,10 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
-import com.sdoras.petfeeder.dashboard.views.DashboardFragment
+import com.sdoras.petfeeder.dashboard.views.DashboardPageFragment
 import com.sdoras.petfeeder.history.views.HistoryFragment
 import com.sdoras.petfeeder.main.viewModels.MainViewModelImpl
 import com.sdoras.petfeeder.schedules.views.SchedulesFragment
@@ -28,7 +32,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.navigation_home -> {
                     supportFragmentManager.beginTransaction()
-                            .replace(R.id.frame, DashboardFragment())
+                            .replace(R.id.frame, DashboardPageFragment())
                             .commit()
                     currentTab = item.itemId
                     true
@@ -63,11 +67,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(action_bar)
+
         navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
         supportFragmentManager.beginTransaction()
-                .replace(R.id.frame, DashboardFragment())
+                .replace(R.id.frame, DashboardPageFragment())
                 .commit()
+
+        viewModel.feeders.observe(this, Observer {
+            spinner_feeders.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
+            spinner_feeders.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    viewModel.feederUrl = it[position].url
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+            }
+        })
     }
 
     override fun onPause() {
