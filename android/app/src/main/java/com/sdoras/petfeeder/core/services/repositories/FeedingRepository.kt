@@ -5,7 +5,9 @@ import com.sdoras.petfeeder.core.services.FeedingServices
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-class FeedingRepository(feederUrlRepository: FeederUrlRepository) : AbstractRxRepository<FeedingServices, List<Feeding>>(feederUrlRepository) {
+class FeedingRepository(
+        feederUrlRepository: FeederUrlRepository
+) : AbstractRxRepository<FeedingServices, List<Feeding>>(feederUrlRepository) {
 
     override fun getServiceClass(): Class<FeedingServices> {
         return FeedingServices::class.java

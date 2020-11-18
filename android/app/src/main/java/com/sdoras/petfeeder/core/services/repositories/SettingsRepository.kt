@@ -33,6 +33,8 @@ class SettingsRepository(feederUrlRepository: FeederUrlRepository) : AbstractRxR
     }
 
     fun get(feederUrl : String) : Single<Settings> {
-        return ServiceCall(feederUrl).create(getServiceClass()).getSettings()
+        return ServiceCall(feederUrl)
+                .create(getServiceClass())
+                .getSettings()
     }
 }

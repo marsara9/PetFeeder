@@ -28,11 +28,9 @@ class SettingsViewModelImpl(
 
         disposables.add(notificationServices.getCloudMessagingToken()
                 .compose(applyDefaultSingleRxSettings())
-                .subscribe({
-                    cloudMessagingToken.value = it
-                }, {
+                .subscribe(cloudMessagingToken::setValue) {
 
-                }))
+                })
     }
 
     override fun setWifi(ssid: String, password: String?) {
