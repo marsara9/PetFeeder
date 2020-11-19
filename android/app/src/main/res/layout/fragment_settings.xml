@@ -5,38 +5,38 @@
     <data>
         <import type="android.view.View" />
 
-        <variable
-            name="viewModel"
-            type="com.sdoras.petfeeder.settings.viewModels.SettingsViewModel" />
-
-        <variable
-            name="clickHandler"
-            type="com.sdoras.petfeeder.settings.views.SettingsClickHandler" />
+        <variable name="viewModel" type="com.sdoras.petfeeder.settings.viewModels.SettingsViewModel" />
+        <variable name="clickHandler" type="com.sdoras.petfeeder.settings.views.SettingsClickHandler" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorAccent"
         android:orientation="vertical">
 
-        <include layout="@layout/item_section_header"
+        <include
+            layout="@layout/item_section_header"
             bind:header="@{@string/settings_title_app}" />
 
         <include
             layout="@layout/item_simple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/row_separation"
+            android:visibility="@{viewModel.showCloudMessagingToken ? View.VISIBLE : View.GONE}"
             bind:subtitle="@{viewModel.cloudMessagingToken}"
-            bind:title="@{@string/settings_cloud_messaging_token}"
-            android:visibility="@{viewModel.showCloudMessagingToken ? View.VISIBLE : View.GONE}"/>
+            bind:title="@{@string/settings_cloud_messaging_token}" />
 
-        <include layout="@layout/item_section_header"
+        <include
+            layout="@layout/item_section_header"
             bind:header="@{@string/settings_title_feeder}" />
 
         <include
             layout="@layout/item_simple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/row_separation"
             bind:onClick="@{clickHandler::onEditSSID}"
             bind:subtitle="@{viewModel.ssid}"
             bind:title="@{@string/setting_wifi_ssid}" />
@@ -45,6 +45,7 @@
             layout="@layout/item_simple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/row_separation"
             bind:onClick="@{clickHandler::onEditPassword}"
             bind:subtitle="@{@string/setting_masked_password}"
             bind:title="@{@string/setting_wifi_password}" />
@@ -53,6 +54,7 @@
             layout="@layout/item_simple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/row_separation"
             bind:onClick="@{clickHandler::onEditName}"
             bind:subtitle="@{viewModel.name}"
             bind:title="@{@string/setting_nickname}" />
@@ -61,6 +63,7 @@
             layout="@layout/item_simple"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/row_separation"
             bind:onClick="@{clickHandler::onResetToFactorySettings}"
             bind:subtitle="@{@string/setting_reset_warning}"
             bind:title="@{@string/setting_reset_factory}" />
