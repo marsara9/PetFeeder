@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable
-            name="viewModel"
-            type="com.sdoras.petfeeder.history.viewModels.HistoryViewModel" />
-        <variable
-            name="clickHandler"
-            type="com.sdoras.petfeeder.history.views.HistoryClickHandler" />
+        <variable name="viewModel" type="com.sdoras.petfeeder.history.viewModels.HistoryViewModel" />
+        <variable name="clickHandler" type="com.sdoras.petfeeder.history.views.HistoryClickHandler" />
     </data>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!--
+            TODO: See about adding a filter? (i.e. feedings in the last x days)
+              Maybe also add stats to see how many feedings / cups were dispensed
+              since the same time frame?
+         -->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorAccent"
+            tools:listitem="@layout/item_history_feeding" />
+
+    </LinearLayout>
 
 </layout>

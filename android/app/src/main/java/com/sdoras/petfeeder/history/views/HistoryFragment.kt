@@ -18,7 +18,7 @@ class HistoryFragment : DataBoundFragment<HistoryViewModel, FragmentHistoryBindi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
         viewModel.history.observe(viewLifecycleOwner, Observer {

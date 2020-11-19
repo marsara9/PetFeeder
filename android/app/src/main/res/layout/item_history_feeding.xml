@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable
-            name="feeding"
-            type="com.sdoras.petfeeder.core.models.Feeding" />
+        <variable name="feeding" type="com.sdoras.petfeeder.core.models.Feeding" />
     </data>
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:cardPreventCornerOverlap="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -18,28 +21,29 @@
             android:layout_centerInParent="true"
             android:minHeight="?attr/listPreferredItemHeight"
             android:orientation="vertical"
-            android:paddingEnd="?attr/listPreferredItemPaddingEnd"
-            android:paddingStart="?attr/listPreferredItemPaddingStart">
+            android:padding="8dp"
+            android:paddingStart="?attr/listPreferredItemPaddingStart"
+            android:paddingEnd="?attr/listPreferredItemPaddingEnd">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:textAppearance="?attr/textAppearanceListItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
+                    android:textAppearance="?attr/textAppearanceListItem"
                     android:textString="@{feeding.cups}"
                     tools:text="3/8" />
 
                 <TextView
-                    android:textAppearance="?attr/textAppearanceListItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/cups" />
+                    android:text="@string/cups"
+                    android:textAppearance="?attr/textAppearanceListItem" />
 
             </LinearLayout>
 
@@ -47,13 +51,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:textTime="@{feeding.date}"
-                android:textColor="@color/colorAccent"
                 android:textAppearance="?attr/textAppearanceListItemSecondary"
+                android:textColor="@color/colorAccent"
+                android:textTime="@{feeding.date}"
                 tools:text="8:00am" />
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 
 </layout>

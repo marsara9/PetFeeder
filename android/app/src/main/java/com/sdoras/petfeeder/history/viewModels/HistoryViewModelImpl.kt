@@ -7,26 +7,31 @@ import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 class HistoryViewModelImpl(
         feedingRepository: FeedingRepository
 ) : AbstractViewModel(), HistoryViewModel {
 
-    override val history = MutableLiveData<Map<String, List<Feeding>>>()
+    override val history = MutableLiveData<List<HistoryViewModel.HistoryItem>>()
 
     init {
         disposables.add(feedingRepository.get()
                 .map {
-                    it.fold(mutableMapOf<String, List<Feeding>>()) { map, item ->
-                        val dateFormat = SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault())
-                        dateFormat.format(item.date).let { date ->
-                            map[date] = (map[date] ?: emptyList()).plus(item)
-                        }
-                        map
+                    it.sortedByDescending { it.date }
+                            .fold(LinkedHashMap<String, List<Feeding>>()) { map, item ->
+                                val dateFormat = SimpleDateFormat("EEE, MMM d, yyyy", Locale.getDefault())
+                                dateFormat.format(item.date).let { date ->
+                                    map[date] = (map[date] ?: emptyList()).plus(item)
+                                }
+                                map
+                            }
+                }.map {
+                    it.map { entry ->
+                        HistoryViewModel.HistoryItem(entry.key, entry.value)
                     }
-                }
-                .subscribe(history::setValue) {
-                    history.value = emptyMap()
+                }.subscribe(history::setValue) {
+                    history.value = emptyList()
                 })
     }
 }
