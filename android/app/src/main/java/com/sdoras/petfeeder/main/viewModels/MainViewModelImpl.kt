@@ -33,6 +33,8 @@ class MainViewModelImpl(
                                 Single.zip(settingsRepository.get(feederUrl).map { settings ->
                                     settings.name
                                 }, Single.just(feederUrl), ::Feeder)
+                            }.sorted { o1, o2 ->
+                                o1.name.compareTo(o2.name)
                             }.toList()
                 }
                 .compose(applyDefaultObservableRxSettings())

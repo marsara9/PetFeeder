@@ -7,6 +7,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.net.InetAddress
 import java.util.*
+import kotlin.collections.LinkedHashSet
 
 class FeederFinderRepository(context: Context) : Repository<Set<String>>, NsdHelper.Delegate {
 
@@ -29,8 +30,8 @@ class FeederFinderRepository(context: Context) : Repository<Set<String>>, NsdHel
     override fun get(): Observable<Set<String>> {
         return subject
                 .map {
-                    it.values.map { value -> "http://${value.hostAddress}" }
-                }.map { it.toSortedSet() }
+                    it.map { value -> "http://${value.value}" }
+                }.map(Iterable<String>::toSet)
     }
 
     override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
