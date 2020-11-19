@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.frame, DashboardPageFragment())
                 .commit()
 
-        viewModel.feeders.observe(this, Observer {
+        viewModel.feeders.observe(this, {
             spinner_feeders.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
             spinner_feeders.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 

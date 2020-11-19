@@ -14,8 +14,13 @@
     <string name="next">Next</string>
     <string name="try_again">Try again</string>
 
+    <string name="schedule_add">Add a New Scheduled Feeding</string>
+
     <string name="feedings">Feedings</string>
     <string name="cups">Cups</string>
+
+    <string name="feedings_per_day">Feedings Per Day</string>
+    <string name="cups_per_day">Cups Per Day</string>
 
     <string name="settings_header_feeders">Feeder Settings</string>
     <string name="setting_nickname">Nickname</string>
@@ -41,6 +46,5 @@
     <string name="setup_scan_message_notice">Please make sure your feeder is plugged in and turned on.</string>
     <string name="setup_scan_message_found_multiple">Please select which one you wish to configure.</string>
     <string name="setup_scan_message_error">Please try again.</string>
-
 
 </resources>

@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 fun schedulesModule() : Module {
     return module {
-        viewModel { SchedulesViewModelImpl(get()) }
+        viewModel { SchedulesViewModelImpl(get(), get()) }
         single<SchedulesClickHandler> { args -> SchedulesClickHandlerImpl(args[0]) }
     }
 }

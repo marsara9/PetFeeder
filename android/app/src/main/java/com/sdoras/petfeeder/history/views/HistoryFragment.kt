@@ -21,7 +21,7 @@ class HistoryFragment : DataBoundFragment<HistoryViewModel, FragmentHistoryBindi
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
-        viewModel.history.observe(viewLifecycleOwner, Observer {
+        viewModel.history.observe(viewLifecycleOwner, {
             binding.recyclerView.adapter = HistoryAdapter(it)
         })
     }

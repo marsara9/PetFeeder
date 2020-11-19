@@ -1,14 +1,55 @@
 package com.sdoras.petfeeder.schedules.viewModels
 
+import android.content.Context
+import android.text.format.DateFormat
+import androidx.lifecycle.MutableLiveData
 import com.sdoras.petfeeder.core.services.repositories.ScheduleRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
+import java.util.*
 
 class SchedulesViewModelImpl(
+        context: Context,
         schedulesRepository: ScheduleRepository
 ) : AbstractViewModel(), SchedulesViewModel {
 
+    override val numberOfFeedingsPerDay = MutableLiveData<Int>()
+    override val numberOfCupsPerDay = MutableLiveData<Double>()
+    override val schedules = MutableLiveData<List<SchedulesViewModel.ScheduledItem>>()
+
     init {
         disposables.add(schedulesRepository.get()
-                .subscribe())
+                .compose(applyDefaultObservableRxSettings())
+                .map {
+                    it.fold(mutableListOf<SchedulesViewModel.ScheduledItem>()) { list, item ->
+
+                        val timeString = DateFormat.getTimeFormat(context)
+                                .format(Calendar.getInstance().apply {
+                                    set(Calendar.HOUR, item.hour.toInt())
+                                    set(Calendar.MINUTE, item.minute.toInt())
+                                }.time)
+
+                        list.add(SchedulesViewModel.ScheduledItem(timeString, item.cups.toDouble()))
+                        list
+                    }
+                }.subscribe(schedules::setValue) {
+
+                })
+
+        disposables.add(schedulesRepository.get()
+                .compose(applyDefaultObservableRxSettings())
+                .map { it.size }
+                .subscribe(numberOfFeedingsPerDay::setValue) {
+
+                })
+
+        disposables.add(schedulesRepository.get()
+                .compose(applyDefaultObservableRxSettings())
+                .map {
+                    it.fold(0.0) { current, feeding ->
+                        current + feeding.cups
+                    }
+                }.subscribe(numberOfCupsPerDay::setValue) {
+
+                })
     }
 }

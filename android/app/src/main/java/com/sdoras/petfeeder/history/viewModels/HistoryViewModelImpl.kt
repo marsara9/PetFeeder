@@ -17,6 +17,7 @@ class HistoryViewModelImpl(
 
     init {
         disposables.add(feedingRepository.get()
+                .compose(applyDefaultObservableRxSettings())
                 .map {
                     it.sortedByDescending { it.date }
                             .fold(LinkedHashMap<String, List<Feeding>>()) { map, item ->
