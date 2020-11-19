@@ -1,0 +1,64 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportHeight="96"
+    android:viewportWidth="96">
+
+    <!-- Outside Circle -->
+    <path
+        android:strokeColor="@color/colorPrimary"
+        android:strokeWidth="2"
+        android:pathData="
+            M48,4
+            a44,44 0 1,1 0,88
+            a44,44 0 1,1 0,-88
+            Z" />
+
+    <!-- Head -->
+    <path
+        android:fillColor="@color/colorPrimary"
+        android:strokeColor="@color/colorPrimaryDark"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="
+            M24,52 a24,24 0 1,0 48,0
+            v-16
+            v-12 l-12,12
+            h-24
+            l-12,-12 v12
+            v16
+            Z" />
+
+    <!-- Eyes -->
+    <path
+        android:fillColor="@color/colorAccent"
+        android:pathData="
+            M36,52
+            a2,2 0 1,1 4,4
+            a2,2 0 1,1 -4,-4
+            M56,52
+            a2,2 0 1,1 4,4
+            a2,2 0 1,1 -4,-4
+            " />
+
+    <!-- Face -->
+    <path
+        android:strokeColor="@color/colorAccent"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="
+            M40,64 l-16,0
+            M40,66 l-14,4
+            M40,68 l-12,8
+
+            M56,64 l16,0
+            M56,66 l14,4
+            M56,68 l12,8
+
+            M48,66 l-4,-4 h8 Z
+            M48,66 a2,2 0, 1,1 -4,0
+            M48,66 a2,2 0, 1,0 4,0
+            " />
+</vector>
