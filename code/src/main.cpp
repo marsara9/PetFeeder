@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-#include "webserver.h"
-#include "wifi.h"
+#include "WebServerManager.h"
+#include "WiFiManager.h"
 #include "motorcontrol.h"
 #include "dataStore.h"
 #include "scheduler.h"
@@ -28,8 +28,8 @@ const char* notificationsAuthorizationKey = "AAAAeYpJcNM:APA91bFW0WSI91TuBrMvtgt
 
 TimeKeeper *timeKeeper = new TimeKeeper();
 
-WiFiConnection* wifi = new WiFiConnection();
-WebServer* webServer = new WebServer(80, timeKeeper);
+WiFiManager* wifi = new WiFiManager();
+WebServerManager* webServer = new WebServerManager(80, timeKeeper);
 MotorControl* motorControl = new MotorControl(CONTAINERS_PER_ROTATION);
 DataStore* dataStore = new DataStore();
 Scheduler* scheduler = new Scheduler(timeKeeper);

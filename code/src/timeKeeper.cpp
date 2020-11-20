@@ -1,14 +1,51 @@
 #include "timeKeeper.h"
 
+#ifdef ARDUINO_ARCH_ESP32
+
+#include <sntp.h>
+#include <lwip/apps/sntp.h>
+#include <tcpip_adapter.h>
+
+#else
+
 #include <WiFiUDP.h>
 #include <NTPClient.h>
 
-WiFiUDP ntpUDP;
-NTPClient *timeClient = new NTPClient(ntpUDP);
+#endif
 
 TimeKeeper::TimeKeeper() {
     
 }
+
+#ifdef ARDUINO_ARCH_ESP32
+
+const char* ntpServer = "pool.ntp.org";
+
+void TimeKeeper::begin() {
+    tcpip_adapter_init();  // Should not hurt anything if already inited
+    if(sntp_enabled()){
+        sntp_stop();
+    }
+    sntp_setoperatingmode(0);
+    sntp_setservername(0, (char*)ntpServer);
+    sntp_init();
+    //setTimeZone(0, 0);
+}
+
+time_t TimeKeeper::now() {
+    time_t now;
+    time(&now);
+    return now;
+}
+
+bool TimeKeeper::update() {
+    return true;
+}
+
+#else
+
+WiFiUDP ntpUDP;
+NTPClient *timeClient = new NTPClient(ntpUDP);
 
 void TimeKeeper::begin() {
     timeClient->begin();
@@ -18,8 +55,14 @@ time_t TimeKeeper::now() {
     return timeClient->getEpochTime();
 }
 
+bool TimeKeeper::update() {
+    return timeClient->update();
+}
+
+#endif
+
 time_t TimeKeeper::next(int hour, int minute) {
-    time_t now = timeClient->getEpochTime();
+    time_t now = this->now();
     tm t = *gmtime(&now);
 
     t.tm_hour = hour;
@@ -36,8 +79,4 @@ time_t TimeKeeper::next(int hour, int minute) {
     }
     
     return result;
-}
-
-bool TimeKeeper::update() {
-    return timeClient->update();
 }

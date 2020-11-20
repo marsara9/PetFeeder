@@ -39,6 +39,7 @@ public:
 private:
     template<typename T> T readBytesFromFile(fs::File file);
     template<typename T> void writeBytesToFile(fs::File file, T data);
+    template<typename T> void writeArrayToFile(fs::File file, T* data, size_t size);
     template<typename T> std::vector<T> enumerateFiles(std::string folder, std::function<T(fs::File)> read);
     template<typename T> T read(std::string id, std::string folder, std::function<T(fs::File)> read);
     template<typename T> void save(T item, std::string id, std::string folder, std::function<void(T, fs::File)> write);

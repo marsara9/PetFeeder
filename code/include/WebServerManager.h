@@ -14,9 +14,9 @@
 #ifndef PET_WEBSERVER
 #define PET_WEBSERVER
 
-class WebServer {
+class WebServerManager {
     public:
-        WebServer(int port, TimeKeeper* timeKeeper);
+        WebServerManager(int port, TimeKeeper* timeKeeper);
         
         void startServer();
         void handleClient();

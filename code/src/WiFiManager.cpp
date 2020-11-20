@@ -1,12 +1,18 @@
-#include "wifi.h"
+#include "WiFiManager.h"
 
 #include <sstream>
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
+
+#ifdef ARDUINO_ARCH_ESP32
+    #include <WiFi.h>
+    #include <ESPmDNS.h>
+#else
+    #include <ESP8266WiFi.h>
+    #include <ESP8266mDNS.h>
+#endif
 
 const int NUMBER_OF_CONNECTION_ATTEMPTS = 10;
 
-WiFiConnection::WiFiConnection() {
+WiFiManager::WiFiManager() {
 
     std::stringstream ss;
     ss << "petfeeder_" << random(9999);
@@ -23,7 +29,7 @@ WiFiConnection::WiFiConnection() {
     WiFi.setAutoReconnect(true);
 }
 
-void WiFiConnection::begin(const Settings settings) {
+void WiFiManager::begin(const Settings settings) {
     
     if(this->settings.ssid.compare(settings.ssid) != 0 || this->settings.password.compare(settings.password) != 0) {
         WiFi.disconnect(true);
@@ -40,7 +46,7 @@ void WiFiConnection::begin(const Settings settings) {
     this->settings = settings;
 }
 
-void WiFiConnection::checkStatus() {
+void WiFiManager::checkStatus() {
     if(WiFi.isConnected() && WiFi.getMode() & WIFI_AP) {
         Serial.print("Connected to:\t");
         Serial.println(WiFi.SSID());
@@ -51,8 +57,9 @@ void WiFiConnection::checkStatus() {
         WiFi.softAPdisconnect(true);
         delay(1000);
 
-        WiFi.hostname(defaultName.c_str());
-        if(MDNS.begin(defaultName.c_str(), WiFi.localIP()) && MDNS.addService("petfeeder", "tcp", 80)) {
+        //WiFi.hostname(defaultName.c_str());
+        if(MDNS.begin(defaultName.c_str())) {
+            MDNS.addService("petfeeder", "tcp", 80);
             Serial.println("mDNS is running...");
         } else {
             Serial.println("mDNS failed.");
@@ -63,13 +70,19 @@ void WiFiConnection::checkStatus() {
         createAccessPoint();
     }
 
-    MDNS.update();            
+#ifndef ARDUINO_ARCH_ESP32
+    MDNS.update();       
+#endif     
 }
 
-bool WiFiConnection::createAccessPoint() {
+bool WiFiManager::createAccessPoint() {
     if(WiFi.softAP(defaultName.c_str())) {
         Serial.print("\tSSID:\t");
+#ifdef ARDUINO_ARCH_ESP32
+        Serial.println(WiFi.softAPgetHostname());
+#else
         Serial.println(WiFi.softAPSSID());
+#endif
         Serial.print("\tIP address:\t");
         Serial.println(WiFi.softAPIP());
 

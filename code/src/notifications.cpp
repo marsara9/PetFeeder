@@ -3,8 +3,15 @@
 #include "models/feeding.h"
 #include "models/settings.h"
 
-#include <ESP8266HTTPClient.h>
-#include <WiFiClientSecureBearSSL.h>
+#ifdef ARDUINO_ARCH_ESP32
+    #include <HTTPClient.h>
+    #include <WiFiClientSecure.h>
+#else
+    #include <ESP8266HTTPClient.h>
+    #include <WiFiClientSecureBearSSL.h>
+#endif
+
+
 #include <stdio.h>
 #include <sstream>
 
@@ -59,9 +66,13 @@ void Notifications::sendFCMNotification(std::string token, std::string message, 
     std::string payload = "{ \"to\": \"" + token + "\", \"notification\": { \"body\": \"" + message + "\", \"title\": \"PetFeeder\" } }";
 
     HTTPClient http;
+#ifdef ARDUINO_ARCH_ESP32
+    WiFiClientSecure client;
+#else
     BearSSL::WiFiClientSecure client;
 
     client.setFingerprint(fingerprint);
+#endif
 
     Serial.print("REQUEST: ");
     Serial.print("POST");

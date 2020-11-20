@@ -1,13 +1,27 @@
-#include "webserver.h"
+#include "WebServerManager.h"
 #include "jsonUtils.h"
 
+#ifdef ARDUINO_ARCH_ESP32
+
+#include <WebServer.h>
 #include <uri/UriBraces.h>
 
+#else
+
+#include <uri/UriBraces.h>
 #include <ESP8266WebServer.h>
+
+#endif
+
 #include <string>
 #include <math.h>
 
+#ifdef ARDUINO_ARCH_ESP32
+WebServer *server = nullptr;
+#else
 ESP8266WebServer *server = nullptr;
+#endif
+
 
 std::function<Settings()> onGetSettingsCallback;
 std::function<void(Settings)> onSettingsChangedCallback;
@@ -31,82 +45,86 @@ const int HTTP_NO_CONTENT = 204;
 const int HTTP_BAD_REQUEST = 400;
 const int HTTP_NOT_FOUND = 404;
 
-WebServer::WebServer(int port, TimeKeeper* timeKeeper) {
+WebServerManager::WebServerManager(int port, TimeKeeper* timeKeeper) {
+#ifdef ARDUINO_ARCH_ESP32
+    server = new WebServer(port);
+#else
     server = new ESP8266WebServer(port);
+#endif
     this->timeKeeper = timeKeeper;
 }
 
-void WebServer::startServer() {
+void WebServerManager::startServer() {
     server->stop();
     server->begin();
 
-    server->onNotFound(std::bind(&WebServer::handleNotFound, this));
-    server->on("/settings", HTTP_GET, std::bind(&WebServer::handleGETSettings, this));
-    server->on("/settings", HTTP_PUT, std::bind(&WebServer::handlePUTSettings, this));
+    server->onNotFound(std::bind(&WebServerManager::handleNotFound, this));
+    server->on("/settings", HTTP_GET, std::bind(&WebServerManager::handleGETSettings, this));
+    server->on("/settings", HTTP_PUT, std::bind(&WebServerManager::handlePUTSettings, this));
 
-    server->on("/feed", HTTP_GET, std::bind(&WebServer::handleGETFeed, this));
-    server->on("/feed", HTTP_POST, std::bind(&WebServer::handlePOSTFeed, this));
+    server->on("/feed", HTTP_GET, std::bind(&WebServerManager::handleGETFeed, this));
+    server->on("/feed", HTTP_POST, std::bind(&WebServerManager::handlePOSTFeed, this));
 
-    server->on("/schedule", HTTP_GET, std::bind(&WebServer::handleGETSchedules, this));
-    server->on("/schedule", HTTP_POST, std::bind(&WebServer::handlePOSTSchedule, this));
-    server->on(UriBraces("/schedule/{}"), HTTP_DELETE, std::bind(&WebServer::handleDELETESchedule, this));
+    server->on("/schedule", HTTP_GET, std::bind(&WebServerManager::handleGETSchedules, this));
+    server->on("/schedule", HTTP_POST, std::bind(&WebServerManager::handlePOSTSchedule, this));
+    server->on(UriBraces("/schedule/{}"), HTTP_DELETE, std::bind(&WebServerManager::handleDELETESchedule, this));
 
-    server->on("/register", HTTP_POST, std::bind(&WebServer::handlePOSTRegister, this));
-    server->on(UriBraces("/register/{}"), HTTP_DELETE, std::bind(&WebServer::handleDELETERegister, this));
+    server->on("/register", HTTP_POST, std::bind(&WebServerManager::handlePOSTRegister, this));
+    server->on(UriBraces("/register/{}"), HTTP_DELETE, std::bind(&WebServerManager::handleDELETERegister, this));
 }
 
-void WebServer::handleClient() {
+void WebServerManager::handleClient() {
     server->handleClient();
 }
 
-void WebServer::onGetSettings(std::function<Settings()> callback) {
+void WebServerManager::onGetSettings(std::function<Settings()> callback) {
     onGetSettingsCallback = callback;
 }
 
-void WebServer::onSettingsChanged(std::function<void(Settings)> callback) {
+void WebServerManager::onSettingsChanged(std::function<void(Settings)> callback) {
     onSettingsChangedCallback = callback;
 }
 
-void WebServer::onGetFeedings(std::function<std::vector<Feeding>()> callback) {
+void WebServerManager::onGetFeedings(std::function<std::vector<Feeding>()> callback) {
     onGetFeedingsCallback = callback;
 }
 
-void WebServer::onFeed(std::function<void(Feeding)> callback) {
+void WebServerManager::onFeed(std::function<void(Feeding)> callback) {
     onFeedCallback = callback;
 }
 
-void WebServer::isValidFeedAmount(std::function<bool(float)> callback) {
+void WebServerManager::isValidFeedAmount(std::function<bool(float)> callback) {
     isValidFeedAmountCallback = callback;
 }
 
-void WebServer::onGetAllScheduledFeedings(std::function<std::vector<Schedule>()> callback) {
+void WebServerManager::onGetAllScheduledFeedings(std::function<std::vector<Schedule>()> callback) {
     onGetAllScheduledFeedingsCallback = callback;
 }
 
-void WebServer::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
+void WebServerManager::onAddScheduledFeeding(std::function<void(Schedule)> callback) {
     onAddScheduledFeedingCallback = callback;
 }
 
-void WebServer::onDeleteScheduledFeeding(std::function<void(std::string)> callback) {
+void WebServerManager::onDeleteScheduledFeeding(std::function<void(std::string)> callback) {
     onDeleteScheduledFeedingCallback = callback;
 }
 
-void WebServer::onRegisterDevice(std::function<void(Registration)> callback) {
+void WebServerManager::onRegisterDevice(std::function<void(Registration)> callback) {
     onRegisterDeviceCallback = callback;
 }
 
-void WebServer::onDeleteRegistration(std::function<void(std::string)> callback) {
+void WebServerManager::onDeleteRegistration(std::function<void(std::string)> callback) {
     onDeleteRegistrationCallback = callback;
 }
 
-void WebServer::printRequest() {
+void WebServerManager::printRequest() {
     Serial.print("REQUEST: ");
     Serial.print(server->method());
     Serial.print(" ");
     Serial.println(server->uri());
 }
 
-void WebServer::sendResponse(int code, const char* contentType = "", std::string response = "") {
+void WebServerManager::sendResponse(int code, const char* contentType = "", std::string response = "") {
     Serial.print("RESPONSE: ");
     Serial.print(code);
     Serial.print(" ");
@@ -115,11 +133,11 @@ void WebServer::sendResponse(int code, const char* contentType = "", std::string
     server->send(code, contentType, response.c_str());
 }
 
-void WebServer::handleNotFound() {
+void WebServerManager::handleNotFound() {
     sendResponse(HTTP_NOT_FOUND, CONTENT_TYPE, "{ \"error\" : { \"code\" : 404, \"message\" : \"Not Found\" } }");
 }
 
-void WebServer::handleGETSettings() {
+void WebServerManager::handleGETSettings() {
     printRequest();
 
     Settings settings = onGetSettingsCallback();
@@ -127,7 +145,7 @@ void WebServer::handleGETSettings() {
     sendResponse(HTTP_OK, CONTENT_TYPE, settingsToJson(settings).c_str());
 }
 
-void WebServer::handlePUTSettings() {
+void WebServerManager::handlePUTSettings() {
     printRequest();
 
     const char* ssid = server->arg("ssid").c_str();
@@ -154,7 +172,7 @@ void WebServer::handlePUTSettings() {
     onSettingsChangedCallback(settings);
 }
 
-void WebServer::handleGETFeed() {
+void WebServerManager::handleGETFeed() {
     printRequest();
 
     std::vector<Feeding> feedings = onGetFeedingsCallback();
@@ -163,7 +181,7 @@ void WebServer::handleGETFeed() {
     sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(feedings, toJson));
 }
 
-void WebServer::handlePOSTFeed() {
+void WebServerManager::handlePOSTFeed() {
     printRequest();
 
     const char* cupsString = server->arg("cups").c_str();
@@ -191,7 +209,7 @@ void WebServer::handlePOSTFeed() {
     onFeedCallback(feeding);
 }
 
-void WebServer::handleGETSchedules() {
+void WebServerManager::handleGETSchedules() {
     printRequest();
 
     std::vector<Schedule> scheduledFeedings = onGetAllScheduledFeedingsCallback();
@@ -200,7 +218,7 @@ void WebServer::handleGETSchedules() {
     sendResponse(HTTP_OK, CONTENT_TYPE, toJsonArray(scheduledFeedings, toJson));
 }
 
-void WebServer::handlePOSTSchedule() {
+void WebServerManager::handlePOSTSchedule() {
     printRequest();
 
     const char* cupsString = server->arg("cups").c_str();
@@ -239,7 +257,7 @@ void WebServer::handlePOSTSchedule() {
     onAddScheduledFeedingCallback(schedule);
 }
 
-void WebServer::handleDELETESchedule() {
+void WebServerManager::handleDELETESchedule() {
     printRequest();
 
     std::string id = server->pathArg(0).c_str();
@@ -249,7 +267,7 @@ void WebServer::handleDELETESchedule() {
     onDeleteScheduledFeedingCallback(id);
 }
 
-void WebServer::handlePOSTRegister() {
+void WebServerManager::handlePOSTRegister() {
     printRequest();
 
     const char* json = server->arg("plain").c_str();
@@ -261,7 +279,7 @@ void WebServer::handlePOSTRegister() {
     sendResponse(HTTP_NO_CONTENT, CONTENT_TYPE);
 }
 
-void WebServer::handleDELETERegister() {
+void WebServerManager::handleDELETERegister() {
     printRequest();
 
     std::string id = server->pathArg(0).c_str();

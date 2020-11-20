@@ -6,9 +6,9 @@
 #ifndef PET_WIFI
 #define PET_WIFI
 
-class WiFiConnection {
+class WiFiManager {
 public:
-    WiFiConnection();
+    WiFiManager();
     void begin(Settings settings);
     
     void checkStatus();

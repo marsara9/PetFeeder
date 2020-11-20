@@ -25,12 +25,18 @@ template<typename T> T DataStore::readBytesFromFile(fs::File file) {
 template<typename T> void DataStore::writeBytesToFile(fs::File file, T data) {
     union {
         T data;
-        char bytes[sizeof(T)];
+        unsigned char bytes[sizeof(T)];
     } converter;
 
     converter.data = data;
 
     file.write(converter.bytes, sizeof(T));
+}
+
+template<typename T> void DataStore::writeArrayToFile(fs::File file, T* data, size_t size) {
+    for(int i = 0; i < size; i++) {
+        writeBytesToFile(file, data[i]);
+    }
 }
 
 template<typename T> std::vector<T> DataStore::enumerateFiles(std::string folder, std::function<T(fs::File)> read) {
@@ -126,21 +132,21 @@ void DataStore::deleteSchedule(std::string id) {
 
 void DataStore::deleteAllFeedings() {
     enumerateFiles<void*>("feedings", [](fs::File file){
-        SD.remove(file.fullName());
+        SD.remove(file.name());
         return nullptr;
     });
 }
 
 void DataStore::deleteAllSchedules() {
     enumerateFiles<void*>("schedules", [](fs::File file){
-        SD.remove(file.fullName());
+        SD.remove(file.name());
         return nullptr;
     });
 }
 
 void DataStore::deleteAllRegisteredDevices() {
     enumerateFiles<void*>("registrations", [](fs::File file){
-        SD.remove(file.fullName());
+        SD.remove(file.name());
         return nullptr;
     });
 }
@@ -212,20 +218,20 @@ void DataStore::scheduleToFile(Schedule schedule, fs::File file) {
 }
 
 void DataStore::registrationToFile(Registration registration, fs::File file) {
-    file.write(registration.token.c_str());
-    file.write("\n");
-    file.write(registration.deviceType.c_str());
-    file.write("\n");
+    writeArrayToFile(file, registration.token.c_str(), registration.token.length());
+    writeArrayToFile(file, "\n", 2);
+    writeArrayToFile(file, registration.deviceType.c_str(), registration.deviceType.length());
+    writeArrayToFile(file, "\n", 2);
 }
 
 void DataStore::settingsToFile(Settings settings, fs::File file) {
-    file.write(settings.ssid.c_str());
-    file.write("\n");
-    file.write(settings.password.c_str());
-    file.write("\n");
-    file.write(settings.name.c_str());
-    file.write("\n");
-    file.write(settings.fcm_fingerprint, sizeof(settings.fcm_fingerprint));
+    writeArrayToFile(file, settings.ssid.c_str(), settings.ssid.length());
+    writeArrayToFile(file, "\n", 2);
+    writeArrayToFile(file, settings.password.c_str(), settings.password.length());
+    writeArrayToFile(file, "\n", 2);
+    writeArrayToFile(file, settings.name.c_str(), settings.name.length());
+    writeArrayToFile(file, "\n", 2);
+    writeArrayToFile(file, settings.fcm_fingerprint, 20);
 }
 
 Settings DataStore::getFactoryDefaultSettings() {
