@@ -1,5 +1,6 @@
 package com.sdoras.petfeeder.schedules.viewModels
 
+import android.graphics.drawable.Drawable
 import androidx.lifecycle.LiveData
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 
@@ -10,6 +11,7 @@ interface SchedulesViewModel : BaseViewModel {
 
     data class ScheduledItem(
             val timeString: String,
-            val cups: Double
+            val cups: Double,
+            val icon : Drawable
     )
 }

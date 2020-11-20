@@ -16,7 +16,7 @@ class SchedulesAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return if(position < scheduledFeedings.size) {
-            R.layout.item_simple
+            R.layout.item_scheduled_feeding
         } else {
             R.layout.item_schedule_add
         }
@@ -32,9 +32,8 @@ class SchedulesAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         when(holder.viewType) {
-            R.layout.item_simple -> {
-                holder.binding.setVariable(BR.title, scheduledFeedings[position].timeString)
-                holder.binding.setVariable(BR.subtitle, scheduledFeedings[position].cups)
+            R.layout.item_scheduled_feeding -> {
+                holder.binding.setVariable(BR.item, scheduledFeedings[position])
             }
             R.layout.item_schedule_add -> {
                 // TODO: Set onClick listener
