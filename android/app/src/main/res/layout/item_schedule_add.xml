@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable name="onClick" type="kotlin.jvm.functions.Function1&lt;android.view.View, kotlin.Unit>" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/list_selector_background"
             android:clickable="true"
+            android:onClick="@{(v) -> onClick.invoke(v)}"
             android:minHeight="?attr/listPreferredItemHeight"
             android:orientation="horizontal"
             android:padding="8dp"

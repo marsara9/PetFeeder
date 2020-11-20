@@ -2,11 +2,15 @@ package com.sdoras.petfeeder.settings.views
 
 import android.app.AlertDialog
 import android.view.View
+import androidx.fragment.app.FragmentManager
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.dialogs.EditTextDialog
 import com.sdoras.petfeeder.settings.viewModels.SettingsViewModel
 
-class SettingsClickHandlerImpl(override val viewModel: SettingsViewModel) : SettingsClickHandler {
+class SettingsClickHandlerImpl(
+        override val viewModel: SettingsViewModel,
+        override val fragmentManager: FragmentManager
+) : SettingsClickHandler {
 
     override fun onEditSSID(view: View) {
         EditTextDialog(view.context, R.string.setting_edit_ssid).apply {

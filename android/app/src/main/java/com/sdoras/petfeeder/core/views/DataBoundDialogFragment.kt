@@ -1,15 +1,17 @@
 package com.sdoras.petfeeder.core.views
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.fragment.app.DialogFragment
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 import com.sdoras.petfeeder.core.views.dialogs.ProgressDialog
@@ -17,7 +19,7 @@ import org.koin.android.ext.android.getKoin
 import org.koin.core.parameter.parametersOf
 import kotlin.reflect.KClass
 
-abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> : Fragment() {
+abstract class DataBoundDialogFragment<VM : BaseViewModel, Binding : ViewDataBinding> : DialogFragment() {
 
     abstract val layoutId : Int
     abstract val viewModel : VM
@@ -42,11 +44,16 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this
 
+        //setStyle(STYLE_NO_FRAME, 0)
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Dialog_MinWidth)
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        //dialog?.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+
         viewModel.showLoading.observe(this, {
-            if(it > 0) {
+            if (it > 0) {
                 Handler(Looper.getMainLooper()).post {
                     context?.let {
-                        if(progressDialog == null) {
+                        if (progressDialog == null) {
                             progressDialog = ProgressDialog(it)
                         }
                         progressDialog?.show()
@@ -54,7 +61,7 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
                 }
             } else {
                 Handler(Looper.getMainLooper()).postDelayed({
-                    if(it == 0) {
+                    if (it == 0) {
                         progressDialog?.dismiss()
                     }
                 }, 100)
@@ -62,5 +69,16 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
         })
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+//        val params = dialog?.window?.attributes?.apply {
+//            width = WindowManager.LayoutParams.MATCH_PARENT
+//            height = WindowManager.LayoutParams.WRAP_CONTENT
+//            horizontalMargin = 20f
+//        }
+//        dialog?.window?.attributes = params
     }
 }

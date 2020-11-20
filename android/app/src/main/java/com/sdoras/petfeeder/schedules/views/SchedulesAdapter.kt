@@ -14,6 +14,8 @@ class SchedulesAdapter(
         private val scheduledFeedings: List<SchedulesViewModel.ScheduledItem>
 ) : RecyclerView.Adapter<SchedulesAdapter.ViewHolder>() {
 
+    var delegate : Delegate? = null
+
     override fun getItemViewType(position: Int): Int {
         return if(position < scheduledFeedings.size) {
             R.layout.item_scheduled_feeding
@@ -34,9 +36,14 @@ class SchedulesAdapter(
         when(holder.viewType) {
             R.layout.item_scheduled_feeding -> {
                 holder.binding.setVariable(BR.item, scheduledFeedings[position])
+                holder.binding.setVariable(BR.onClick, { view : View ->
+                    delegate?.onEditScheduledFeeding(view, scheduledFeedings[position])
+                })
             }
             R.layout.item_schedule_add -> {
-                // TODO: Set onClick listener
+                holder.binding.setVariable(BR.onClick, { view : View ->
+                    delegate?.onAddNewScheduledFeeding(view)
+                })
             }
         }
     }
@@ -50,4 +57,9 @@ class SchedulesAdapter(
             val viewType: Int,
             val binding: ViewDataBinding
     ) : RecyclerView.ViewHolder(view)
+
+    interface Delegate {
+        fun onEditScheduledFeeding(view : View, scheduledItem : SchedulesViewModel.ScheduledItem)
+        fun onAddNewScheduledFeeding(view : View)
+    }
 }

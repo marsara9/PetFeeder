@@ -23,7 +23,9 @@ class SchedulesFragment : DataBoundFragment<SchedulesViewModel, FragmentSchedule
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
         viewModel.schedules.observe(viewLifecycleOwner, {
-            binding.recyclerView.adapter = SchedulesAdapter(it)
+            binding.recyclerView.adapter = SchedulesAdapter(it).apply {
+                delegate = clickHandler
+            }
         })
     }
 }

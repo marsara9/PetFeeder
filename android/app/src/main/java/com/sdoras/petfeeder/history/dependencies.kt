@@ -10,6 +10,6 @@ import org.koin.dsl.module
 fun historyModule() : Module {
     return module {
         viewModel { HistoryViewModelImpl(get()) }
-        single<HistoryClickHandler> { args -> HistoryClickHandlerImpl(args[0]) }
+        single<HistoryClickHandler> { args -> HistoryClickHandlerImpl(args[0], args[1]) }
     }
 }
