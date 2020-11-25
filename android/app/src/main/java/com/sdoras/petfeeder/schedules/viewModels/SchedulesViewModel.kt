@@ -11,7 +11,9 @@ interface SchedulesViewModel : BaseViewModel {
 
     data class ScheduledItem(
             val timeString: String,
+            val icon : Drawable,
             val cups: Double,
-            val icon : Drawable
+            val hour : Int,
+            val minute : Int
     )
 }
