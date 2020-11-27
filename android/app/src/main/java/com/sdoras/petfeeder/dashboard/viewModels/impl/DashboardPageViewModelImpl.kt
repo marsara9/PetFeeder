@@ -7,7 +7,6 @@ import com.sdoras.petfeeder.core.models.Registration
 import com.sdoras.petfeeder.core.services.NotificationServices
 import com.sdoras.petfeeder.core.services.RegistrationServices
 import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
-import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel

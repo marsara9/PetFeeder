@@ -6,10 +6,8 @@ import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 import com.sdoras.petfeeder.main.viewModels.MainViewModel.Feeder
-import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.kotlin.flatMapIterable
 
 class MainViewModelImpl(
         private val feederFinderRepository: FeederFinderRepository,

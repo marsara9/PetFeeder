@@ -3,8 +3,6 @@ package com.sdoras.petfeeder.schedules.views
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.dialog.MaterialDialogs
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.sdoras.petfeeder.schedules.viewModels.SchedulesViewModel

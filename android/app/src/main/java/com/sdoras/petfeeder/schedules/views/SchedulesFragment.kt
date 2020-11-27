@@ -2,12 +2,10 @@ package com.sdoras.petfeeder.schedules.views
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.DataBoundFragment
 import com.sdoras.petfeeder.databinding.FragmentSchedulesBinding
-import com.sdoras.petfeeder.history.views.HistoryAdapter
 import com.sdoras.petfeeder.schedules.viewModels.SchedulesViewModel
 import com.sdoras.petfeeder.schedules.viewModels.SchedulesViewModelImpl
 import org.koin.androidx.viewmodel.ext.android.viewModel

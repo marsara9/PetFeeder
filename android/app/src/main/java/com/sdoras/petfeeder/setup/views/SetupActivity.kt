@@ -2,7 +2,6 @@ package com.sdoras.petfeeder.setup.views
 
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.ClickHandler
 import com.sdoras.petfeeder.core.views.DataBoundActivity
@@ -21,7 +20,7 @@ class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.currentStepFragment.observe(this, Observer {
+        viewModel.currentStepFragment.observe(this, {
             supportFragmentManager.beginTransaction()
                     .replace(R.id.frame, it)
                     .commit()

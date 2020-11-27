@@ -2,7 +2,6 @@ package com.sdoras.petfeeder.setup.views.steps
 
 import androidx.databinding.ViewDataBinding
 import com.sdoras.petfeeder.R
-import com.sdoras.petfeeder.core.views.ClickHandler
 import com.sdoras.petfeeder.setup.viewModels.steps.ScanForFeedersSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.impl.ScanForFeedersSetupStepViewModelImpl
 import com.sdoras.petfeeder.setup.views.AbstractSetupStepFragment

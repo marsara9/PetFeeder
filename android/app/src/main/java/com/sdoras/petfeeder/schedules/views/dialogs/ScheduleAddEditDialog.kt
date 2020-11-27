@@ -3,7 +3,6 @@ package com.sdoras.petfeeder.schedules.views.dialogs
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.ClickHandler
 import com.sdoras.petfeeder.core.views.DataBoundDialogFragment
-import com.sdoras.petfeeder.core.views.DataBoundFragment
 import com.sdoras.petfeeder.databinding.DialogScheduleAddEditBinding
 import com.sdoras.petfeeder.schedules.viewModels.ScheduleAddEditViewModel
 import com.sdoras.petfeeder.schedules.viewModels.ScheduleAddEditViewModelImpl

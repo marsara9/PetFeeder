@@ -2,7 +2,6 @@ package com.sdoras.petfeeder.history.views
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.core.views.DataBoundFragment
