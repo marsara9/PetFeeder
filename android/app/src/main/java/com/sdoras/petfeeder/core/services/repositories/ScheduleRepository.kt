@@ -22,4 +22,8 @@ class ScheduleRepository(
                             minute : Byte) : Completable? {
         return service?.addScheduledFeeding(cups, hour, minute)
     }
+
+    fun deleteScheduledFeeding(scheduledFeeding: ScheduledFeeding) : Completable? {
+        return service?.deleteScheduledFeeding(scheduledFeeding.id)
+    }
 }

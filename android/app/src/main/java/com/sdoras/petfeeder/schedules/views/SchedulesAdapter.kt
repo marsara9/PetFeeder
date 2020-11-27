@@ -8,6 +8,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.R
+import com.sdoras.petfeeder.core.models.ScheduledFeeding
 import com.sdoras.petfeeder.schedules.viewModels.SchedulesViewModel
 
 class SchedulesAdapter(
@@ -37,7 +38,7 @@ class SchedulesAdapter(
             R.layout.item_scheduled_feeding -> {
                 holder.binding.setVariable(BR.item, scheduledFeedings[position])
                 holder.binding.setVariable(BR.onClick, { view : View ->
-                    delegate?.onEditScheduledFeeding(view, scheduledFeedings[position])
+                    delegate?.onEditScheduledFeeding(view, scheduledFeedings[position].scheduledFeeding)
                 })
             }
             R.layout.item_schedule_add -> {
@@ -59,7 +60,7 @@ class SchedulesAdapter(
     ) : RecyclerView.ViewHolder(view)
 
     interface Delegate {
-        fun onEditScheduledFeeding(view : View, scheduledItem : SchedulesViewModel.ScheduledItem)
+        fun onEditScheduledFeeding(view : View, scheduledFeeding: ScheduledFeeding)
         fun onAddNewScheduledFeeding(view : View)
     }
 }

@@ -22,7 +22,11 @@ abstract class DataBoundDialogFragment<VM : BaseViewModel, Binding : ViewDataBin
 
     abstract val layoutId : Int
     abstract val viewModel : VM
-    abstract val clickHandler : ClickHandler<VM>?
+    abstract val clickHandler : DialogClickHandler<VM>?
+
+    var positiveButtonClickListener : View.OnClickListener? = null
+    var negativeButtonClickListener : View.OnClickListener? = null
+    var neutralButtonClickListener : View.OnClickListener? = null
 
     protected lateinit var binding: Binding
         private set
@@ -33,7 +37,7 @@ abstract class DataBoundDialogFragment<VM : BaseViewModel, Binding : ViewDataBin
 
     protected fun <T : ClickHandler<in VM>> clickHandler(clazz: KClass<T>) = lazy {
         getKoin().get<T>(clazz, null) {
-            parametersOf(viewModel, fragmentManager)
+            parametersOf(dialog, viewModel, fragmentManager)
         }
     }
 
@@ -43,10 +47,8 @@ abstract class DataBoundDialogFragment<VM : BaseViewModel, Binding : ViewDataBin
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this
 
-        //setStyle(STYLE_NO_FRAME, 0)
         setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Dialog_MinWidth)
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        //dialog?.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
 
         viewModel.showLoading.observe(this, {
             if (it > 0) {
@@ -70,14 +72,15 @@ abstract class DataBoundDialogFragment<VM : BaseViewModel, Binding : ViewDataBin
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
+    fun onPositiveButtonClicked(view : View) {
+        positiveButtonClickListener?.onClick(view)
+    }
 
-//        val params = dialog?.window?.attributes?.apply {
-//            width = WindowManager.LayoutParams.MATCH_PARENT
-//            height = WindowManager.LayoutParams.WRAP_CONTENT
-//            horizontalMargin = 20f
-//        }
-//        dialog?.window?.attributes = params
+    fun onNegativeButtonClicked(view : View) {
+        negativeButtonClickListener?.onClick(view)
+    }
+
+    fun onNeutralButtonClicked(view : View) {
+        neutralButtonClickListener?.onClick(view)
     }
 }

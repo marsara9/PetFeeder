@@ -49,5 +49,7 @@
     <string name="setup_scan_message_notice">Please make sure your feeder is plugged in and turned on.</string>
     <string name="setup_scan_message_found_multiple">Please select which one you wish to configure.</string>
     <string name="setup_scan_message_error">Please try again.</string>
+    <string name="hours">Hours</string>
+    <string name="minute">Minute</string>
 
 </resources>

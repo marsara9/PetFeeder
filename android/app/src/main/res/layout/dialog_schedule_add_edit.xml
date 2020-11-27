@@ -4,6 +4,15 @@
 
     <data>
 
+        <import type="java.util.Calendar" />
+
+        <variable
+            name="viewModel"
+            type="com.sdoras.petfeeder.schedules.viewModels.ScheduleAddEditViewModel" />
+
+        <variable
+            name="dialogFragment"
+            type="com.sdoras.petfeeder.schedules.views.dialogs.ScheduleAddEditDialog" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -14,78 +23,123 @@
         app:cardElevation="8dp"
         app:cardPreventCornerOverlap="false">
 
-        <LinearLayout
-            android:layout_width="300dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:orientation="vertical">
+            android:layout_margin="12dp">
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_ok"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/title_dialog_schedule"
-                android:textAppearance="?textAppearanceCaption" />
+                android:layout_marginHorizontal="8dp"
+                android:onClick="@{dialogFragment::onPositiveButtonClicked}"
+                android:text="@string/ok"
+                app:layout_constraintEnd_toStartOf="@id/button_cancel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_cups" />
 
-            <View
-                android:id="@+id/separator"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/divider_width"
-                android:layout_margin="8dp"
-                android:layout_marginBottom="16dp"
-                android:background="@color/colorAccent"
-                app:layout_constraintTop_toBottomOf="@id/title" />
-
-            <TextView
-                android:id="@+id/label_hours"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button_cancel"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:labelFor="@id/edit_time"
-                android:text="@string/time" />
+                android:layout_marginHorizontal="8dp"
+                android:onClick="@{dialogFragment::onNegativeButtonClicked}"
+                android:text="@string/cancel"
+                app:layout_constraintBaseline_toBaselineOf="@id/button_ok"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/button_ok" />
 
             <EditText
-                android:id="@+id/edit_time"
-                android:layout_width="match_parent"
+                android:id="@+id/edit_hour"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:importantForAutofill="no"
-                android:inputType="time" />
+                android:inputType="number"
+                android:text="@{viewModel.hour}"
+                app:layout_constraintStart_toStartOf="@id/label_hour"
+                app:layout_constraintTop_toBottomOf="@id/label_hour" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/edit_minute"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:labelFor="@id/edit_cups"
-                android:text="@string/cups" />
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textString="@={viewModel.minute}"
+                app:layout_constraintStart_toStartOf="@id/label_minute"
+                app:layout_constraintTop_toBottomOf="@id/label_minute" />
 
             <EditText
                 android:id="@+id/edit_cups"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:importantForAutofill="no"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:textString="@={viewModel.cups}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_cups" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="@string/title_dialog_schedule"
+                android:textAppearance="?textAppearancePopupMenuHeader"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/ok" />
+            <TextView
+                android:id="@+id/label_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/edit_hour"
+                android:text="@string/hours"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/separator" />
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/cancel" />
+            <TextView
+                android:id="@+id/label_minute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/edit_minute"
+                android:text="@string/minute"
+                app:layout_constraintStart_toEndOf="@id/hour_minute_separator"
+                app:layout_constraintTop_toBottomOf="@id/separator" />
 
-            </LinearLayout>
+            <TextView
+                android:id="@+id/label_cups"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:labelFor="@id/edit_cups"
+                android:text="@string/cups"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edit_hour" />
 
-        </LinearLayout>
+            <View
+                android:id="@+id/separator"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_width"
+                android:layout_margin="8dp"
+                android:background="@color/colorAccent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/hour_minute_separator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="end"
+                app:barrierMargin="8dp"
+                app:constraint_referenced_ids="label_hour,edit_hour" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 

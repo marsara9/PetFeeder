@@ -18,5 +18,5 @@ interface ScheduleServices {
     fun getAllScheduledFeedings() : Single<List<ScheduledFeeding>>
 
     @DELETE("schedule/{id}")
-    fun deleteScheduledFeeding(@Path("id") id : UUID)
+    fun deleteScheduledFeeding(@Path("id") id : UUID) : Completable
 }

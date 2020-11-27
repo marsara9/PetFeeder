@@ -12,7 +12,7 @@ import java.util.*
 
 class SchedulesViewModelImpl(
         context: Context,
-        schedulesRepository: ScheduleRepository
+        private val schedulesRepository: ScheduleRepository
 ) : AbstractViewModel(), SchedulesViewModel {
 
     override val numberOfFeedingsPerDay = MutableLiveData<Int>()
@@ -42,7 +42,7 @@ class SchedulesViewModelImpl(
                             else -> 0
                         })!!
 
-                        list.plus(SchedulesViewModel.ScheduledItem(timeString, drawable, item.cups.toDouble(), item.hour.toInt(), item.minute.toInt()))
+                        list.plus(SchedulesViewModel.ScheduledItem(timeString, drawable, item))
                     }
                 }.subscribe(schedules::setValue) {
 
@@ -64,5 +64,25 @@ class SchedulesViewModelImpl(
                 }.subscribe(numberOfCupsPerDay::setValue) {
 
                 })
+    }
+
+    override fun createScheduledFeeding(scheduledFeeding: ScheduledFeeding) {
+        schedulesRepository.addScheduledFeeding(
+                scheduledFeeding.cups,
+                scheduledFeeding.hour,
+                scheduledFeeding.minute)
+                ?.compose(applyCompletableShowLoading())
+                ?.subscribe(schedulesRepository::refresh) {
+
+                }
+    }
+
+    override fun updateScheduledFeeding(scheduledFeeding: ScheduledFeeding) {
+        schedulesRepository.deleteScheduledFeeding(scheduledFeeding)
+                ?.andThen(schedulesRepository.addScheduledFeeding(scheduledFeeding.cups, scheduledFeeding.hour, scheduledFeeding.minute))
+                ?.compose(applyCompletableShowLoading())
+                ?.subscribe(schedulesRepository::refresh) {
+
+                }
     }
 }
