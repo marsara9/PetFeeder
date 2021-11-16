@@ -8,7 +8,6 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.R
-import com.sdoras.petfeeder.core.models.Feeding
 import com.sdoras.petfeeder.history.viewModels.HistoryViewModel
 
 class HistoryAdapter(

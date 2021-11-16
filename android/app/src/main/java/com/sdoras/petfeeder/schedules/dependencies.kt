@@ -1,5 +1,6 @@
 package com.sdoras.petfeeder.schedules
 
+import com.sdoras.petfeeder.schedules.viewModels.ScheduleAddEditViewModelImpl
 import com.sdoras.petfeeder.schedules.viewModels.SchedulesViewModelImpl
 import com.sdoras.petfeeder.schedules.views.SchedulesClickHandler
 import com.sdoras.petfeeder.schedules.views.SchedulesClickHandlerImpl
@@ -9,7 +10,9 @@ import org.koin.dsl.module
 
 fun schedulesModule() : Module {
     return module {
-        viewModel { SchedulesViewModelImpl(get()) }
-        single<SchedulesClickHandler> { args -> SchedulesClickHandlerImpl(args[0]) }
+        viewModel { SchedulesViewModelImpl(get(), get()) }
+        single<SchedulesClickHandler> { args -> SchedulesClickHandlerImpl(args[0], args[1]) }
+        viewModel { ScheduleAddEditViewModelImpl() }
+
     }
 }

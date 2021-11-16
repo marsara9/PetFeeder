@@ -81,7 +81,7 @@
             </LinearLayout>
 
             <View
-                android:layout_width="2dp"
+                android:layout_width="@dimen/divider_width"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"

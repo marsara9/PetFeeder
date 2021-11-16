@@ -2,7 +2,6 @@ package com.sdoras.petfeeder.history.viewModels
 
 import androidx.lifecycle.MutableLiveData
 import com.sdoras.petfeeder.core.models.Feeding
-import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
 import com.sdoras.petfeeder.core.viewModels.AbstractViewModel
 import java.text.SimpleDateFormat
@@ -17,6 +16,7 @@ class HistoryViewModelImpl(
 
     init {
         disposables.add(feedingRepository.get()
+                .compose(applyDefaultObservableRxSettings())
                 .map {
                     it.sortedByDescending { it.date }
                             .fold(LinkedHashMap<String, List<Feeding>>()) { map, item ->

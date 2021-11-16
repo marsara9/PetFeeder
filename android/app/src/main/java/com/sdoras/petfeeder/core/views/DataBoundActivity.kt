@@ -6,7 +6,6 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.Observer
 import com.sdoras.petfeeder.BR
 import com.sdoras.petfeeder.core.viewModels.BaseViewModel
 import com.sdoras.petfeeder.core.views.dialogs.ProgressDialog
@@ -40,7 +39,7 @@ abstract class DataBoundActivity<VM : BaseViewModel, Binding : ViewDataBinding> 
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this
 
-        viewModel.showLoading.observe(this, Observer {
+        viewModel.showLoading.observe(this, {
             if(it > 0) {
                 Handler(Looper.getMainLooper()).post {
                     if(progressDialog == null) {

@@ -18,6 +18,6 @@ fun setupModule() = module {
     viewModel { ScanForFeedersSetupStepViewModelImpl(get()) }
     viewModel { ConnectToAccessPointSetupStepViewModelImpl(get()) }
 
-    single<IntroductionSetupStepClickHandler> { args -> IntroductionSetupStepClickHandlerImpl(args[0]) }
-    single<ScanForFeedersSetupStepClickHandler> { args -> ScanForFeedersSetupStepClickHandlerImpl(args[0]) }
+    single<IntroductionSetupStepClickHandler> { args -> IntroductionSetupStepClickHandlerImpl(args[0], args[1]) }
+    single<ScanForFeedersSetupStepClickHandler> { args -> ScanForFeedersSetupStepClickHandlerImpl(args[0], args[1]) }
 }

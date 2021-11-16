@@ -10,6 +10,6 @@ import org.koin.dsl.module
 fun settingsModule() : Module {
     return module {
         viewModel { SettingsViewModelImpl(get(), get()) }
-        single<SettingsClickHandler> { args -> SettingsClickHandlerImpl(args[0]) }
+        single<SettingsClickHandler> { args -> SettingsClickHandlerImpl(args[0], args[1]) }
     }
 }

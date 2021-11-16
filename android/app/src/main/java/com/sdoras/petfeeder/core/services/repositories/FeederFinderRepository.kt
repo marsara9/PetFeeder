@@ -7,7 +7,6 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import java.net.InetAddress
 import java.util.*
-import kotlin.collections.LinkedHashSet
 
 class FeederFinderRepository(context: Context) : Repository<Set<String>>, NsdHelper.Delegate {
 

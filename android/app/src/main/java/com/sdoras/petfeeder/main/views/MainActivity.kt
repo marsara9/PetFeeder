@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.dashboard.views.DashboardPageFragment
@@ -75,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.frame, DashboardPageFragment())
                 .commit()
 
-        viewModel.feeders.observe(this, Observer {
+        viewModel.feeders.observe(this, {
             spinner_feeders.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
             spinner_feeders.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 

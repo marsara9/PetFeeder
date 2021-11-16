@@ -2,9 +2,10 @@ package com.sdoras.petfeeder.core.utils
 
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
 import net.adamjak.math.fractions.Fraction
 import java.text.DateFormat
-import java.text.SimpleDateFormat
+import java.text.ParseException
 import java.util.*
 import kotlin.math.floor
 
@@ -28,6 +29,16 @@ object BindingAdapters {
     }
 
     @JvmStatic
+    @InverseBindingAdapter(attribute = "android:textString")
+    fun bindTextToDouble(textView: TextView) : Double? {
+        return try {
+            Fraction.tryParse(textView.text.toString()).toDouble()
+        } catch(e : ParseException) {
+            return null
+        }
+    }
+
+    @JvmStatic
     @BindingAdapter("android:textString")
     fun bindIntToText(textView : TextView, int: Int?) {
         if(int == null) {
@@ -35,6 +46,12 @@ object BindingAdapters {
         }
 
         textView.text = "$int"
+    }
+
+    @JvmStatic
+    @InverseBindingAdapter(attribute = "android:textString")
+    fun bindTextToInt(textView: TextView) : Int? {
+        return textView.text.toString().toIntOrNull()
     }
 
     @JvmStatic
