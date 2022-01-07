@@ -6,7 +6,7 @@
 struct Feeding {
     std::string id;
     const float cups;
-    const long date;
+    const time_t date;
 };
 
 #endif

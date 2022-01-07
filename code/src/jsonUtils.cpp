@@ -13,7 +13,7 @@ std::string feedingToJson(Feeding feeding) {
     strftime(time_buf, sizeof(time_buf), "%FT%TZ", &ts);
 
     char cupsString[6]; // 0.000
-    snprintf(cupsString, sizeof(cupsString), "%f", feeding.cups);
+    snprintf(cupsString, sizeof(cupsString), "%.3f", feeding.cups);
 
     return "{ \"id\" : \"" + feeding.id + "\", \"cups\" : " + cupsString + ", \"date\" : \"" + time_buf + "\" }";
 }
@@ -21,7 +21,7 @@ std::string feedingToJson(Feeding feeding) {
 std::string scheduleToJson(Schedule schedule) {
 
     char cupsString[6]; // 0.000
-    snprintf(cupsString, sizeof(cupsString), "%f", schedule.cups);
+    snprintf(cupsString, sizeof(cupsString), "%.3f", schedule.cups);
 
     std::stringstream ss;
     ss << (int)schedule.hour << ":" << (int)schedule.minute;
@@ -45,9 +45,9 @@ Registration registrationFromJson(std::string json) {
 
     JsonObject parsed = jsonDocument.as<JsonObject>();
 
-    std::string id = parsed["id"].as<char*>();
-    std::string token = parsed["token"].as<char*>();
-    std::string deviceType = parsed["deviceType"].as<char*>();
+    std::string id = parsed["id"].as<const char*>();
+    std::string token = parsed["token"].as<const char*>();
+    std::string deviceType = parsed["deviceType"].as<const char*>();
 
     return Registration {
         .id = id,

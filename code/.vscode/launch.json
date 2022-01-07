@@ -1,5 +1,5 @@
 // AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
-
+//
 // PIO Unified Debugger
 //
 // Documentation: https://docs.platformio.org/page/plus/debugging.html
@@ -12,23 +12,33 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "d:/Projects/PetFeeder/code/.pio/build/huzzah/firmware.elf",
+            "executable": "/Users/pday/Projects/PetFeeder/code/.pio/build/huzzah/firmware.elf",
             "projectEnvName": "huzzah",
-            "toolchainBinDir": "C:/Users/MarSara/.platformio/packages/toolchain-xtensa/bin",
+            "toolchainBinDir": "/Users/pday/.platformio/packages/toolchain-xtensa/bin",
+            "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
                 "task": "Pre-Debug"
-            },
-            "internalConsoleOptions": "openOnSessionStart"
+            }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "d:/Projects/PetFeeder/code/.pio/build/huzzah/firmware.elf",
+            "executable": "/Users/pday/Projects/PetFeeder/code/.pio/build/huzzah/firmware.elf",
             "projectEnvName": "huzzah",
-            "toolchainBinDir": "C:/Users/MarSara/.platformio/packages/toolchain-xtensa/bin",
+            "toolchainBinDir": "/Users/pday/.platformio/packages/toolchain-xtensa/bin",
             "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "platformio-debug",
+            "request": "launch",
+            "name": "PIO Debug (without uploading)",
+            "executable": "/Users/pday/Projects/PetFeeder/code/.pio/build/huzzah/firmware.elf",
+            "projectEnvName": "huzzah",
+            "toolchainBinDir": "/Users/pday/.platformio/packages/toolchain-xtensa/bin",
+            "internalConsoleOptions": "openOnSessionStart",
+            "loadMode": "manual"
         }
     ]
 }
