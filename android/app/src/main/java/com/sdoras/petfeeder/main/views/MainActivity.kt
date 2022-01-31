@@ -12,18 +12,20 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.dashboard.views.DashboardPageFragment
+import com.sdoras.petfeeder.databinding.ActivityMainBinding
 import com.sdoras.petfeeder.history.views.HistoryFragment
 import com.sdoras.petfeeder.main.viewModels.MainViewModelImpl
 import com.sdoras.petfeeder.schedules.views.SchedulesFragment
 import com.sdoras.petfeeder.settings.views.SettingsFragment
 import com.sdoras.petfeeder.setup.views.SetupActivity
-import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private var currentTab = R.id.navigation_home
     private val viewModel by viewModel<MainViewModelImpl>()
+
+    private lateinit var binding: ActivityMainBinding
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         if(item.itemId == currentTab) {
@@ -65,19 +67,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        setSupportActionBar(action_bar)
+        setSupportActionBar(binding.actionBar)
 
-        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        binding.navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
 
         supportFragmentManager.beginTransaction()
                 .replace(R.id.frame, DashboardPageFragment())
                 .commit()
 
         viewModel.feeders.observe(this, Observer {
-            spinner_feeders.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
-            spinner_feeders.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            binding.spinnerFeeders.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
+            binding.spinnerFeeders.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     viewModel.feederUrl = it[position].url
