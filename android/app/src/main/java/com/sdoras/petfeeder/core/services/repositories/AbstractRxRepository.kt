@@ -8,7 +8,9 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
-abstract class AbstractRxRepository<S, T>(feederUrlRepository: FeederUrlRepository) : Repository<T> {
+abstract class AbstractRxRepository<S, T : Any>(
+        feederUrlRepository: FeederUrlRepository
+) : Repository<T> {
 
     private val subject = BehaviorSubject.create<T>()
     protected var service : S? = null

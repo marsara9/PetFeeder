@@ -18,13 +18,13 @@ interface BaseViewModel {
         }
     }
 
-    fun <T> applySingleShowLoading() : SingleTransformer<T, T> {
+    fun <T : Any> applySingleShowLoading() : SingleTransformer<T, T> {
         return SingleTransformer {
             it.doOnSubscribe { showLoading.postValue( (showLoading.value ?: 0) + 1) }
                     .doAfterTerminate { showLoading.postValue((showLoading.value ?: 1) - 1) }
         }
     }
-    fun <T> applyObservableShowLoading() : ObservableTransformer<T, T> {
+    fun <T : Any> applyObservableShowLoading() : ObservableTransformer<T, T> {
         return ObservableTransformer {
             it.doOnSubscribe { showLoading.postValue( (showLoading.value ?: 0) + 1) }
                     .doAfterTerminate { showLoading.postValue((showLoading.value ?: 1) - 1) }
@@ -39,14 +39,14 @@ interface BaseViewModel {
         }
     }
 
-    fun <T> applyDefaultSingleRxSettings() : SingleTransformer<T, T> {
+    fun <T : Any> applyDefaultSingleRxSettings() : SingleTransformer<T, T> {
         return SingleTransformer {
             it.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
         }
     }
 
-    fun <T> applyDefaultObservableRxSettings() : ObservableTransformer<T, T> {
+    fun <T : Any> applyDefaultObservableRxSettings() : ObservableTransformer<T, T> {
         return ObservableTransformer {
             it.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())

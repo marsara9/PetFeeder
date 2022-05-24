@@ -34,20 +34,29 @@ class SettingsViewModelImpl(
     }
 
     override fun setWifi(ssid: String, password: String?) {
-        disposables.add(settingsRepository.setWiFiSettings(ssid, password)
+        settingsRepository.setWiFiSettings(ssid, password)
                 ?.andThen(settingsRepository.refresh())
-                ?.subscribe())
+                ?.subscribe()
+                ?.let {
+                    disposables.add(it)
+                }
     }
 
     override fun setName(name: String) {
-        disposables.add(settingsRepository.setFeederName(name)
+        settingsRepository.setFeederName(name)
                 ?.andThen(settingsRepository.refresh())
-                ?.subscribe())
+                ?.subscribe()
+                ?.let {
+                    disposables.add(it)
+                }
     }
 
     override fun restoreFactoryDefaults() {
-        disposables.add(settingsRepository.deleteSettings()
+        settingsRepository.deleteSettings()
                 ?.andThen(settingsRepository.refresh())
-                ?.subscribe())
+                ?.subscribe()
+                ?.let {
+                    disposables.add(it)
+                }
     }
 }

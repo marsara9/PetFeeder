@@ -43,7 +43,7 @@ class DashboardPageViewModelImpl(
                     }
                 }.subscribe({
                     numberOfFeedingsToday.value = it.size
-                    totalCupsDispensedToday.value = it.sumByDouble(Feeding::cups)
+                    totalCupsDispensedToday.value = it.sumOf(Feeding::cups)
                 }, {
 
                 }))
