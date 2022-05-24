@@ -12,21 +12,26 @@ import com.sdoras.petfeeder.setup.viewModels.steps.ConnectToAccessPointSetupStep
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
 import io.reactivex.rxjava3.core.Completable
 
-class ConnectToAccessPointSetupStepViewModelImpl(private val context: Context) : AbstractSetupStepViewModel(), ConnectToAccessPointSetupStepViewModel {
-
-    init {
-
-    }
+class ConnectToAccessPointSetupStepViewModelImpl(
+        private val context: Context
+) : AbstractSetupStepViewModel(), ConnectToAccessPointSetupStepViewModel {
 
     override val ssid = MutableLiveData<String>()
 
-    override fun setSSID(ssid: String, bssid : MacAddress?) {
+    override fun setSSID(
+            ssid: String,
+            bssid: MacAddress?
+    ) {
         this.ssid.postValue(ssid)
         connectToFeederAccessPoint(context, ssid, bssid)
     }
 
-    private fun connectToFeederAccessPoint(context: Context, ssid: String, bssid: MacAddress?) : Completable {
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    private fun connectToFeederAccessPoint(
+            context: Context,
+            ssid: String,
+            bssid: MacAddress?
+    ): Completable {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             connectToFeederAccessPointNew(context, ssid, bssid)
         } else {
             connectToFeederAccessPointLegacy(context, ssid, bssid?.toString())
@@ -34,12 +39,16 @@ class ConnectToAccessPointSetupStepViewModelImpl(private val context: Context) :
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
-    private fun connectToFeederAccessPointNew(context: Context, ssid : String, bssid: MacAddress?) : Completable {
+    private fun connectToFeederAccessPointNew(
+            context: Context,
+            ssid: String,
+            bssid: MacAddress?
+    ): Completable {
         return Completable.create {
             val specifier = WifiNetworkSpecifier.Builder()
                     .setSsid(ssid)
                     .apply {
-                        if(bssid != null) {
+                        if (bssid != null) {
                             setBssid(bssid)
                         }
                     }.build()
@@ -68,7 +77,11 @@ class ConnectToAccessPointSetupStepViewModelImpl(private val context: Context) :
     }
 
     @Suppress("DEPRECATION")
-    private fun connectToFeederAccessPointLegacy(context: Context, ssid: String, bssid: String?) : Completable {
+    private fun connectToFeederAccessPointLegacy(
+            context: Context,
+            ssid: String,
+            bssid: String?
+    ): Completable {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         val configuration = WifiConfiguration()
@@ -80,7 +93,7 @@ class ConnectToAccessPointSetupStepViewModelImpl(private val context: Context) :
 
         val networkId = wifiManager.addNetwork(configuration)
         wifiManager.isWifiEnabled = true
-        if(networkId != -1) {
+        if (networkId != -1) {
             wifiManager.disconnect()
             wifiManager.enableNetwork(networkId, true)
             wifiManager.reconnect()

@@ -2,31 +2,33 @@ package com.sdoras.petfeeder.core.services
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import io.reactivex.rxjava3.core.Single
 import java.util.*
 
-class NotificationServicesImpl(private val application: Application) : NotificationServices {
+
+class NotificationServicesImpl(
+        private val application: Application
+) : NotificationServices {
 
     companion object {
-        private const val SHARED_PREFERENCES_NAME = "petFeeder";
+        private const val SHARED_PREFERENCES_NAME = "petFeeder"
     }
 
     override fun getCloudMessagingToken(): Single<String> {
         return Single.create{ emitter ->
-            FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(OnCompleteListener { task ->
-                if(!task.isSuccessful) {
-                    emitter.onError(task.exception)
-                    return@OnCompleteListener
-                }
+            FirebaseMessaging.getInstance().token
+                    .addOnCompleteListener(OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            task.exception?.let { exception ->
+                                emitter.onError(exception)
+                            }
+                            return@OnCompleteListener
+                        }
 
-                task.result?.token?.let {
-                    Log.d("Settings", it)
-                    emitter.onSuccess(it)
-                } ?: emitter.onError(task.exception)
-            })
+                        emitter.onSuccess(task.result)
+                    })
         }
     }
 

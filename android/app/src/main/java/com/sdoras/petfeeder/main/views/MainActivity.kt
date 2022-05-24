@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.dashboard.views.DashboardPageFragment
 import com.sdoras.petfeeder.databinding.ActivityMainBinding
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+    private val onNavigationItemSelectedListener = NavigationBarView.OnItemSelectedListener { item ->
         if(item.itemId == currentTab) {
             true
         } else {
@@ -73,13 +73,13 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.actionBar)
 
-        binding.navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        binding.navigation.setOnItemSelectedListener(onNavigationItemSelectedListener)
 
         supportFragmentManager.beginTransaction()
                 .replace(R.id.frame, DashboardPageFragment())
                 .commit()
 
-        viewModel.feeders.observe(this, Observer {
+        viewModel.feeders.observe(this) {
             binding.spinnerFeeders.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
             binding.spinnerFeeders.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
             }
-        })
+        }
     }
 
     override fun onPause() {
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu);
+        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 

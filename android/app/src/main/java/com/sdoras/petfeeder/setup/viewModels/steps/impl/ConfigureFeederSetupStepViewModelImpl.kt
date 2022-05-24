@@ -24,7 +24,7 @@ class ConfigureFeederSetupStepViewModelImpl(private val settingsRepository: Sett
 
         requireNotNull(ssid)
 
-        disposables.add(settingsRepository.setWiFiSettings(ssid, password)
+        settingsRepository.setWiFiSettings(ssid, password)
                 ?.compose(applyCompletableShowLoading())
                 ?.andThen {
                     name?.let {
@@ -34,7 +34,9 @@ class ConfigureFeederSetupStepViewModelImpl(private val settingsRepository: Sett
                     delegate?.goToNextStep()
                 }, {
 
-                }))
+                })?.let {
+                    disposables.add(it)
+                }
 
     }
 }

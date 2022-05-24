@@ -14,7 +14,9 @@ import com.sdoras.petfeeder.setup.views.steps.ConnectToAccessPointSetupStepFragm
 import io.reactivex.rxjava3.core.Single
 import java.util.concurrent.TimeUnit
 
-class ScanForFeedersSetupStepViewModelImpl(val context: Context) : AbstractSetupStepViewModel(), ScanForFeedersSetupStepViewModel {
+class ScanForFeedersSetupStepViewModelImpl(
+        val context: Context
+) : AbstractSetupStepViewModel(), ScanForFeedersSetupStepViewModel {
 
     override val status = MutableLiveData<Int>()
     override val message = MutableLiveData<Int>()
@@ -27,13 +29,13 @@ class ScanForFeedersSetupStepViewModelImpl(val context: Context) : AbstractSetup
         tryAgain()
     }
 
-    private fun findFeeders(context: Context) : Single<List<String>> {
+    private fun findFeeders(context: Context): Single<List<String>> {
         return Single.create { emitter ->
             val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
             val broadcastReceiver = object : BroadcastReceiver() {
                 override fun onReceive(context: Context?, intent: Intent?) {
-                    if(intent?.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
+                    if (intent?.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                         emitter.onSuccess(wifiManager.scanResults
                                 .filter { it.SSID.startsWith("petfeeder_") }
                                 .map { it.SSID })
@@ -58,7 +60,7 @@ class ScanForFeedersSetupStepViewModelImpl(val context: Context) : AbstractSetup
                 .timeout(30, TimeUnit.SECONDS)
                 .delaySubscription(30, TimeUnit.SECONDS)
                 .subscribe({
-                    when(it.size) {
+                    when (it.size) {
                         0 -> {
                             status.value = R.string.setup_scan_status_no_feeders_found
                             message.value = R.string.setup_scan_message_notice
