@@ -20,13 +20,13 @@ class SetupActivity : DataBoundActivity<SetupViewModel, ActivitySetupBinding>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.currentStepFragment.observe(this, {
+        viewModel.currentStepFragment.observe(this) {
             supportFragmentManager.beginTransaction()
                     .replace(R.id.frame, it)
                     .commit()
 
             it.viewModel.delegate = this
-        })
+        }
     }
 
     override fun onBackPressed() {

@@ -39,21 +39,21 @@ abstract class DataBoundActivity<VM : BaseViewModel, Binding : ViewDataBinding> 
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this
 
-        viewModel.showLoading.observe(this, {
-            if(it > 0) {
+        viewModel.showLoading.observe(this) {
+            if (it > 0) {
                 Handler(Looper.getMainLooper()).post {
-                    if(progressDialog == null) {
+                    if (progressDialog == null) {
                         progressDialog = ProgressDialog(this)
                     }
                     progressDialog?.show()
                 }
             } else {
                 Handler(Looper.getMainLooper()).postDelayed({
-                    if(it == 0) {
+                    if (it == 0) {
                         progressDialog?.dismiss()
                     }
                 }, 100)
             }
-        })
+        }
     }
 }
