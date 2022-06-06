@@ -31,7 +31,7 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
 
     protected fun <T : ClickHandler<in VM>> clickHandler(clazz: KClass<T>) = lazy {
         getKoin().get<T>(clazz, null) {
-            parametersOf(viewModel, fragmentManager)
+            parametersOf(viewModel, parentFragmentManager)
         }
     }
 
@@ -41,11 +41,11 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
         binding.setVariable(BR.clickHandler, clickHandler)
         binding.lifecycleOwner = this
 
-        viewModel.showLoading.observe(this, {
-            if(it > 0) {
+        viewModel.showLoading.observe(viewLifecycleOwner) {
+            if (it > 0) {
                 Handler(Looper.getMainLooper()).post {
                     context?.let {
-                        if(progressDialog == null) {
+                        if (progressDialog == null) {
                             progressDialog = ProgressDialog(it)
                         }
                         progressDialog?.show()
@@ -53,12 +53,12 @@ abstract class DataBoundFragment<VM : BaseViewModel, Binding : ViewDataBinding> 
                 }
             } else {
                 Handler(Looper.getMainLooper()).postDelayed({
-                    if(it == 0) {
+                    if (it == 0) {
                         progressDialog?.dismiss()
                     }
                 }, 100)
             }
-        })
+        }
 
         return binding.root
     }
