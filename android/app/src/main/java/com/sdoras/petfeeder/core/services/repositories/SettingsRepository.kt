@@ -1,40 +1,17 @@
 package com.sdoras.petfeeder.core.services.repositories
 
 import com.sdoras.petfeeder.core.models.Settings
-import com.sdoras.petfeeder.core.services.ServiceCall
-import com.sdoras.petfeeder.core.services.SettingsServices
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import com.sdoras.petfeeder.core.services.repositories.base.Repository
 
-class SettingsRepository(feederUrlRepository: FeederUrlRepository) : AbstractRxRepository<SettingsServices, Settings>(feederUrlRepository) {
+interface SettingsRepository : Repository<Settings?> {
 
-    override fun getServiceClass(): Class<SettingsServices> {
-        return SettingsServices::class.java
-    }
+    suspend fun get(url : String) : Settings
 
-    override fun getServiceCall(service: SettingsServices): Single<Settings> {
-        return service.getSettings()
-    }
+    suspend fun setWifiSettings(ssid : String, password : String?)
 
-    fun setWiFiSettings(ssid : String, password : String? = null) : Completable? {
-        return service?.setSettings(ssid, password)
-    }
+    suspend fun setFeederName(name: String)
 
-    fun setFeederName(name: String) : Completable? {
-        return service?.setSettings(name = name)
-    }
+    suspend fun setNotificationsApiKey(fingerprint : String)
 
-    fun updateFeederFCMFingerprint(fingerprint : String) : Completable? {
-        return service?.setSettings(fingerprint = fingerprint)
-    }
-
-    fun deleteSettings() : Completable? {
-        return service?.deleteSettings()
-    }
-
-    fun get(feederUrl : String) : Single<Settings> {
-        return ServiceCall(feederUrl)
-                .create(getServiceClass())
-                .getSettings()
-    }
+    suspend fun deleteSettings()
 }

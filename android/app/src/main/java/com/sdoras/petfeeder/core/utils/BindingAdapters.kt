@@ -29,7 +29,24 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @InverseBindingAdapter(attribute = "android:textString")
+    @BindingAdapter("android:textString")
+    fun bindFloatToText(textView : TextView, float: Float?) {
+        if(float == null) {
+            return
+        }
+
+        val whole = floor(float).toInt()
+        val fraction = Fraction.createFraction(float - whole)
+
+        textView.text = if(whole > 0) {
+            "$whole-$fraction"
+        } else {
+            fraction.toString()
+        }
+    }
+
+    @JvmStatic
+    @InverseBindingAdapter(attribute = "android:textString", event = "android:textAttrChanged")
     fun bindTextToDouble(textView: TextView) : Double? {
         return try {
             Fraction.tryParse(textView.text.toString()).toDouble()
@@ -49,7 +66,7 @@ object BindingAdapters {
     }
 
     @JvmStatic
-    @InverseBindingAdapter(attribute = "android:textString")
+    @InverseBindingAdapter(attribute = "android:textString", event = "android:textAttrChanged")
     fun bindTextToInt(textView: TextView) : Int? {
         return textView.text.toString().toIntOrNull()
     }

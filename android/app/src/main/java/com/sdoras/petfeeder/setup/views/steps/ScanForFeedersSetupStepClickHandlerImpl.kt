@@ -11,7 +11,7 @@ class ScanForFeedersSetupStepClickHandlerImpl(
 ) : ScanForFeedersSetupStepClickHandler {
 
     override fun onTryAgain(view: View) {
-        viewModel.tryAgain()
+        viewModel.tryAgain(view.context)
     }
 
     override fun onNext(view: View) {

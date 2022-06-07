@@ -1,5 +1,6 @@
 package com.sdoras.petfeeder.setup.viewModels.steps
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import com.sdoras.petfeeder.setup.viewModels.steps.base.SetupStepViewModel
 
@@ -11,7 +12,7 @@ interface ScanForFeedersSetupStepViewModel : SetupStepViewModel {
 
     val selectedSSID : String?
 
-    fun tryAgain()
+    fun tryAgain(context: Context)
 
     fun next()
 }

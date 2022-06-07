@@ -1,7 +1,7 @@
 package com.sdoras.petfeeder.core.services
 
 import com.sdoras.petfeeder.core.models.Registration
-import io.reactivex.rxjava3.core.Completable
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
@@ -11,9 +11,9 @@ import java.util.*
 interface RegistrationServices {
 
     @POST("register")
-    fun registerDevice(@Body registration : Registration) : Completable
+    suspend fun registerDevice(@Body registration : Registration) : Response<Unit>
 
     @DELETE("register/{id}")
-    fun deleteRegistration(@Path("id") id : UUID) : Completable
+    suspend fun deleteRegistration(@Path("id") id : UUID)
 
 }

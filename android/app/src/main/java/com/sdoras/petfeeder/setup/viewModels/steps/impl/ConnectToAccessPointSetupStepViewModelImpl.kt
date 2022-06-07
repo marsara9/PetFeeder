@@ -8,29 +8,34 @@ import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.sdoras.petfeeder.setup.viewModels.steps.ConnectToAccessPointSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
-class ConnectToAccessPointSetupStepViewModelImpl(
-        private val context: Context
-) : AbstractSetupStepViewModel(), ConnectToAccessPointSetupStepViewModel {
+class ConnectToAccessPointSetupStepViewModelImpl : AbstractSetupStepViewModel(), ConnectToAccessPointSetupStepViewModel {
 
     override val ssid = MutableLiveData<String>()
 
     override fun setSSID(
+            context: Context,
             ssid: String,
             bssid: MacAddress?
     ) {
         this.ssid.postValue(ssid)
-        connectToFeederAccessPoint(context, ssid, bssid)
+        viewModelScope.launch {
+            connectToFeederAccessPoint(context, ssid, bssid)
+        }
     }
 
-    private fun connectToFeederAccessPoint(
+    private suspend fun connectToFeederAccessPoint(
             context: Context,
             ssid: String,
             bssid: MacAddress?
-    ): Completable {
+    ) {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             connectToFeederAccessPointNew(context, ssid, bssid)
         } else {
@@ -39,12 +44,12 @@ class ConnectToAccessPointSetupStepViewModelImpl(
     }
 
     @TargetApi(Build.VERSION_CODES.Q)
-    private fun connectToFeederAccessPointNew(
+    private suspend fun connectToFeederAccessPointNew(
             context: Context,
             ssid: String,
             bssid: MacAddress?
-    ): Completable {
-        return Completable.create {
+    ) {
+        suspendCoroutine<Unit> { continuation ->
             val specifier = WifiNetworkSpecifier.Builder()
                     .setSsid(ssid)
                     .apply {
@@ -63,13 +68,13 @@ class ConnectToAccessPointSetupStepViewModelImpl(
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
 
-                    it.onComplete()
+                    continuation.resume(Unit)
                 }
 
                 override fun onUnavailable() {
                     super.onUnavailable()
 
-                    it.onError(RuntimeException("Could not find associated network."))
+                    continuation.resumeWithException(RuntimeException("Could not find associated network."))
                 }
             }
             connectivityManager.requestNetwork(request, networkCallback)
@@ -81,7 +86,7 @@ class ConnectToAccessPointSetupStepViewModelImpl(
             context: Context,
             ssid: String,
             bssid: String?
-    ): Completable {
+    ) {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         val configuration = WifiConfiguration()
@@ -98,7 +103,5 @@ class ConnectToAccessPointSetupStepViewModelImpl(
             wifiManager.enableNetwork(networkId, true)
             wifiManager.reconnect()
         }
-
-        return Completable.complete()
     }
 }

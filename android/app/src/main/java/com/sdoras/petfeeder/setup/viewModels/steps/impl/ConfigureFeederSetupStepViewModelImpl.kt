@@ -1,20 +1,19 @@
 package com.sdoras.petfeeder.setup.viewModels.steps.impl
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.setup.viewModels.steps.ConfigureFeederSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.launch
 
-class ConfigureFeederSetupStepViewModelImpl(private val settingsRepository: SettingsRepository) : AbstractSetupStepViewModel(), ConfigureFeederSetupStepViewModel {
+class ConfigureFeederSetupStepViewModelImpl(
+        private val settingsRepository: SettingsRepository
+) : AbstractSetupStepViewModel(), ConfigureFeederSetupStepViewModel {
 
     override val ssid = MutableLiveData<String>()
     override val password = MutableLiveData<String>()
     override val name = MutableLiveData<String>()
-
-    init {
-
-    }
 
     fun onNext() {
 
@@ -24,19 +23,12 @@ class ConfigureFeederSetupStepViewModelImpl(private val settingsRepository: Sett
 
         requireNotNull(ssid)
 
-        settingsRepository.setWiFiSettings(ssid, password)
-                ?.compose(applyCompletableShowLoading())
-                ?.andThen {
-                    name?.let {
-                        settingsRepository.setFeederName(it)
-                    } ?: Completable.complete()
-                }?.subscribe({
-                    delegate?.goToNextStep()
-                }, {
-
-                })?.let {
-                    disposables.add(it)
-                }
-
+        viewModelScope.launch {
+            settingsRepository.setWifiSettings(ssid, password)
+            name?.let {
+                settingsRepository.setFeederName(it)
+            }
+            delegate?.goToNextStep()
+        }
     }
 }

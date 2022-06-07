@@ -1,29 +1,15 @@
 package com.sdoras.petfeeder.core.services.repositories
 
 import com.sdoras.petfeeder.core.models.ScheduledFeeding
-import com.sdoras.petfeeder.core.services.ScheduleServices
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import com.sdoras.petfeeder.core.services.repositories.base.Repository
 
-class ScheduleRepository(
-        feederUrlRepository: FeederUrlRepository
-) : AbstractRxRepository<ScheduleServices, List<ScheduledFeeding>>(feederUrlRepository) {
+interface ScheduleRepository : Repository<List<ScheduledFeeding>> {
 
-    override fun getServiceClass(): Class<ScheduleServices> {
-        return ScheduleServices::class.java
-    }
+    suspend fun addScheduledFeeding(
+            cups: Float,
+            hour: Byte,
+            minute: Byte
+    )
 
-    override fun getServiceCall(service: ScheduleServices): Single<List<ScheduledFeeding>> {
-        return service.getAllScheduledFeedings()
-    }
-
-    fun addScheduledFeeding(cups : Float,
-                            hour : Byte,
-                            minute : Byte) : Completable? {
-        return service?.addScheduledFeeding(cups, hour, minute)
-    }
-
-    fun deleteScheduledFeeding(scheduledFeeding: ScheduledFeeding) : Completable? {
-        return service?.deleteScheduledFeeding(scheduledFeeding.id)
-    }
+    suspend fun deleteScheduledFeeding(scheduledFeeding: ScheduledFeeding)
 }

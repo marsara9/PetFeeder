@@ -14,9 +14,4 @@ class FirebaseMessagingServiceImpl : FirebaseMessagingService() {
                 .putBoolean("tokenUpdated", true)
                 .apply()
     }
-
-    override fun onMessageReceived(message: RemoteMessage) {
-        super.onMessageReceived(message)
-    }
-
 }

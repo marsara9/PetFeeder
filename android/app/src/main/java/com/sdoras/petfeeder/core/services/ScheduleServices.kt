@@ -1,22 +1,22 @@
 package com.sdoras.petfeeder.core.services
 
 import com.sdoras.petfeeder.core.models.ScheduledFeeding
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import retrofit2.Response
 import retrofit2.http.*
 import java.util.*
 
 interface ScheduleServices {
 
     @POST("schedule")
-    fun addScheduledFeeding(
+    suspend fun addScheduledFeeding(
             @Query("cups") cups : Float,
             @Query("hour") hour : Byte,
-            @Query("minute") minute : Byte) : Completable
+            @Query("minute") minute : Byte
+    ) : Response<Unit>
 
     @GET("schedule")
-    fun getAllScheduledFeedings() : Single<List<ScheduledFeeding>>
+    suspend fun getAllScheduledFeedings() : List<ScheduledFeeding>
 
     @DELETE("schedule/{id}")
-    fun deleteScheduledFeeding(@Path("id") id : UUID) : Completable
+    suspend fun deleteScheduledFeeding(@Path("id") id : UUID) : Response<Unit>
 }

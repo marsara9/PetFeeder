@@ -5,16 +5,12 @@ import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.setup.viewModels.steps.VerifyAccessPointIsFeederSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
 
-class VerifyAccessPointIsFeederSetupStepViewModelImpl(feederUrlRepository: FeederUrlRepository, settingsRepository: SettingsRepository) : AbstractSetupStepViewModel(), VerifyAccessPointIsFeederSetupStepViewModel {
+class VerifyAccessPointIsFeederSetupStepViewModelImpl(
+        feederUrlRepository: FeederUrlRepository,
+        settingsRepository: SettingsRepository
+) : AbstractSetupStepViewModel(), VerifyAccessPointIsFeederSetupStepViewModel {
 
     init {
-        feederUrlRepository.setFeederUrl("http://192.168.4.1")
-
-        settingsRepository.get()
-                .subscribe({
-
-                }, {
-
-                })
+        feederUrlRepository.set("http://192.168.4.1")
     }
 }

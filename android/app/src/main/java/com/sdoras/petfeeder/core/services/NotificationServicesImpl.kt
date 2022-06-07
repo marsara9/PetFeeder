@@ -2,11 +2,11 @@ package com.sdoras.petfeeder.core.services
 
 import android.app.Application
 import android.content.Context
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import io.reactivex.rxjava3.core.Single
 import java.util.*
-
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class NotificationServicesImpl(
         private val application: Application
@@ -16,21 +16,38 @@ class NotificationServicesImpl(
         private const val SHARED_PREFERENCES_NAME = "petFeeder"
     }
 
-    override fun getCloudMessagingToken(): Single<String> {
-        return Single.create{ emitter ->
+    override suspend fun getCloudMessagingToken(): String {
+        return suspendCoroutine { continuation ->
             FirebaseMessaging.getInstance().token
-                    .addOnCompleteListener(OnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            task.exception?.let { exception ->
-                                emitter.onError(exception)
-                            }
-                            return@OnCompleteListener
+                    .addOnCompleteListener { task ->
+                        if(!task.isSuccessful) {
+                            task.exception?.let {
+                                continuation.resumeWithException(it)
+                            } ?: continuation.resumeWithException(
+                                    Exception("Unknown Error fetching cloud messaging token.")
+                            )
+                        } else {
+                            continuation.resume(task.result)
                         }
-
-                        emitter.onSuccess(task.result)
-                    })
+                    }
+            }
         }
-    }
+
+//    override fun getCloudMessagingToken(): Single<String> {
+//        return Single.create{ emitter ->
+//            FirebaseMessaging.getInstance().token
+//                    .addOnCompleteListener(OnCompleteListener { task ->
+//                        if (!task.isSuccessful) {
+//                            task.exception?.let { exception ->
+//                                emitter.onError(exception)
+//                            }
+//                            return@OnCompleteListener
+//                        }
+//
+//                        emitter.onSuccess(task.result)
+//                    })
+//        }
+//    }
 
     override fun getDeviceId(): UUID {
 

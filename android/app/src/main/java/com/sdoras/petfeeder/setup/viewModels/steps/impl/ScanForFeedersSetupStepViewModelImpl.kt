@@ -7,15 +7,18 @@ import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.sdoras.petfeeder.R
 import com.sdoras.petfeeder.setup.viewModels.steps.ScanForFeedersSetupStepViewModel
 import com.sdoras.petfeeder.setup.viewModels.steps.base.AbstractSetupStepViewModel
 import com.sdoras.petfeeder.setup.views.steps.ConnectToAccessPointSetupStepFragment
-import io.reactivex.rxjava3.core.Single
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ScanForFeedersSetupStepViewModelImpl(
-        val context: Context
+        context: Context
 ) : AbstractSetupStepViewModel(), ScanForFeedersSetupStepViewModel {
 
     override val status = MutableLiveData<Int>()
@@ -26,19 +29,23 @@ class ScanForFeedersSetupStepViewModelImpl(
     override var selectedSSID: String? = null
 
     init {
-        tryAgain()
+        viewModelScope.launch {
+            tryAgain(context)
+        }
     }
 
-    private fun findFeeders(context: Context): Single<List<String>> {
-        return Single.create { emitter ->
+    private suspend fun findFeeders(context: Context): List<String> {
+        return suspendCoroutine { continuation ->
             val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
             val broadcastReceiver = object : BroadcastReceiver() {
                 override fun onReceive(context: Context?, intent: Intent?) {
                     if (intent?.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
-                        emitter.onSuccess(wifiManager.scanResults
+
+                        continuation.resume(wifiManager.scanResults
                                 .filter { it.SSID.startsWith("petfeeder_") }
-                                .map { it.SSID })
+                                .map { it.SSID }
+                        )
 
                         context?.unregisterReceiver(this)
                     }
@@ -50,23 +57,24 @@ class ScanForFeedersSetupStepViewModelImpl(
         }
     }
 
-    override fun tryAgain() {
+    override fun tryAgain(context: Context) {
         status.value = R.string.setup_scan_status_scanning
         message.value = R.string.setup_scan_message_notice
         isTryAgainVisible.value = false
         ssids.value = emptyList()
 
-        findFeeders(context)
-                .timeout(30, TimeUnit.SECONDS)
-                .delaySubscription(30, TimeUnit.SECONDS)
-                .subscribe({
-                    when (it.size) {
+        try {
+            viewModelScope.launch {
+                withTimeout(30_000) {
+                    val feeders = findFeeders(context)
+
+                    when (feeders.size) {
                         0 -> {
                             status.value = R.string.setup_scan_status_no_feeders_found
                             message.value = R.string.setup_scan_message_notice
                         }
                         1 -> {
-                            selectedSSID = it.first()
+                            selectedSSID = feeders.first()
                             next()
                         }
                         else -> {
@@ -74,13 +82,16 @@ class ScanForFeedersSetupStepViewModelImpl(
                             message.value = R.string.setup_scan_message_found_multiple
                         }
                     }
-                    ssids.value = it
+
+                    ssids.value = feeders
                     isTryAgainVisible.value = true
-                }, {
-                    status.value = R.string.setup_scan_status_error
-                    message.value = R.string.setup_scan_message_error
-                    ssids.value = emptyList()
-                })
+                }
+            }
+        } catch (exception : Exception) {
+            status.value = R.string.setup_scan_status_error
+            message.value = R.string.setup_scan_message_error
+            ssids.value = emptyList()
+        }
     }
 
     override fun next() {
