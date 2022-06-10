@@ -2,58 +2,55 @@ package com.sdoras.petfeeder.core.services.repositories.base
 
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.retrofit.ServiceCall
-import com.sdoras.petfeeder.core.utils.firstNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 abstract class AbstractFeederRepository<S, T>(
-        feederUrlRepository: FeederUrlRepository,
-        private val defaultValue: T
+        private val feederUrlRepository: FeederUrlRepository,
+        defaultValue: T?
 ) : Repository<T> {
 
-    private val service = MutableStateFlow<S?>(null)
     private val channel = MutableStateFlow(defaultValue)
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            service.collect { service ->
-                service?.let {
-                    invokeServiceCall(it)
-                }?.let {
-                    channel.emit(it)
-                }
-            }
-
             feederUrlRepository.get().map { url ->
                 url?.let {
                     ServiceCall(it)
                 }?.create(getServiceClass())
+            }.map { service ->
+                service?.let {
+                    invokeServiceCall(it)
+                }
             }.collect {
-                service.emit(it)
+                channel.emit(it)
             }
         }
     }
 
     final override fun init() {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                service.firstNotNull().let {
-                    channel.emit(invokeServiceCall(it))
-                }
-            } catch (exception: Exception) {
-                channel.emit(defaultValue)
+            getService()?.let { service ->
+                invokeServiceCall(service)
+            }?.let {
+                channel.emit(it)
             }
         }
     }
 
     final override fun get(): Flow<T> {
-        return channel
+        return channel.filterNotNull()
     }
 
-    protected fun getService(): Flow<S?> {
-        return service
+    protected suspend fun getService(): S? {
+        return feederUrlRepository.get()
+                .filterNotNull()
+                .first()
+                .let { url ->
+                    ServiceCall(url).create(getServiceClass())
+                }
     }
 
     protected abstract fun getServiceClass(): Class<S>

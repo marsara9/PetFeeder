@@ -4,13 +4,9 @@ import android.content.Context
 import android.net.nsd.NsdServiceInfo
 import com.sdoras.petfeeder.core.services.repositories.FeederFinderRepository
 import com.sdoras.petfeeder.core.utils.NsdHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.net.InetAddress
 
 class FeederFinderRepositoryImpl(

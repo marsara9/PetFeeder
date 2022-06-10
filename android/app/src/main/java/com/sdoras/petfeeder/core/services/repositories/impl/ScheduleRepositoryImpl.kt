@@ -5,7 +5,6 @@ import com.sdoras.petfeeder.core.services.ScheduleServices
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.ScheduleRepository
 import com.sdoras.petfeeder.core.services.repositories.base.AbstractFeederRepository
-import kotlinx.coroutines.flow.first
 
 class ScheduleRepositoryImpl(
         feederUrlRepository: FeederUrlRepository
@@ -21,10 +20,10 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun addScheduledFeeding(cups: Float, hour: Byte, minute: Byte) {
-        checkNotNull(getService().first()).addScheduledFeeding(cups, hour, minute)
+        checkNotNull(getService()).addScheduledFeeding(cups, hour, minute)
     }
 
     override suspend fun deleteScheduledFeeding(scheduledFeeding: ScheduledFeeding) {
-        checkNotNull(getService().first()).deleteScheduledFeeding(scheduledFeeding.id)
+        checkNotNull(getService()).deleteScheduledFeeding(scheduledFeeding.id)
     }
 }

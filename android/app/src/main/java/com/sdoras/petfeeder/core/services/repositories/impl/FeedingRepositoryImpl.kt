@@ -5,7 +5,6 @@ import com.sdoras.petfeeder.core.services.FeedingServices
 import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.FeedingRepository
 import com.sdoras.petfeeder.core.services.repositories.base.AbstractFeederRepository
-import kotlinx.coroutines.flow.first
 
 class FeedingRepositoryImpl(
         feederUrlRepository: FeederUrlRepository
@@ -24,7 +23,7 @@ class FeedingRepositoryImpl(
     }
 
     override suspend fun manualFeed(cups: Float) {
-        checkNotNull(getService().first())
+        checkNotNull(getService())
                 .manualFeed(cups)
     }
 }

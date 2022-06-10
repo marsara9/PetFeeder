@@ -6,11 +6,10 @@ import com.sdoras.petfeeder.core.services.repositories.FeederUrlRepository
 import com.sdoras.petfeeder.core.services.repositories.SettingsRepository
 import com.sdoras.petfeeder.core.services.repositories.base.AbstractFeederRepository
 import com.sdoras.petfeeder.core.services.retrofit.ServiceCall
-import kotlinx.coroutines.flow.first
 
 class SettingsRepositoryImpl(
         feederUrlRepository: FeederUrlRepository
-) : AbstractFeederRepository<SettingsServices, Settings?>(
+) : AbstractFeederRepository<SettingsServices, Settings>(
         feederUrlRepository, null
 ), SettingsRepository {
 
@@ -28,22 +27,22 @@ class SettingsRepositoryImpl(
     }
 
     override suspend fun setWifiSettings(ssid: String, password: String?) {
-        checkNotNull(getService().first())
+        checkNotNull(getService())
                 .setSettings(ssid = ssid, password = password)
     }
 
     override suspend fun setFeederName(name: String) {
-        checkNotNull(getService().first())
+        checkNotNull(getService())
                 .setSettings(name = name)
     }
 
     override suspend fun setNotificationsApiKey(fingerprint: String) {
-        checkNotNull(getService().first())
+        checkNotNull(getService())
                 .setSettings(fingerprint = fingerprint)
     }
 
     override suspend fun deleteSettings() {
-        checkNotNull(getService().first())
+        checkNotNull(getService())
                 .deleteSettings()
     }
 }
