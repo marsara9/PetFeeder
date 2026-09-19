@@ -1,0 +1,8 @@
+1	USB Type C Breakout Board (Downstream)	Adafruit #4090	$2.95
+1	HUZZAH32 – ESP32 Breakout Board	Adafruit #4172	$13.50
+1	PowerBoost 1000C (charger + power path)	Adafruit #2465	$19.95
+1	Lithium Ion Battery Pack, 3.7V 6600mAh	Adafruit #353	$24.50
+1	12V Step-Up Voltage Regulator U3V50F12	Pololu #2568	~$27 (per your last check)
+1	TB6612 1.2A DC/Stepper Motor Driver Breakout	Adafruit #2448	$6.95
+1	Stepper motor, NEMA-17, 200 steps/rev, 12V 350mA	Adafruit #324	$14.00
+1	MicroSD card breakout board+	Adafruit #254	$7.50
