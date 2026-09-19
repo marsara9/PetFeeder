@@ -11,6 +11,7 @@
 #include "freertos/task.h"
 
 #include "datastore.h"
+#include "motorcontrol.h"
 #include "scheduler.h"
 #include "timekeeper.h"
 #include "webserver.h"
@@ -65,7 +66,10 @@ static bool execute_feeding(float cups, Feeding *feeding)
     create_uuid(feeding->id, sizeof(feeding->id));
     feeding->cups = cups;
     feeding->date = timekeeper_now();
-    return datastore_record_feeding(feeding);
+    if (!datastore_record_feeding(feeding)) {
+        return false;
+    }
+    return motorcontrol_start_feed(cups);
 }
 
 static RuntimeSchedule *find_runtime_schedule(const char *id)
@@ -153,6 +157,10 @@ void app_main(void)
 
     const char *message = "ESP32 UART echo ready at 115200 baud\\r\\n";
     uart_write_bytes(UART_PORT, message, strlen(message));
+
+    if (!motorcontrol_init()) {
+        ESP_LOGE(SCHEDULE_TAG, "Motor controller initialization failed");
+    }
 
     WifiCredentials credentials = {0};
     if (!datastore_init() || !datastore_read_wifi_credentials(&credentials)) {

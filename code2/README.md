@@ -53,6 +53,21 @@ Use the ESP32 VSPI pins for the SD card reader:
 | VCC | 3.3V | Use 3.3 V logic |
 | GND | GND | Common ground |
 
+## Stepper motor wiring
+
+The TB6612 motor driver uses the following ESP32 GPIOs in `motorcontrol.c`:
+
+| TB6612 signal | ESP32 |
+| --- | --- |
+| AIN1 | GPIO21 |
+| AIN2 | GPIO14 |
+| BIN1 | GPIO27 |
+| BIN2 | GPIO26 |
+| STBY | GPIO25 |
+| PWMA | GPIO33 |
+| PWMB | GPIO32 |
+
+The motor controls use the available GPIO21 pin for AIN1 because GPIO13 drives the HUZZAH32 red LED. The other control signals remain grouped on the right-side header. The SD-card pins remain GPIO5/18/19/23. Connect the TB6612 motor supply to the 12 V regulator, logic VCC to 3.3 V, and share ground with the ESP32. The motor driver outputs connect to the NEMA-17 coils according to the motor coil pairs.
 The firmware expects a FAT-formatted card with a text file named `wifi` in the card root:
 
 ```text
@@ -96,7 +111,7 @@ Example response:
 [{"id":"feeding-uuid","cups":0.125,"date":"2026-09-19T20:12:00Z"}]
 ```
 
-`POST /feed` executes a manual feeding through the same action used by scheduled events, records it in feeding history, and returns the new feeding record with `200 OK`.
+`POST /feed` records the feeding, starts the motor in a background task, and returns the new feeding record with `200 OK` without waiting for the rotation to finish. Only one motor operation is accepted at a time; a request made while the motor is busy is rejected.
 
 When a schedule fires, the firmware currently logs an event over UART. All schedule times are UTC. For a quick test, calculate the next UTC minute and send:
 
