@@ -87,6 +87,7 @@ Feeding history is stored in `/sdcard/feedings` and is recorded when a scheduled
 
 ```text
 GET /feed
+POST /feed?cups=0.125
 ```
 
 Example response:
@@ -94,6 +95,8 @@ Example response:
 ```json
 [{"id":"feeding-uuid","cups":0.125,"date":"2026-09-19T20:12:00Z"}]
 ```
+
+`POST /feed` executes a manual feeding through the same action used by scheduled events, records it in feeding history, and returns the new feeding record with `200 OK`.
 
 When a schedule fires, the firmware currently logs an event over UART. All schedule times are UTC. For a quick test, calculate the next UTC minute and send:
 

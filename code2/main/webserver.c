@@ -1,6 +1,7 @@
 #include "webserver.h"
 
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -29,7 +30,9 @@ static webserver_get_schedules_fn get_schedules;
 static webserver_save_schedule_fn save_schedule;
 static webserver_delete_schedule_fn delete_schedule;
 static webserver_get_feedings_fn get_feedings;
+static webserver_feed_fn feed;
 static Feeding feeding_history[MAX_HTTP_FEEDINGS];
+static Schedule schedule_history[MAX_HTTP_SCHEDULES];
 
 static esp_err_t send_json(httpd_req_t *request, int status_code, const char *body)
 {
@@ -145,9 +148,8 @@ static bool get_schedule_id(httpd_req_t *request, char *id, size_t id_size)
 
 static esp_err_t handle_get_schedules(httpd_req_t *request)
 {
-    Schedule schedules[MAX_HTTP_SCHEDULES];
     size_t count = 0;
-    if (get_schedules == NULL || !get_schedules(schedules, MAX_HTTP_SCHEDULES, &count)) {
+    if (get_schedules == NULL || !get_schedules(schedule_history, MAX_HTTP_SCHEDULES, &count)) {
         return send_json(request, 503, SAVE_FAILED_RESPONSE);
     }
 
@@ -158,10 +160,10 @@ static esp_err_t handle_get_schedules(httpd_req_t *request)
 
     for (size_t index = 0; index < count; index++) {
         cJSON *schedule = cJSON_CreateObject();
-        cJSON_AddStringToObject(schedule, "id", schedules[index].id);
-        cJSON_AddNumberToObject(schedule, "cups", schedules[index].cups);
+        cJSON_AddStringToObject(schedule, "id", schedule_history[index].id);
+        cJSON_AddNumberToObject(schedule, "cups", schedule_history[index].cups);
         char time[9];
-        snprintf(time, sizeof(time), "%u:%02u", schedules[index].hour, schedules[index].minute);
+        snprintf(time, sizeof(time), "%u:%02u", schedule_history[index].hour, schedule_history[index].minute);
         cJSON_AddStringToObject(schedule, "time", time);
         cJSON_AddItemToArray(response_array, schedule);
     }
@@ -203,6 +205,47 @@ static esp_err_t handle_get_feedings(httpd_req_t *request)
 
     char *response = cJSON_PrintUnformatted(response_array);
     cJSON_Delete(response_array);
+    if (response == NULL) {
+        return send_json(request, 500, "{\"error\":{\"code\":500,\"message\":\"Unable to create response\"}}");
+    }
+
+    esp_err_t result = send_json(request, 200, response);
+    free(response);
+    return result;
+}
+
+static esp_err_t handle_post_feed(httpd_req_t *request)
+{
+    char value[QUERY_BUFFER_SIZE];
+    if (!get_query_value(request, "cups", value, sizeof(value))) {
+        return send_json(request, 400, INVALID_REQUEST_RESPONSE);
+    }
+
+    char *end = NULL;
+    float cups = strtof(value, &end);
+    float remainder = fmodf(cups, FEEDING_MINIMUM_CUPS);
+    if (end == value || *end != '\0' || !isfinite(cups) || cups < FEEDING_MINIMUM_CUPS || (remainder > 0.0001f && FEEDING_MINIMUM_CUPS - remainder > 0.0001f)) {
+        return send_json(request, 400, INVALID_REQUEST_RESPONSE);
+    }
+
+    Feeding feeding = {0};
+    if (feed == NULL || !feed(cups, &feeding)) {
+        return send_json(request, 503, SAVE_FAILED_RESPONSE);
+    }
+
+    cJSON *response_object = cJSON_CreateObject();
+    if (response_object == NULL) {
+        return send_json(request, 500, "{\"error\":{\"code\":500,\"message\":\"Out of memory\"}}");
+    }
+    char date[21];
+    struct tm utc_time;
+    gmtime_r(&feeding.date, &utc_time);
+    strftime(date, sizeof(date), "%Y-%m-%dT%H:%M:%SZ", &utc_time);
+    cJSON_AddStringToObject(response_object, "id", feeding.id);
+    cJSON_AddNumberToObject(response_object, "cups", feeding.cups);
+    cJSON_AddStringToObject(response_object, "date", date);
+    char *response = cJSON_PrintUnformatted(response_object);
+    cJSON_Delete(response_object);
     if (response == NULL) {
         return send_json(request, 500, "{\"error\":{\"code\":500,\"message\":\"Unable to create response\"}}");
     }
@@ -280,9 +323,10 @@ bool webserver_start(
     webserver_get_schedules_fn get_schedules_callback,
     webserver_save_schedule_fn save_schedule_callback,
     webserver_delete_schedule_fn delete_schedule_callback,
-    webserver_get_feedings_fn get_feedings_callback)
+    webserver_get_feedings_fn get_feedings_callback,
+    webserver_feed_fn feed_callback)
 {
-    if (credentials == NULL || save_callback == NULL || get_schedules_callback == NULL || save_schedule_callback == NULL || delete_schedule_callback == NULL || get_feedings_callback == NULL) {
+    if (credentials == NULL || save_callback == NULL || get_schedules_callback == NULL || save_schedule_callback == NULL || delete_schedule_callback == NULL || get_feedings_callback == NULL || feed_callback == NULL) {
         return false;
     }
 
@@ -292,6 +336,7 @@ bool webserver_start(
     save_schedule = save_schedule_callback;
     delete_schedule = delete_schedule_callback;
     get_feedings = get_feedings_callback;
+    feed = feed_callback;
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = HTTP_PORT;
@@ -345,6 +390,13 @@ bool webserver_start(
         .user_ctx = NULL,
     };
     httpd_register_uri_handler(server, &get_feedings_uri);
+    httpd_uri_t post_feed_uri = {
+        .uri = "/feed",
+        .method = HTTP_POST,
+        .handler = handle_post_feed,
+        .user_ctx = NULL,
+    };
+    httpd_register_uri_handler(server, &post_feed_uri);
     httpd_register_err_handler(server, HTTPD_404_NOT_FOUND, handle_not_found);
 
     ESP_LOGI(TAG, "HTTP server listening on port %d", HTTP_PORT);

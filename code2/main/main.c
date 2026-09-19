@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include <string.h>
 
 #include "driver/uart.h"
@@ -29,6 +30,8 @@ static const char *SCHEDULE_TAG = "feeding";
 static RuntimeSchedule runtime_schedules[MAX_SCHEDULES];
 static Schedule loaded_schedules[MAX_SCHEDULES];
 
+static bool execute_feeding(float cups, Feeding *feeding);
+
 static void create_uuid(char *id, size_t id_size)
 {
     snprintf(id, id_size, "%08x-%04x-%04x-%04x-%012llx", (unsigned)esp_random(), (unsigned)(esp_random() & 0xffff), (unsigned)(esp_random() & 0xffff), (unsigned)(esp_random() & 0xffff), (unsigned long long)(((uint64_t)esp_random() << 32) | esp_random()));
@@ -37,6 +40,11 @@ static void create_uuid(char *id, size_t id_size)
 static void log_scheduled_feeding(void *context)
 {
     RuntimeSchedule *runtime_schedule = context;
+    Feeding feeding = {0};
+    if (!execute_feeding(runtime_schedule->schedule.cups, &feeding)) {
+        ESP_LOGE(SCHEDULE_TAG, "Could not execute scheduled feeding");
+        return;
+    }
     ESP_LOGI(
         SCHEDULE_TAG,
         "Scheduled event fired: id=%s cups=%.3f at %02u:%02u UTC",
@@ -45,13 +53,19 @@ static void log_scheduled_feeding(void *context)
         runtime_schedule->schedule.hour,
         runtime_schedule->schedule.minute);
 
-    Feeding feeding = {0};
-    create_uuid(feeding.id, sizeof(feeding.id));
-    feeding.cups = runtime_schedule->schedule.cups;
-    feeding.date = timekeeper_now();
-    if (!datastore_record_feeding(&feeding)) {
-        ESP_LOGE(SCHEDULE_TAG, "Could not record scheduled feeding history");
+}
+
+static bool execute_feeding(float cups, Feeding *feeding)
+{
+    float remainder = fmodf(cups, FEEDING_MINIMUM_CUPS);
+    if (feeding == NULL || !isfinite(cups) || cups < FEEDING_MINIMUM_CUPS || (remainder > 0.0001f && FEEDING_MINIMUM_CUPS - remainder > 0.0001f)) {
+        return false;
     }
+    memset(feeding, 0, sizeof(*feeding));
+    create_uuid(feeding->id, sizeof(feeding->id));
+    feeding->cups = cups;
+    feeding->date = timekeeper_now();
+    return datastore_record_feeding(feeding);
 }
 
 static RuntimeSchedule *find_runtime_schedule(const char *id)
@@ -163,7 +177,8 @@ void app_main(void)
         datastore_get_schedules,
         save_schedule_and_activate,
         delete_schedule_and_cancel,
-        datastore_get_feedings);
+        datastore_get_feedings,
+        execute_feeding);
 
     uint8_t buffer[UART_BUFFER_SIZE];
     while (true) {
