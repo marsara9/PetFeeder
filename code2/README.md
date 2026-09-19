@@ -70,3 +70,13 @@ PUT /settings?ssid=network-name&password=network-password
 ```
 
 The GET response contains the SSID but never the password. A successful PUT returns `204 No Content` and saves the credentials to the SD card. The new credentials are used after the next reboot; Wi-Fi reconfiguration during a request will be added when the connection lifecycle is formalized.
+
+Schedules use Android-created UUIDs and are stored as individual files under `/sdcard/schedules/`:
+
+```text
+GET /schedule
+PUT /schedule/uuid?cups=0.125&time=08:30
+DELETE /schedule/uuid
+```
+
+The schedule PUT requires a UUID-shaped path ID, is idempotent, and returns `204 No Content`. The firmware does not generate or replace the ID.

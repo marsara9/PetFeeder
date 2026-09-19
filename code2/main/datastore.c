@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "driver/sdspi_host.h"
 #include "driver/spi_common.h"
@@ -18,6 +19,8 @@
 #define SD_MOUNT_POINT "/sdcard"
 #define WIFI_CREDENTIALS_PATH SD_MOUNT_POINT "/wifi"
 #define WIFI_CREDENTIALS_TEMP_PATH SD_MOUNT_POINT "/wifi.tmp"
+#define SCHEDULES_PATH SD_MOUNT_POINT "/schedules"
+#define SCHEDULES_TEMP_SUFFIX ".tmp"
 
 static const char *TAG = "datastore";
 static bool datastore_mounted;
@@ -78,6 +81,9 @@ bool datastore_init(void)
 
     ESP_LOGI(TAG, "SD card mounted at %s", SD_MOUNT_POINT);
     sdmmc_card_print_info(stdout, card);
+    if (mkdir(SCHEDULES_PATH, 0777) != 0 && errno != EEXIST) {
+        ESP_LOGW(TAG, "Schedules directory will be created on first write: errno=%d (%s)", errno, strerror(errno));
+    }
     datastore_mounted = true;
     return true;
 }
@@ -142,4 +148,109 @@ bool datastore_write_wifi_credentials(const WifiCredentials *credentials)
 
     ESP_LOGI(TAG, "Saved Wi-Fi credentials for SSID '%s'", credentials->ssid);
     return true;
+}
+
+static bool read_schedule_file(const char *path, Schedule *schedule)
+{
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        return false;
+    }
+
+    char line[64];
+    bool has_cups = false;
+    bool has_hour = false;
+    bool has_minute = false;
+    char value[64];
+    while (fgets(line, sizeof(line), file) != NULL) {
+        trim_line_end(line);
+        if (read_key_value(line, "cups", value, sizeof(value))) {
+            schedule->cups = strtof(value, NULL);
+            has_cups = true;
+        } else if (read_key_value(line, "hour", value, sizeof(value))) {
+            schedule->hour = (uint8_t)strtoul(value, NULL, 10);
+            has_hour = true;
+        } else if (read_key_value(line, "minute", value, sizeof(value))) {
+            schedule->minute = (uint8_t)strtoul(value, NULL, 10);
+            has_minute = true;
+        }
+    }
+    fclose(file);
+    return has_cups && has_hour && has_minute;
+}
+
+bool datastore_get_schedules(Schedule *schedules, size_t capacity, size_t *count)
+{
+    if (!datastore_mounted || schedules == NULL || count == NULL) {
+        return false;
+    }
+
+    *count = 0;
+    DIR *directory = opendir(SCHEDULES_PATH);
+    if (directory == NULL) {
+        ESP_LOGI(TAG, "Schedules directory not found; returning an empty schedule list");
+        return true;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(directory)) != NULL && *count < capacity) {
+        if (entry->d_name[0] == '.') {
+            continue;
+        }
+
+        Schedule schedule = {0};
+        strncpy(schedule.id, entry->d_name, sizeof(schedule.id) - 1);
+        char path[320];
+        snprintf(path, sizeof(path), "%s/%s", SCHEDULES_PATH, entry->d_name);
+        if (read_schedule_file(path, &schedule)) {
+            schedules[*count] = schedule;
+            (*count)++;
+        }
+    }
+    closedir(directory);
+    return true;
+}
+
+bool datastore_write_schedule(const Schedule *schedule)
+{
+    if (!datastore_mounted || schedule == NULL || schedule->id[0] == '\0') {
+        return false;
+    }
+
+    if (mkdir(SCHEDULES_PATH, 0777) != 0 && errno != EEXIST) {
+        ESP_LOGE(TAG, "Could not create schedules directory: errno=%d (%s)", errno, strerror(errno));
+        return false;
+    }
+
+    char path[128];
+    char temporary_path[128];
+    snprintf(path, sizeof(path), "%s/%s", SCHEDULES_PATH, schedule->id);
+    snprintf(temporary_path, sizeof(temporary_path), "%s/%s%s", SCHEDULES_PATH, schedule->id, SCHEDULES_TEMP_SUFFIX);
+    FILE *file = fopen(temporary_path, "w");
+    if (file == NULL) {
+        return false;
+    }
+
+    int result = fprintf(file, "cups=%.3f\nhour=%u\nminute=%u\n", schedule->cups, schedule->hour, schedule->minute);
+    if (result < 0 || fclose(file) != 0) {
+        remove(temporary_path);
+        return false;
+    }
+
+    if (rename(temporary_path, path) != 0) {
+        remove(temporary_path);
+        return false;
+    }
+    return true;
+}
+
+bool datastore_delete_schedule(const char *id)
+{
+    if (!datastore_mounted || id == NULL || id[0] == '\0') {
+        return false;
+    }
+
+    char path[128];
+    snprintf(path, sizeof(path), "%s/%s", SCHEDULES_PATH, id);
+    return remove(path) == 0 || errno == ENOENT;
 }

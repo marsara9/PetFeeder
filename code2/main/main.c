@@ -45,7 +45,12 @@ void app_main(void)
     }
 
     wifi_start(&credentials);
-    webserver_start(&credentials, datastore_write_wifi_credentials);
+    webserver_start(
+        &credentials,
+        datastore_write_wifi_credentials,
+        datastore_get_schedules,
+        datastore_write_schedule,
+        datastore_delete_schedule);
 
     uint8_t buffer[UART_BUFFER_SIZE];
     while (true) {
