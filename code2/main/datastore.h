@@ -3,14 +3,10 @@
 
 #include <stdbool.h>
 
-#define WIFI_CREDENTIAL_MAX_LENGTH 64
-
-typedef struct {
-    char ssid[WIFI_CREDENTIAL_MAX_LENGTH];
-    char password[WIFI_CREDENTIAL_MAX_LENGTH];
-} WifiCredentials;
+#include "wifi_credentials.h"
 
 bool datastore_init(void);
 bool datastore_read_wifi_credentials(WifiCredentials *credentials);
+bool datastore_write_wifi_credentials(const WifiCredentials *credentials);
 
 #endif

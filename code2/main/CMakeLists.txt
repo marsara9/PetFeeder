@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "main.c" "wifi.c" "datastore.c"
+    SRCS "main.c" "wifi.c" "datastore.c" "webserver.c"
     INCLUDE_DIRS "."
-    REQUIRES driver esp_event esp_netif esp_wifi nvs_flash fatfs sdmmc
+    REQUIRES driver esp_event esp_http_server json esp_netif esp_wifi nvs_flash fatfs sdmmc
 )

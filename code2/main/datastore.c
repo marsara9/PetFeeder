@@ -17,8 +17,10 @@
 #define SD_CS_GPIO 5
 #define SD_MOUNT_POINT "/sdcard"
 #define WIFI_CREDENTIALS_PATH SD_MOUNT_POINT "/wifi"
+#define WIFI_CREDENTIALS_TEMP_PATH SD_MOUNT_POINT "/wifi.tmp"
 
 static const char *TAG = "datastore";
+static bool datastore_mounted;
 
 static void trim_line_end(char *line)
 {
@@ -76,6 +78,7 @@ bool datastore_init(void)
 
     ESP_LOGI(TAG, "SD card mounted at %s", SD_MOUNT_POINT);
     sdmmc_card_print_info(stdout, card);
+    datastore_mounted = true;
     return true;
 }
 
@@ -109,4 +112,34 @@ bool datastore_read_wifi_credentials(WifiCredentials *credentials)
 
     ESP_LOGI(TAG, "Loaded Wi-Fi credentials for SSID '%s'", credentials->ssid);
     return credentials->ssid[0] != '\0';
+}
+
+bool datastore_write_wifi_credentials(const WifiCredentials *credentials)
+{
+    if (!datastore_mounted || credentials == NULL || credentials->ssid[0] == '\0') {
+        return false;
+    }
+
+    FILE *file = fopen(WIFI_CREDENTIALS_TEMP_PATH, "w");
+    if (file == NULL) {
+        ESP_LOGE(TAG, "Could not open temporary credentials file: errno=%d (%s)", errno, strerror(errno));
+        return false;
+    }
+
+    int result = fprintf(file, "ssid=%s\npassword=%s\n", credentials->ssid, credentials->password);
+    bool write_succeeded = result >= 0 && fclose(file) == 0;
+    if (!write_succeeded) {
+        fclose(file);
+        remove(WIFI_CREDENTIALS_TEMP_PATH);
+        return false;
+    }
+
+    if (rename(WIFI_CREDENTIALS_TEMP_PATH, WIFI_CREDENTIALS_PATH) != 0) {
+        ESP_LOGE(TAG, "Could not replace credentials file: errno=%d (%s)", errno, strerror(errno));
+        remove(WIFI_CREDENTIALS_TEMP_PATH);
+        return false;
+    }
+
+    ESP_LOGI(TAG, "Saved Wi-Fi credentials for SSID '%s'", credentials->ssid);
+    return true;
 }

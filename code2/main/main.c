@@ -8,6 +8,7 @@
 #include "freertos/task.h"
 
 #include "datastore.h"
+#include "webserver.h"
 #include "wifi.h"
 
 #define UART_PORT UART_NUM_0
@@ -44,6 +45,7 @@ void app_main(void)
     }
 
     wifi_start(&credentials);
+    webserver_start(&credentials, datastore_write_wifi_credentials);
 
     uint8_t buffer[UART_BUFFER_SIZE];
     while (true) {
