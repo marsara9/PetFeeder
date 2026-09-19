@@ -119,6 +119,25 @@ static bool is_uuid(const char *id)
     return true;
 }
 
+static bool get_schedule_id(httpd_req_t *request, char *id, size_t id_size)
+{
+    const char *prefix = "/schedule/";
+    if (strncmp(request->uri, prefix, strlen(prefix)) != 0) {
+        return false;
+    }
+
+    const char *start = request->uri + strlen(prefix);
+    const char *query = strchr(start, '?');
+    size_t length = query == NULL ? strlen(start) : (size_t)(query - start);
+    if (length == 0 || length >= id_size) {
+        return false;
+    }
+
+    memcpy(id, start, length);
+    id[length] = '\0';
+    return is_uuid(id);
+}
+
 static esp_err_t handle_get_schedules(httpd_req_t *request)
 {
     Schedule schedules[MAX_HTTP_SCHEDULES];
@@ -157,13 +176,7 @@ static esp_err_t handle_put_schedule(httpd_req_t *request)
 {
     char value[QUERY_BUFFER_SIZE];
     char id[SCHEDULE_ID_MAX_LENGTH];
-    const char *prefix = "/schedule/";
-    if (strncmp(request->uri, prefix, strlen(prefix)) != 0) {
-        return send_json(request, 400, INVALID_REQUEST_RESPONSE);
-    }
-    strncpy(id, request->uri + strlen(prefix), sizeof(id) - 1);
-    id[sizeof(id) - 1] = '\0';
-    if (!is_uuid(id)) {
+    if (!get_schedule_id(request, id, sizeof(id))) {
         return send_json(request, 400, INVALID_REQUEST_RESPONSE);
     }
     if (!get_query_value(request, "cups", value, sizeof(value))) {
@@ -208,12 +221,12 @@ static esp_err_t handle_put_schedule(httpd_req_t *request)
 
 static esp_err_t handle_delete_schedule(httpd_req_t *request)
 {
-    const char *prefix = "/schedule/";
-    if (strncmp(request->uri, prefix, strlen(prefix)) != 0 || !is_uuid(request->uri + strlen(prefix))) {
+    char id[SCHEDULE_ID_MAX_LENGTH];
+    if (!get_schedule_id(request, id, sizeof(id))) {
         return send_json(request, 400, INVALID_REQUEST_RESPONSE);
     }
 
-    if (delete_schedule == NULL || !delete_schedule(request->uri + strlen(prefix))) {
+    if (delete_schedule == NULL || !delete_schedule(id)) {
         return send_json(request, 503, SAVE_FAILED_RESPONSE);
     }
 
@@ -241,6 +254,7 @@ bool webserver_start(
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = HTTP_PORT;
     config.max_uri_handlers = 8;
+    config.uri_match_fn = httpd_uri_match_wildcard;
 
     if (httpd_start(&server, &config) != ESP_OK) {
         ESP_LOGE(TAG, "Could not start HTTP server");
@@ -287,5 +301,3 @@ bool webserver_start(
     ESP_LOGI(TAG, "HTTP server listening on port %d", HTTP_PORT);
     return true;
 }
-
-

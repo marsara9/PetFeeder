@@ -80,3 +80,15 @@ DELETE /schedule/uuid
 ```
 
 The schedule PUT requires a UUID-shaped path ID, is idempotent, and returns `204 No Content`. The firmware does not generate or replace the ID.
+
+When a schedule fires, the firmware currently logs an event over UART. All schedule times are UTC. For a quick test, calculate the next UTC minute and send:
+
+```sh
+curl -X PUT "http://DEVICE_IP/schedule/550e8400-e29b-41d4-a716-446655440000?cups=0.125&time=HH:MM"
+```
+
+After SNTP synchronization, the monitor should show `Scheduled event fired` at that UTC time.
+
+## Time and scheduling
+
+`timekeeper.c` synchronizes the ESP32 clock through SNTP and treats all firmware times as UTC. `scheduler.c` owns recurring daily events and runs them from its own FreeRTOS task, independent of the HTTP and datastore services. Android is responsible for converting user-local times to UTC before saving schedules.

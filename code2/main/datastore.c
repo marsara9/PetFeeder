@@ -140,6 +140,12 @@ bool datastore_write_wifi_credentials(const WifiCredentials *credentials)
         return false;
     }
 
+    if (remove(WIFI_CREDENTIALS_PATH) != 0 && errno != ENOENT) {
+        ESP_LOGE(TAG, "Could not remove existing credentials file: errno=%d (%s)", errno, strerror(errno));
+        remove(WIFI_CREDENTIALS_TEMP_PATH);
+        return false;
+    }
+
     if (rename(WIFI_CREDENTIALS_TEMP_PATH, WIFI_CREDENTIALS_PATH) != 0) {
         ESP_LOGE(TAG, "Could not replace credentials file: errno=%d (%s)", errno, strerror(errno));
         remove(WIFI_CREDENTIALS_TEMP_PATH);
@@ -237,7 +243,14 @@ bool datastore_write_schedule(const Schedule *schedule)
         return false;
     }
 
+    if (remove(path) != 0 && errno != ENOENT) {
+        ESP_LOGE(TAG, "Could not remove existing schedule: errno=%d (%s)", errno, strerror(errno));
+        remove(temporary_path);
+        return false;
+    }
+
     if (rename(temporary_path, path) != 0) {
+        ESP_LOGE(TAG, "Could not replace schedule: errno=%d (%s)", errno, strerror(errno));
         remove(temporary_path);
         return false;
     }
