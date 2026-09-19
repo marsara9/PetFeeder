@@ -21,6 +21,8 @@
 #define WIFI_CREDENTIALS_TEMP_PATH SD_MOUNT_POINT "/wifi.tmp"
 #define SCHEDULES_PATH SD_MOUNT_POINT "/schedules"
 #define SCHEDULES_TEMP_SUFFIX ".tmp"
+#define FEEDINGS_PATH SD_MOUNT_POINT "/feedings"
+#define FEEDINGS_TEMP_PATH SD_MOUNT_POINT "/feedings.tmp"
 
 static const char *TAG = "datastore";
 static bool datastore_mounted;
@@ -266,4 +268,97 @@ bool datastore_delete_schedule(const char *id)
     char path[128];
     snprintf(path, sizeof(path), "%s/%s", SCHEDULES_PATH, id);
     return remove(path) == 0 || errno == ENOENT;
+}
+
+static bool read_feedings_file(Feeding *feedings, size_t capacity, size_t *count)
+{
+    FILE *file = fopen(FEEDINGS_PATH, "r");
+    if (file == NULL) {
+        *count = 0;
+        return errno == ENOENT;
+    }
+
+    *count = 0;
+    char line[128];
+    while (fgets(line, sizeof(line), file) != NULL) {
+        if (*count >= capacity) {
+            break;
+        }
+
+        Feeding feeding = {0};
+        long timestamp = 0;
+        if (sscanf(line, "%36[^,],%f,%ld", feeding.id, &feeding.cups, &timestamp) == 3) {
+            feeding.date = (time_t)timestamp;
+            feedings[*count] = feeding;
+            (*count)++;
+        }
+    }
+    fclose(file);
+    return true;
+}
+
+static bool write_feedings_file(const Feeding *feedings, size_t count)
+{
+    FILE *file = fopen(FEEDINGS_TEMP_PATH, "w");
+    if (file == NULL) {
+        ESP_LOGE(TAG, "Could not open temporary feeding history: errno=%d (%s)", errno, strerror(errno));
+        return false;
+    }
+
+    for (size_t index = 0; index < count; index++) {
+        if (fprintf(file, "%s,%.3f,%ld\n", feedings[index].id, feedings[index].cups, (long)feedings[index].date) < 0) {
+            fclose(file);
+            remove(FEEDINGS_TEMP_PATH);
+            return false;
+        }
+    }
+
+    if (fclose(file) != 0 || (remove(FEEDINGS_PATH) != 0 && errno != ENOENT) || rename(FEEDINGS_TEMP_PATH, FEEDINGS_PATH) != 0) {
+        ESP_LOGE(TAG, "Could not replace feeding history: errno=%d (%s)", errno, strerror(errno));
+        remove(FEEDINGS_TEMP_PATH);
+        return false;
+    }
+    return true;
+}
+
+bool datastore_get_feedings(Feeding *feedings, size_t capacity, size_t *count)
+{
+    if (!datastore_mounted || feedings == NULL || count == NULL) {
+        return false;
+    }
+    return read_feedings_file(feedings, capacity, count);
+}
+
+bool datastore_record_feeding(const Feeding *feeding)
+{
+    static Feeding history[DATASTORE_MAX_FEEDINGS + 1];
+    size_t count = 0;
+    if (!datastore_mounted || feeding == NULL || feeding->id[0] == '\0') {
+        return false;
+    }
+    if (!read_feedings_file(history, DATASTORE_MAX_FEEDINGS, &count)) {
+        return false;
+    }
+
+    if (count == DATASTORE_MAX_FEEDINGS) {
+        memmove(&history[0], &history[1], (count - 1) * sizeof(history[0]));
+        count--;
+    }
+    history[count++] = *feeding;
+
+    time_t now;
+    time(&now);
+    if (now > 1600000000) {
+        time_t cutoff = now - (time_t)DATASTORE_FEEDING_RETENTION_DAYS * 86400;
+        size_t first_retained = 0;
+        while (first_retained < count && history[first_retained].date < cutoff) {
+            first_retained++;
+        }
+        if (first_retained > 0) {
+            memmove(history, &history[first_retained], (count - first_retained) * sizeof(history[0]));
+            count -= first_retained;
+        }
+    }
+
+    return write_feedings_file(history, count);
 }

@@ -8,6 +8,8 @@ The application entry point in `main.c` composes the firmware services. `datasto
 
 Keep hardware and persistence details behind their service boundaries as additional features are ported. Scheduling, motor control, HTTP, and notifications should become separate services rather than being added to `main.c` or coupled directly to the SD implementation.
 
+Feeding-history retention defaults are defined in `datastore_config.h`: 365 days and 1,000 entries. They are compile-time policy defaults for now and can later move into persisted settings without changing the feeding model or datastore API.
+
 ## Prerequisites
 
 Install ESP-IDF and source its environment in the shell. For example:
@@ -80,6 +82,18 @@ DELETE /schedule/uuid
 ```
 
 The schedule PUT requires a UUID-shaped path ID, is idempotent, and returns `204 No Content`. The firmware does not generate or replace the ID.
+
+Feeding history is stored in `/sdcard/feedings` and is recorded when a scheduled event fires. It is retained for `DATASTORE_FEEDING_RETENTION_DAYS` days and capped at `DATASTORE_MAX_FEEDINGS` entries. The history endpoint returns UTC timestamps:
+
+```text
+GET /feed
+```
+
+Example response:
+
+```json
+[{"id":"feeding-uuid","cups":0.125,"date":"2026-09-19T20:12:00Z"}]
+```
 
 When a schedule fires, the firmware currently logs an event over UART. All schedule times are UTC. For a quick test, calculate the next UTC minute and send:
 

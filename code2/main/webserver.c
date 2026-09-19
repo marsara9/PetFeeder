@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "cJSON.h"
 #include "esp_http_server.h"
@@ -12,12 +13,14 @@
 #define HTTP_PORT 80
 #define QUERY_BUFFER_SIZE 256
 #define MAX_HTTP_SCHEDULES MAX_SCHEDULES
+#define MAX_HTTP_FEEDINGS DATASTORE_MAX_FEEDINGS
 
 static const char *TAG = "webserver";
 static const char *JSON_CONTENT_TYPE = "application/json";
 static const char *NOT_FOUND_RESPONSE = "{\"error\":{\"code\":404,\"message\":\"Not Found\"}}";
 static const char *INVALID_REQUEST_RESPONSE = "{\"error\":{\"code\":400,\"message\":\"Invalid request\"}}";
 static const char *SAVE_FAILED_RESPONSE = "{\"error\":{\"code\":503,\"message\":\"Unable to save settings\"}}";
+static const char *HISTORY_FAILED_RESPONSE = "{\"error\":{\"code\":503,\"message\":\"Unable to read feeding history\"}}";
 
 static httpd_handle_t server;
 static WifiCredentials current_credentials;
@@ -25,6 +28,8 @@ static webserver_save_credentials_fn save_credentials;
 static webserver_get_schedules_fn get_schedules;
 static webserver_save_schedule_fn save_schedule;
 static webserver_delete_schedule_fn delete_schedule;
+static webserver_get_feedings_fn get_feedings;
+static Feeding feeding_history[MAX_HTTP_FEEDINGS];
 
 static esp_err_t send_json(httpd_req_t *request, int status_code, const char *body)
 {
@@ -172,6 +177,41 @@ static esp_err_t handle_get_schedules(httpd_req_t *request)
     return result;
 }
 
+static esp_err_t handle_get_feedings(httpd_req_t *request)
+{
+    size_t count = 0;
+    if (get_feedings == NULL || !get_feedings(feeding_history, MAX_HTTP_FEEDINGS, &count)) {
+        return send_json(request, 503, HISTORY_FAILED_RESPONSE);
+    }
+
+    cJSON *response_array = cJSON_CreateArray();
+    if (response_array == NULL) {
+        return send_json(request, 500, "{\"error\":{\"code\":500,\"message\":\"Out of memory\"}}");
+    }
+
+    for (size_t index = 0; index < count; index++) {
+        cJSON *feeding = cJSON_CreateObject();
+        char date[21];
+        struct tm utc_time;
+        gmtime_r(&feeding_history[index].date, &utc_time);
+        strftime(date, sizeof(date), "%Y-%m-%dT%H:%M:%SZ", &utc_time);
+        cJSON_AddStringToObject(feeding, "id", feeding_history[index].id);
+        cJSON_AddNumberToObject(feeding, "cups", feeding_history[index].cups);
+        cJSON_AddStringToObject(feeding, "date", date);
+        cJSON_AddItemToArray(response_array, feeding);
+    }
+
+    char *response = cJSON_PrintUnformatted(response_array);
+    cJSON_Delete(response_array);
+    if (response == NULL) {
+        return send_json(request, 500, "{\"error\":{\"code\":500,\"message\":\"Unable to create response\"}}");
+    }
+
+    esp_err_t result = send_json(request, 200, response);
+    free(response);
+    return result;
+}
+
 static esp_err_t handle_put_schedule(httpd_req_t *request)
 {
     char value[QUERY_BUFFER_SIZE];
@@ -239,9 +279,10 @@ bool webserver_start(
     webserver_save_credentials_fn save_callback,
     webserver_get_schedules_fn get_schedules_callback,
     webserver_save_schedule_fn save_schedule_callback,
-    webserver_delete_schedule_fn delete_schedule_callback)
+    webserver_delete_schedule_fn delete_schedule_callback,
+    webserver_get_feedings_fn get_feedings_callback)
 {
-    if (credentials == NULL || save_callback == NULL || get_schedules_callback == NULL || save_schedule_callback == NULL || delete_schedule_callback == NULL) {
+    if (credentials == NULL || save_callback == NULL || get_schedules_callback == NULL || save_schedule_callback == NULL || delete_schedule_callback == NULL || get_feedings_callback == NULL) {
         return false;
     }
 
@@ -250,6 +291,7 @@ bool webserver_start(
     get_schedules = get_schedules_callback;
     save_schedule = save_schedule_callback;
     delete_schedule = delete_schedule_callback;
+    get_feedings = get_feedings_callback;
 
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.server_port = HTTP_PORT;
@@ -296,6 +338,13 @@ bool webserver_start(
     httpd_register_uri_handler(server, &get_schedules_uri);
     httpd_register_uri_handler(server, &put_schedule_uri);
     httpd_register_uri_handler(server, &delete_schedule_uri);
+    httpd_uri_t get_feedings_uri = {
+        .uri = "/feed",
+        .method = HTTP_GET,
+        .handler = handle_get_feedings,
+        .user_ctx = NULL,
+    };
+    httpd_register_uri_handler(server, &get_feedings_uri);
     httpd_register_err_handler(server, HTTPD_404_NOT_FOUND, handle_not_found);
 
     ESP_LOGI(TAG, "HTTP server listening on port %d", HTTP_PORT);
