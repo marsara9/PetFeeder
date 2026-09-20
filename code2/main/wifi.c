@@ -25,6 +25,7 @@ static const char *TAG = "wifi";
 static EventGroupHandle_t wifi_event_group;
 static int retry_count;
 static bool station_active;
+static bool station_was_connected;
 static WifiCredentials station_credentials;
 
 static void start_access_point(void)
@@ -60,7 +61,14 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
             return;
         }
 
-        if (retry_count < WIFI_MAX_RETRIES) {
+        if (station_was_connected) {
+            retry_count = 0;
+            ESP_LOGW(TAG, "Station disconnected, reason=%d; reconnecting", event->reason);
+            esp_err_t result = esp_wifi_connect();
+            if (result != ESP_OK) {
+                ESP_LOGW(TAG, "Reconnect could not start: %s", esp_err_to_name(result));
+            }
+        } else if (retry_count < WIFI_MAX_RETRIES) {
             retry_count++;
             ESP_LOGW(
                 TAG,
@@ -79,6 +87,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         retry_count = 0;
+        station_was_connected = true;
         ESP_LOGI(TAG, "Connected, IP address: " IPSTR, IP2STR(&event->ip_info.ip));
         xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_BIT);
     }
@@ -107,6 +116,7 @@ void wifi_start(const WifiCredentials *credentials)
 
     wifi_init_config_t wifi_init_config = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&wifi_init_config));
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL));
 

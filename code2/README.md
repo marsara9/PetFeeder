@@ -22,6 +22,8 @@ The project currently targets the classic ESP32 (`esp32`). Change the target bef
 
 The current custom partition table gives the single factory application a 1.5 MiB partition. NVS and PHY calibration data remain reserved. This is an interim layout; it can later be replaced with an OTA table or an SD-card update layout without changing the application service boundaries.
 
+Wi-Fi reconnects indefinitely after a connection has once succeeded. Wi-Fi power save is disabled for the current stability test, which improves responsiveness and can help with marginal links at the cost of higher power consumption.
+
 ## Build and flash
 
 From this directory:
@@ -42,32 +44,36 @@ idf.py -p /dev/ttyUSB0 flash
 
 ## SD card wiring
 
-Use the ESP32 VSPI pins for the SD card reader:
+SD signals are wired to the HUZZAH32's left header, in the same top-to-bottom order as the header pins
+(BAT, 15, 2, 0, 4, 16, 17, 5, 18, 19, 21, RX, TX, 22, 23). GPIO0/2/15 (boot-strapping) and RX/TX (UART0
+console) are skipped.
 
 | SD reader | ESP32 | Signal |
 | --- | --- | --- |
-| CLK | GPIO18 | SPI clock |
-| DO | GPIO19 | MISO, card to ESP32 |
-| DI | GPIO23 | MOSI, ESP32 to card |
-| CS | GPIO5 | Chip select |
-| VCC | 3.3V | Use 3.3 V logic |
+| CS | GPIO4 | Chip select |
+| DI | GPIO16 | MOSI, ESP32 to card |
+| DO | GPIO17 | MISO, card to ESP32 |
+| CLK | GPIO5 | SPI clock |
 | GND | GND | Common ground |
+| VCC | 3.3V | Use 3.3 V logic |
 
 ## Stepper motor wiring
 
-The TB6612 motor driver uses the following ESP32 GPIOs in `motorcontrol.c`:
+The TB6612 motor driver uses the following ESP32 GPIOs in `motorcontrol.c`, wired to the right header in
+the same top-to-bottom order as the header pins (GND, 3V, 13, 12, 14, 27, 26, 25, 33, 32, 35, 34, 39, RST).
+GPIO12 (flash-voltage strapping pin) and the input-only GPIO34/35/39 pins are skipped.
 
 | TB6612 signal | ESP32 |
 | --- | --- |
-| AIN1 | GPIO21 |
-| AIN2 | GPIO14 |
+| PWMB | GPIO13 |
+| BIN2 | GPIO14 |
 | BIN1 | GPIO27 |
-| BIN2 | GPIO26 |
-| STBY | GPIO25 |
-| PWMA | GPIO33 |
-| PWMB | GPIO32 |
+| STBY | GPIO26 |
+| AIN1 | GPIO25 |
+| AIN2 | GPIO33 |
+| PWMA | GPIO32 |
 
-The motor controls use the available GPIO21 pin for AIN1 because GPIO13 drives the HUZZAH32 red LED. The other control signals remain grouped on the right-side header. The SD-card pins remain GPIO5/18/19/23. Connect the TB6612 motor supply to the 12 V regulator, logic VCC to 3.3 V, and share ground with the ESP32. The motor driver outputs connect to the NEMA-17 coils according to the motor coil pairs.
+Connect the TB6612 motor supply to the 12 V regulator, logic VCC to 3.3 V, and share ground with the ESP32. The motor driver outputs connect to the NEMA-17 coils according to the motor coil pairs.
 The firmware expects a FAT-formatted card with a text file named `wifi` in the card root:
 
 ```text
