@@ -1,0 +1,268 @@
+(footprint "Pololu 12v StepUp"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 -0.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "b4c2d22e-5d51-44d3-946d-5be58f48a475")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "Pololu 12v StepUp"
+		(at 0 1 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "23eaefed-6a0c-4471-b1cc-c198b898d762")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "74f99bb3-9fef-4965-8c44-233cfdf83a86")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d92dd387-1748-4b8e-9d1f-8b826413a079")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "KiLib_Generator" "connector/pin_header_socket"
+		(at 26 9 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "3277913c-8556-470f-9046-4c79dfdbd787")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "KiLib_Generator" "connector/pin_header_socket"
+		(at 26 9 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "dd2f7ce5-23a0-4177-b1f7-9ef819a666bf")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -43.18 -12.7)
+		(end -43.18 2.54)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "2219ea75-feaa-4f84-a7eb-79a741e50095")
+	)
+	(fp_line
+		(start -43.18 -12.7)
+		(end 5.08 -12.7)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "47a9ab2d-6b6f-4382-a2ad-fd39d021b19e")
+	)
+	(fp_line
+		(start -43.18 2.54)
+		(end 5.08 2.54)
+		(stroke
+			(width 0.2)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "0a3bd42a-5b8b-48ec-827c-a1b7d8cfd867")
+	)
+	(fp_line
+		(start 5.08 -12.7)
+		(end 5.08 2.54)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "25a00d8c-fdb1-4831-b935-c7ace6d60443")
+	)
+	(fp_text user "GND"
+		(at -36.5 -9 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "d3420647-8cfe-440f-948e-5238f67931b0")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "VIN"
+		(at -36.5 -3.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "9b42bc21-a86d-43bd-b6b6-8ab6be88b406")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "Pololu 12V Step-Up"
+		(at -28 -7 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "cd0135cf-8c9b-412e-9c2e-493a9a72e226")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "U3V50F12"
+		(at -24 -5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "f19087b6-4852-45de-a30a-ada7543fcd14")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.2)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "VOUT"
+		(at -5 -0.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "a39d6c97-0e30-4449-9f6f-c781b643e427")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(fp_text user "GND"
+		(at -4.5 -6 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "7a475e28-6169-478f-bd0f-616bb6ced825")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify left bottom)
+		)
+	)
+	(pad "1" thru_hole rect
+		(at -38.1 -10.16)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "8bf227ba-bdb2-42d2-9bdd-f9b954c6cae8")
+	)
+	(pad "2" thru_hole rect
+		(at -38.1 -7.62)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "9aaa0b78-83ba-4f82-972e-8d9630d9455f")
+	)
+	(pad "3" thru_hole circle
+		(at -38.1 -5.08)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "b196ebee-9586-45ba-9858-2656e0780eb7")
+	)
+	(pad "4" thru_hole circle
+		(at -38.1 -2.54)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "f42f3c6a-6ec3-4640-9bbd-0ba5e3b3ebf2")
+	)
+	(pad "5" thru_hole rect
+		(at 0 -7.62)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "224faee7-c133-4f11-9bb2-48ae7e726434")
+	)
+	(pad "6" thru_hole rect
+		(at 0 -5.08)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "b4cd07c2-b85c-4577-b5b7-9a2d13eae906")
+	)
+	(pad "7" thru_hole circle
+		(at 0 -2.54)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "a6ce4f60-c590-4cbc-8582-309ade11bd5d")
+	)
+	(pad "8" thru_hole circle
+		(at 0 0)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "2754e0bc-ff29-4c72-b69c-9a229b8d24fe")
+	)
+	(embedded_fonts no)
+)
