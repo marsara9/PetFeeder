@@ -1,5 +1,6 @@
 #include "webserver.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -214,6 +215,38 @@ static esp_err_t handle_get_feedings(httpd_req_t *request)
     return result;
 }
 
+// cups is only accurate to the nearest 1/8 cup the motor can dispense
+static bool is_valid_cups(float cups)
+{
+    if (!isfinite(cups) || cups < FEEDING_MINIMUM_CUPS) {
+        return false;
+    }
+    float remainder = fmodf(cups, FEEDING_MINIMUM_CUPS);
+    return remainder <= 0.0001f || FEEDING_MINIMUM_CUPS - remainder <= 0.0001f;
+}
+
+// strict zero-padded 24-hour HH:MM; anything else is ambiguous
+static bool parse_strict_time(const char *value, uint8_t *hour_out, uint8_t *minute_out)
+{
+    if (strlen(value) != 5 || value[2] != ':') {
+        return false;
+    }
+    if (!isdigit((unsigned char)value[0]) || !isdigit((unsigned char)value[1]) ||
+        !isdigit((unsigned char)value[3]) || !isdigit((unsigned char)value[4])) {
+        return false;
+    }
+
+    unsigned hour = (unsigned)((value[0] - '0') * 10 + (value[1] - '0'));
+    unsigned minute = (unsigned)((value[3] - '0') * 10 + (value[4] - '0'));
+    if (hour > 23 || minute > 59) {
+        return false;
+    }
+
+    *hour_out = (uint8_t)hour;
+    *minute_out = (uint8_t)minute;
+    return true;
+}
+
 static esp_err_t handle_post_feed(httpd_req_t *request)
 {
     char value[QUERY_BUFFER_SIZE];
@@ -223,8 +256,7 @@ static esp_err_t handle_post_feed(httpd_req_t *request)
 
     char *end = NULL;
     float cups = strtof(value, &end);
-    float remainder = fmodf(cups, FEEDING_MINIMUM_CUPS);
-    if (end == value || *end != '\0' || !isfinite(cups) || cups < FEEDING_MINIMUM_CUPS || (remainder > 0.0001f && FEEDING_MINIMUM_CUPS - remainder > 0.0001f)) {
+    if (end == value || *end != '\0' || !is_valid_cups(cups)) {
         return send_json(request, 400, INVALID_REQUEST_RESPONSE);
     }
 
@@ -268,7 +300,7 @@ static esp_err_t handle_put_schedule(httpd_req_t *request)
 
     char *end = NULL;
     float cups = strtof(value, &end);
-    if (end == value || *end != '\0' || cups <= 0.0f) {
+    if (end == value || *end != '\0' || !is_valid_cups(cups)) {
         return send_json(request, 400, INVALID_REQUEST_RESPONSE);
     }
 
@@ -276,24 +308,17 @@ static esp_err_t handle_put_schedule(httpd_req_t *request)
         return send_json(request, 400, INVALID_REQUEST_RESPONSE);
     }
 
-    char *separator = strchr(value, ':');
-    if (separator == NULL || separator == value || separator[1] == '\0') {
-        return send_json(request, 400, INVALID_REQUEST_RESPONSE);
-    }
-    *separator = '\0';
-    char *hour_end = NULL;
-    char *minute_end = NULL;
-    unsigned long hour = strtoul(value, &hour_end, 10);
-    unsigned long minute = strtoul(separator + 1, &minute_end, 10);
-    if (hour_end == value || *hour_end != '\0' || minute_end == separator + 1 || *minute_end != '\0' || hour > 23 || minute > 59) {
+    uint8_t hour = 0;
+    uint8_t minute = 0;
+    if (!parse_strict_time(value, &hour, &minute)) {
         return send_json(request, 400, INVALID_REQUEST_RESPONSE);
     }
 
     Schedule schedule = {0};
     strncpy(schedule.id, id, sizeof(schedule.id) - 1);
     schedule.cups = cups;
-    schedule.hour = (uint8_t)hour;
-    schedule.minute = (uint8_t)minute;
+    schedule.hour = hour;
+    schedule.minute = minute;
     if (save_schedule == NULL || !save_schedule(&schedule)) {
         return send_json(request, 503, SAVE_FAILED_RESPONSE);
     }
