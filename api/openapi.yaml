@@ -1,0 +1,240 @@
+openapi: 3.0.3
+info:
+  title: PetFeeder Device API
+  description: >
+    Local HTTP API exposed by the PetFeeder firmware (code2/, ESP32/ESP-IDF).
+    There is no central server; each device serves this API on its own local
+    IP address. This reflects the in-progress ESP32 rewrite, not the legacy
+    ESP8266 firmware in code/.
+  version: "1.0.0"
+servers:
+  - url: http://{ipaddr}
+    variables:
+      ipaddr:
+        default: 192.168.1.100
+        description: Local IP address of the feeder device
+
+paths:
+  /settings:
+    get:
+      summary: Get current device settings
+      operationId: getSettings
+      responses:
+        "200":
+          description: Current settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    put:
+      summary: Update Wi-Fi credentials
+      description: At least one of `ssid` or `password` must be provided.
+      operationId: updateSettings
+      parameters:
+        - name: ssid
+          in: query
+          schema:
+            type: string
+        - name: password
+          in: query
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Credentials saved
+        "400":
+          description: Neither ssid nor password provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Unable to save settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /feed:
+    get:
+      summary: Get feeding history
+      operationId: getFeedings
+      responses:
+        "200":
+          description: List of past feedings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feeding"
+        "503":
+          description: Unable to read feeding history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Trigger an immediate feeding
+      description: Amount must be a positive multiple of 0.125 cups.
+      operationId: createFeeding
+      parameters:
+        - name: cups
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+            minimum: 0.125
+      responses:
+        "200":
+          description: Feeding recorded and dispensed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feeding"
+        "400":
+          description: Invalid cup amount
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Unable to save feeding
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /schedule:
+    get:
+      summary: Get all scheduled feedings
+      operationId: getSchedules
+      responses:
+        "200":
+          description: List of scheduled feedings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Schedule"
+        "503":
+          description: Unable to read schedules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /schedule/{id}:
+    put:
+      summary: Create or update a scheduled feeding
+      description: >
+        The client generates the schedule's UUID and supplies it in the path;
+        an existing schedule with the same id is replaced.
+      operationId: putSchedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: cups
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+            minimum: 0
+            exclusiveMinimum: true
+        - name: time
+          in: query
+          required: true
+          description: 24-hour time in H:MM format
+          schema:
+            type: string
+            example: "12:10"
+      responses:
+        "204":
+          description: Schedule saved
+        "400":
+          description: Invalid id, cups, or time
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Unable to save schedule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a scheduled feeding
+      operationId: deleteSchedule
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Schedule deleted
+        "400":
+          description: Invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Unable to delete schedule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Settings:
+      type: object
+      properties:
+        ssid:
+          type: string
+    Feeding:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cups:
+          type: number
+          format: float
+        date:
+          type: string
+          format: date-time
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        cups:
+          type: number
+          format: float
+        time:
+          type: string
+          description: 24-hour time in H:MM format
+          example: "12:10"
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
