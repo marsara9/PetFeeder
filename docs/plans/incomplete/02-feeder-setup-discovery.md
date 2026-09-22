@@ -4,7 +4,7 @@
 Let a user pair a new feeder to the app and manage the set of feeders they own, providing the real implementation of the `FeederRepository` contract that Plan 01 defines and all other feature plans depend on.
 
 ## Dependencies
-- Plan 01 (Base App Foundation) must exist first: this plan implements the `FeederRepository` interface it defines, and adds Room entities/DAOs to the `PetFeederDatabase` module Plan 01 scaffolds.
+- Plan 01 (Base App Foundation) must exist first: this plan implements the `FeederRepository` interface it defines.
 - No dependency on Plans 03-06; those depend on this plan's output (a working `FeederRepository`), not the other way around.
 
 ## Context / firmware reality check
@@ -20,14 +20,13 @@ the Android discovery source and pairing flow should then be updated to use
 that contract. The local Room display name remains an app concern unless the
 new product contract explicitly makes it device-synchronized.
 
-Because of this, v1 discovery is **manual add-by-IP/hostname**, and the feeder's friendly name is **stored client-side only** in this app's local registry (Room) — it is not synced to or from the device. mDNS-based discovery and a device-side name field are tracked as a future firmware improvement, not blocking work for this plan.
+Because of this, v1 discovery is **manual add-by-IP/hostname**, and the feeder's friendly name is **stored client-side only**, in-memory for the lifetime of the process — it is not synced to or from the device, and it does **not** survive process death (confirmed product decision: losing the paired-feeder list on app restart is acceptable; re-adding a feeder by IP is quick and this avoids any persistence layer for what is otherwise a handful of rows with no relations or queries to speak of). mDNS-based discovery and a device-side name field are tracked as a future firmware improvement, not blocking work for this plan.
 
 ## What this plan delivers
 
-### 1. Local feeder registry (Room)
-- `FeederEntity` (id, displayName, host, dateAdded, maybe lastConnectedAt) + DAO, added to the `PetFeederDatabase` from Plan 01.
-- `FeederRepositoryImpl : FeederRepository` backed by the DAO, replacing/supplying the fake implementation from Plan 01.
-- Simple in-memory/DataStore-backed "currently selected feeder id" (survives process death) driving `FeederRepository.selectedFeeder`.
+### 1. Local feeder registry (in-memory)
+- `FeederRepositoryImpl : FeederRepository` holding the known feeders and selected-feeder id in `MutableStateFlow`s (replacing Plan 01's `InMemoryFeederRepository` fake) — supports add/remove/select, backed by nothing more durable than process memory.
+- If persistence is ever needed later (e.g. users complain about re-adding feeders after every restart), swap in Jetpack DataStore behind this same interface — not Room, which would be overkill for a flat list with no relations or migrations.
 
 ### 2. Pairing wizard (new feeder → home Wi-Fi)
 Compose flow, roughly:
@@ -39,7 +38,7 @@ Compose flow, roughly:
 ### 3. Manual add-by-host (primary v1 discovery mechanism)
 - Simple form: friendly name (required, local-only) + host (IP or hostname, required).
 - On submit, verify reachability with a lightweight request (e.g. `GET /settings`) before saving, surfacing a clear error if unreachable — but per the product decision already made, an unreachable feeder is otherwise just "not there yet," not something the app tracks as degraded/offline state.
-- Save as a new `FeederEntity`.
+- Save as a new in-memory `Feeder` entry.
 
 ### 4. Feeder management UI
 - List of paired feeders (name + host), supporting: select as current, edit name, edit host, remove.
@@ -57,6 +56,6 @@ Compose flow, roughly:
 ## Acceptance criteria
 - A user can pair a brand-new feeder (AP join → Wi-Fi credentials → confirmation) end to end against real `code2` firmware.
 - A user can manually add a feeder already on the home network by host, name it, and select it.
-- `FeederRepository.feeders` and `.selectedFeeder` reflect Room state reactively (Flow-based), and `selectFeeder` persists across process death.
+- `FeederRepository.feeders` and `.selectedFeeder` reflect the in-memory registry reactively (Flow-based); the list is expected to reset on process death (no persistence layer for this plan).
 - ViewModel/UseCase logic (add feeder, remove feeder, select feeder, validate host reachability) has JUnit5/MockK unit test coverage.
 - Plans 03-06 can be implemented purely against the `FeederRepository` interface with no changes needed here.

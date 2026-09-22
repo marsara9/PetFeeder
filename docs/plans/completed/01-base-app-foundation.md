@@ -9,7 +9,7 @@ This is a full rewrite of `android/`, developed in the parallel `android2/` stag
 ## Decisions locked in for this plan (and inherited by all feature plans)
 - **UI:** Jetpack Compose, Material3, single Activity, Compose Navigation.
 - **Async:** Kotlin Coroutines + Flow. No RxJava.
-- **DI:** Hilt (tentative — acceptable to swap for Koin or manual DI before real implementation work begins if it proves not worth the codegen overhead for an app this size; isolate DI wiring so a swap doesn't ripple through feature code).
+- **DI:** Manual DI via a single `AppContainer` held by the `Application` subclass (Hilt was tentative and, given annotation-processor/Kotlin-version churn on this bleeding-edge toolchain, isn't worth the overhead yet; DI wiring is isolated in `core/di` so swapping to Hilt/Koin later doesn't ripple through feature code).
 - **Presentation pattern:** Lightweight MVI per screen:
   - One immutable `data class XyzUiState(...)` exposed as `StateFlow<XyzUiState>` from the ViewModel.
   - One sealed `XyzIntent` hierarchy; ViewModel exposes a single `fun onIntent(intent: XyzIntent)` entry point.
@@ -21,15 +21,16 @@ This is a full rewrite of `android/`, developed in the parallel `android2/` stag
   - Do **not** use a single shared Retrofit instance with an interceptor that rewrites the target host per-request — build a distinct client per feeder id instead, per the architecture decision already made.
   - Shared OkHttp configuration (timeouts, logging interceptor in debug builds, error-body parsing helper for the device's `{"error":{"code":...,"message":...}}` shape).
   - Shared date/time (de)serialization for the device's UTC ISO-8601 timestamps (`2026-09-21T12:00:00Z`) and the `HH:MM` schedule time format.
-- **Local persistence:** Room, but this plan only sets up the Room database/module scaffolding (empty of entities). The `FeederRepository`/feeder registry entities and DAOs belong to Plan 02 (Feeder Setup / Discovery).
+- **Local persistence:** Deferred. Room scaffolding is **not** set up by this plan — it isn't needed until Plan 02 (Feeder Setup / Discovery) introduces the real feeder registry, so it will be added there instead of speculatively here.
 - **Module structure:** Single Gradle module (`app`), organized by feature package (`dashboard/`, `schedule/`, `history/`, `settings/`, `feeder/`, `core/` or `common/` for this plan's shared pieces).
 - **SDK:** `minSdk 26`, `targetSdk` raised to current latest stable (35 at time of writing). Revisit only if it causes real problems.
+- **Screen sizes:** Phone-only for now. No adaptive/tablet layout (navigation rail, list-detail panes, etc.) — revisit if/when tablet support becomes a real requirement.
 - **Visual theme:** The primary palette is `#333`, `#1ed2ff`, `#000`, and `#fff`. Additional supporting colors may be introduced where needed, but these colors should anchor the app's visual language. Preserve [ic_avatar_cat.xml](../../../android/app/src/main/res/drawable-v24/ic_avatar_cat.xml) as the primary artwork for [ic_launcher.xml](../../../android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml), including the round launcher variant where applicable.
 - **Testing:** JUnit5 + MockK for ViewModel/UseCase unit tests. Add Turbine only if plain `Flow` collection (`.first()`, `runTest { ... }.toList()`) proves awkward in practice — don't pre-emptively add it.
 - **Out of scope for the whole rewrite (for now):** FCM/push notifications. Do not scaffold any notification plumbing.
 
 ## What this plan delivers
-1. **App shell:** `MainActivity` hosting a Compose `NavHost`, with a nav graph containing placeholder/empty composables for Dashboard, Schedule, History, and Settings routes (real screen content arrives in their respective plans), plus a Material 3 bottom navigation bar on phones and an adaptive navigation rail on larger layouts.
+1. **App shell:** `MainActivity` hosting a Compose `NavHost`, with a nav graph containing placeholder/empty composables for Dashboard, Schedule, History, and Settings routes (real screen content arrives in their respective plans), plus a Material 3 bottom navigation bar. Phone-only; no adaptive navigation rail for larger layouts.
 2. **Feeder context / switcher shell:** A top-level "currently selected feeder" concept (e.g. a `CurrentFeederHolder`/`SelectedFeederRepository` interface) that feature screens read from to know which feeder's API client to use. This plan defines the **interface only** with a fake/in-memory implementation (e.g. hardcoded single feeder or empty state) — Plan 02 supplies the real Room-backed implementation. Keep the interface minimal:
    ```kotlin
    interface FeederRepository {
@@ -41,9 +42,9 @@ This is a full rewrite of `android/`, developed in the parallel `android2/` stag
    ```
 3. **`FeederApiClientFactory`** (or equivalently named) as described above, taking a `Feeder`/host and returning cached Retrofit instance(s).
 4. **Shared networking primitives:** JSON converter setup, base OkHttp client builder, error-body model + parsing helper, date/time converters.
-5. **Room database module scaffolding:** `PetFeederDatabase` (empty, no entities yet) wired through Hilt, ready for Plan 02 to add its feeder-registry entities/DAOs.
-6. **DI wiring:** Hilt `@Module`/`@InstallIn` setup for the above (networking factory, Room database, dispatchers/coroutine scope providers).
-7. **Testing scaffolding:** Gradle test dependencies (JUnit5, MockK), a base test rule/utilities if needed (e.g. `MainDispatcherRule` for swapping `Dispatchers.Main` in tests), and one example ViewModel test demonstrating the MVI test pattern (intent in → state out) so feature plans have a template to follow.
+5. ~~Room database module scaffolding~~ — skipped for this plan (see "Local persistence" decision above); Plan 02 sets up Room from scratch when it adds the feeder registry.
+6. **DI wiring:** Manual `AppContainer` (see "DI" decision above) providing the above (networking factory, feeder repository, dispatcher provider) to the `Application` subclass.
+7. **Testing scaffolding:** Gradle test dependencies (JUnit5, MockK, kotlinx-coroutines-test), a base test utility (`MainDispatcherExtension`, a JUnit5 extension for swapping `Dispatchers.Main` in tests), and one example ViewModel test demonstrating the MVI test pattern (intent in → state out) so feature plans have a template to follow.
 
 ## Retrofit interface ownership (for reference, implemented in their own plans)
 - `SettingsApi` (`GET/PUT /settings`) → Plan 06 (Settings)
