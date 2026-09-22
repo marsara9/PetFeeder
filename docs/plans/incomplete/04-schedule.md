@@ -27,6 +27,9 @@ interface ScheduleApi {
 ```
 
 ## Firmware contract notes — read carefully, these are hard requirements, not design choices
+- The [firmware migration gap ledger](../../firmware-migration-gaps.md) records
+    scheduler behavior that still needs parity verification, including daily
+    event concurrency and feed/history ordering.
 - **The app generates the schedule's UUID**, not the device. `PUT /schedule/{uuid}` is idempotent and the firmware does not generate or replace the id — generate a UUID client-side (e.g. `java.util.UUID.randomUUID()`) when the user creates a new schedule entry, and use it for that PUT (and for the later DELETE).
 - **All schedule times are UTC**, format `HH:MM` (zero-padded, e.g. `08:30`). The Android app is fully responsible for converting the user's local time selection to UTC before sending, and converting back to local time for display. Use Plan 01's shared date/time conversion helpers — do not reimplement this conversion locally.
 - There is no separate "create" vs "update" endpoint — the same idempotent `PUT /schedule/{uuid}` is used whether the app is creating a brand-new entry (new UUID) or editing an existing one (existing UUID, new cups/time).

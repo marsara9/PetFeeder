@@ -9,6 +9,10 @@ Let the user browse all previous feedings (manual and scheduled) for the current
 - **Plan 03 (Dashboard): consumes `FeedingApi` defined there** — this plan does not define its own feeding API interface. If this plan needs a `FeedingApi` capability that doesn't exist yet (e.g. a shape/field not currently modeled), coordinate the change into Plan 03's interface rather than forking a parallel definition.
 
 ## Firmware contract notes
+- See the [firmware migration gap ledger](../../firmware-migration-gaps.md)
+	when validating history semantics, especially the replacement firmware's
+	asynchronous feed execution and the fact that history is recorded before
+	the motor task completes.
 - `GET /feed` returns the full feeding history as `[{ "id", "cups", "date" }]`, UTC ISO-8601 timestamps, with no pagination or date-range query params. Firmware retains up to `DATASTORE_MAX_FEEDINGS` (1,000) entries or `DATASTORE_FEEDING_RETENTION_DAYS` (365) days, whichever is hit first — so the full list returned is bounded and safe to load in one call without needing app-side pagination for v1.
 - No distinction in the response between "manual" and "scheduled" feedings — if that distinction matters for display, it is not available; do not invent it client-side without a firmware change (flag to the user/developer if this turns out to matter rather than assuming).
 

@@ -52,7 +52,7 @@ This is a full rewrite of `android/`. Nothing from the existing Koin/RxJava/Retr
 This plan does not define any of the above interfaces.
 
 ## Firmware contract notes relevant to this plan
-- Firmware is `code2` (ESP32/ESP-IDF). No mDNS, no per-feeder `name` field, no FCM — these gaps are handled/worked around in Plan 02, not here.
+- Firmware is `code2` (ESP32/ESP-IDF). No mDNS, no per-feeder `name` field, no FCM — these gaps are tracked centrally in [firmware-migration-gaps.md](../../firmware-migration-gaps.md). Discovery and device naming belong to Plan 02; notification parity is currently deferred, but must not be forgotten if that scope changes.
 - All device timestamps and schedule times are UTC; the device does zero timezone conversion. Shared date/time converters in this plan must make local↔UTC conversion easy for feature plans to use consistently (single source of truth for the conversion logic, not reimplemented per feature).
 - Device error responses follow `{"error":{"code":<int>,"message":"..."}}` — the shared error-parsing helper should turn this into a typed exception/result feature plans can pattern-match on.
 

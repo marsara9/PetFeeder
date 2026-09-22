@@ -13,6 +13,13 @@ Let a user pair a new feeder to the app and manage the set of feeders they own, 
 - A fixed soft-AP SSID `PetFeeder-Setup` (open network, not per-device-random) that the device raises when it can't connect to configured Wi-Fi.
 - No `name`/label field on `/settings` — the device has no concept of a user-facing friendly name.
 
+See the [firmware migration gap ledger](../../firmware-migration-gaps.md) for
+the complete parity list. In particular, the firmware follow-up for this plan
+should add a device hostname/default identity and mDNS service advertisement;
+the Android discovery source and pairing flow should then be updated to use
+that contract. The local Room display name remains an app concern unless the
+new product contract explicitly makes it device-synchronized.
+
 Because of this, v1 discovery is **manual add-by-IP/hostname**, and the feeder's friendly name is **stored client-side only** in this app's local registry (Room) — it is not synced to or from the device. mDNS-based discovery and a device-side name field are tracked as a future firmware improvement, not blocking work for this plan.
 
 ## What this plan delivers
@@ -42,8 +49,8 @@ Compose flow, roughly:
 - Structure the "find candidate feeders" step behind a small internal interface (e.g. `FeederDiscoverySource`) even though the only v1 implementation is "user typed in a host." This keeps the door open for an mDNS-based `FeederDiscoverySource` later without reworking the pairing/registry UI.
 
 ## Out of scope
-- mDNS/NSD-based discovery (future firmware + app work once `code2` gains it).
-- Any device-side friendly-name sync (future firmware work).
+- mDNS/NSD-based discovery (tracked in the [firmware migration gap ledger](../../firmware-migration-gaps.md); this is parity work, not a backwards-compatibility requirement).
+- Any device-side friendly-name sync (future firmware work; distinguish this from the local display name).
 - Notifications/FCM registration flow.
 - Anything about what happens once a feeder is selected (that's Plans 03-06).
 

@@ -21,6 +21,9 @@ interface FeedingApi {
 Plan 05 (History) depends on this interface rather than redefining it — coordinate signature changes with that plan if they become necessary.
 
 ## Firmware contract notes
+- See the [firmware migration gap ledger](../../firmware-migration-gaps.md) for
+    the broader parity context, especially asynchronous dispensing and the
+    motor-busy failure state.
 - `POST /feed?cups=<float>` records the feeding and starts the motor in a background task, returning `200 OK` with the new feeding record **immediately**, without waiting for the dispense to finish. The UI should reflect "feed recorded" right away rather than waiting/polling for physical completion.
 - Only one motor operation is accepted at a time — a `POST /feed` while the motor is busy will be rejected by the device (mapped through the shared error handling from Plan 01); surface this as a clear "feeder is busy, try again" message rather than a generic error.
 - `GET /feed` returns the full feeding history as `[{ "id", "cups", "date" }]` with `date` in UTC ISO-8601. There is no server-side date-range filter — "today's total" is computed client-side by filtering the returned list to the user's local "today" (using Plan 01's shared UTC↔local conversion) and summing `cups`.

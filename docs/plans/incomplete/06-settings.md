@@ -23,6 +23,12 @@ interface SettingsApi {
 ```
 
 ## Firmware contract notes
+- See the [firmware migration gap ledger](../../firmware-migration-gaps.md) for
+    the complete settings and provisioning parity work. This plan should keep
+    the firmware follow-up visible: add a persisted device hostname/default
+    identity and expose it through the new settings contract if the modernized
+    product wants the device to own that identity. Do not confuse that field
+    with the app-local display name described below.
 - `code2`'s `/settings` today only models Wi-Fi credentials: `GET` returns `{ "ssid": "..." }` (password never echoed back); `PUT` accepts `ssid`/`password` query params, persists to SD, and takes effect after the next reboot (no live reconnect-during-request yet per the firmware README).
 - There is currently **no device-side hostname or friendly-name field**. The "name" the user sees for a feeder throughout the app is the **local-only** name from Plan 02's feeder registry (Room) — this screen should let the user edit that local name too, but that's a local Room write via `FeederRepository`, not a call to the device's `/settings`.
 - Exact additional fields this screen should expose beyond Wi-Fi are explicitly deferred/TBD — scope this plan's first implementation to what `/settings` actually exposes today (ssid/password) plus the local display-name edit, and treat additional settings as incremental follow-ups as firmware grows rather than speculative UI now.
