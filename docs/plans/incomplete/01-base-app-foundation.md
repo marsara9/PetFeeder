@@ -4,7 +4,7 @@
 Stand up the Android app skeleton and shared architecture that every feature plan builds on. This plan ships **no feature business logic** (no dashboard/schedule/history/settings behavior) — it delivers the scaffolding, conventions, and shared infrastructure other plans depend on.
 
 ## Context
-This is a full rewrite of `android/`. Nothing from the existing Koin/RxJava/Retrofit/View-Binding app is carried forward as-is, but the domain (talking to one or more PetFeeder devices over the LAN) is preserved. Target firmware is `code2` (ESP32/ESP-IDF); `code` (ESP8266/Arduino) is legacy and will be deleted — do not build against it.
+This is a full rewrite of `android/`, developed in the parallel `android2/` staging project until migration parity is reached. Nothing from the existing Koin/RxJava/Retrofit/View-Binding app is carried forward as-is, but the domain (talking to one or more PetFeeder devices over the LAN) is preserved. Target firmware is `code2` (ESP32/ESP-IDF); `code` (ESP8266/Arduino) is legacy and will be deleted — do not build against it.
 
 ## Decisions locked in for this plan (and inherited by all feature plans)
 - **UI:** Jetpack Compose, Material3, single Activity, Compose Navigation.
@@ -24,11 +24,12 @@ This is a full rewrite of `android/`. Nothing from the existing Koin/RxJava/Retr
 - **Local persistence:** Room, but this plan only sets up the Room database/module scaffolding (empty of entities). The `FeederRepository`/feeder registry entities and DAOs belong to Plan 02 (Feeder Setup / Discovery).
 - **Module structure:** Single Gradle module (`app`), organized by feature package (`dashboard/`, `schedule/`, `history/`, `settings/`, `feeder/`, `core/` or `common/` for this plan's shared pieces).
 - **SDK:** `minSdk 26`, `targetSdk` raised to current latest stable (35 at time of writing). Revisit only if it causes real problems.
+- **Visual theme:** The primary palette is `#333`, `#1ed2ff`, `#000`, and `#fff`. Additional supporting colors may be introduced where needed, but these colors should anchor the app's visual language. Preserve [ic_avatar_cat.xml](../../../android/app/src/main/res/drawable-v24/ic_avatar_cat.xml) as the primary artwork for [ic_launcher.xml](../../../android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml), including the round launcher variant where applicable.
 - **Testing:** JUnit5 + MockK for ViewModel/UseCase unit tests. Add Turbine only if plain `Flow` collection (`.first()`, `runTest { ... }.toList()`) proves awkward in practice — don't pre-emptively add it.
 - **Out of scope for the whole rewrite (for now):** FCM/push notifications. Do not scaffold any notification plumbing.
 
 ## What this plan delivers
-1. **App shell:** `MainActivity` hosting a Compose `NavHost`, with a nav graph containing placeholder/empty composables for Dashboard, Schedule, History, and Settings routes (real screen content arrives in their respective plans), plus bottom navigation (or nav rail) between them.
+1. **App shell:** `MainActivity` hosting a Compose `NavHost`, with a nav graph containing placeholder/empty composables for Dashboard, Schedule, History, and Settings routes (real screen content arrives in their respective plans), plus a Material 3 bottom navigation bar on phones and an adaptive navigation rail on larger layouts.
 2. **Feeder context / switcher shell:** A top-level "currently selected feeder" concept (e.g. a `CurrentFeederHolder`/`SelectedFeederRepository` interface) that feature screens read from to know which feeder's API client to use. This plan defines the **interface only** with a fake/in-memory implementation (e.g. hardcoded single feeder or empty state) — Plan 02 supplies the real Room-backed implementation. Keep the interface minimal:
    ```kotlin
    interface FeederRepository {
