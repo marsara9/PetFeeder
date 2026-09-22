@@ -17,12 +17,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sdoras.petfeeder.dashboard.DashboardScreen
+import com.sdoras.petfeeder.dashboard.DashboardViewModelFactory
 import com.sdoras.petfeeder.ui.theme.PetFeederTheme
 
 private sealed class AppDestination(
@@ -92,7 +97,15 @@ private fun PetFeederApp() {
         ) {
             destinations.forEach { destination ->
                 composable(destination.route) {
-                    PlaceholderScreen(destination.label)
+                    if (destination == AppDestination.Dashboard) {
+                        val container = (LocalContext.current.applicationContext as PetFeederApplication).container
+                        val factory = remember(container) {
+                            DashboardViewModelFactory(container.feederRepository, container::feedingApiFor)
+                        }
+                        DashboardScreen(viewModel(factory = factory))
+                    } else {
+                        PlaceholderScreen(destination.label)
+                    }
                 }
             }
         }

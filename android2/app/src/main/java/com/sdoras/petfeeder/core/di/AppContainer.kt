@@ -8,6 +8,7 @@ import com.sdoras.petfeeder.core.feeder.InMemoryFeederRepository
 import com.sdoras.petfeeder.core.feeder.ObserveFeederSwitcherStateUseCase
 import com.sdoras.petfeeder.core.feeder.SelectFeederUseCase
 import com.sdoras.petfeeder.core.network.FeederApiClientFactory
+import com.sdoras.petfeeder.dashboard.FeedingApi
 
 /**
  * Manual dependency graph for the whole app. Deliberately simple (no Hilt/Koin) since the app is
@@ -28,4 +29,7 @@ class AppContainer {
     }
 
     val selectFeederUseCase: SelectFeederUseCase by lazy { SelectFeederUseCase(feederRepository) }
+
+    fun feedingApiFor(feeder: com.sdoras.petfeeder.core.feeder.Feeder): FeedingApi =
+        feederApiClientFactory.serviceFor(feeder, FeedingApi::class.java)
 }
