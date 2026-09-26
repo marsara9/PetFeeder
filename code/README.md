@@ -82,10 +82,10 @@ The initial HTTP service exposes the settings endpoint on port 80:
 
 ```text
 GET /settings
-PUT /settings?ssid=network-name&password=network-password
+PUT /settings?ssid=network-name&password=network-password&hostname=my-feeder
 ```
 
-The GET response contains the SSID but never the password. A successful PUT returns `204 No Content` and saves the credentials to the SD card. The new credentials are used after the next reboot; Wi-Fi reconfiguration during a request will be added when the connection lifecycle is formalized.
+The GET response contains the SSID and hostname but never the password. A successful PUT returns `204 No Content` and saves the credentials to the SD card. The new credentials are used after the next reboot; Wi-Fi reconfiguration during a request will be added when the connection lifecycle is formalized. `hostname` is optional; when set, it is applied to the station network interface (used for DHCP hostname).
 
 Schedules use Android-created UUIDs and are stored as individual files under `/sdcard/schedules/`:
 

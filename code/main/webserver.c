@@ -58,6 +58,7 @@ static esp_err_t handle_get_settings(httpd_req_t *request)
     }
 
     cJSON_AddStringToObject(settings, "ssid", current_credentials.ssid);
+    cJSON_AddStringToObject(settings, "hostname", current_credentials.hostname);
     char *response = cJSON_PrintUnformatted(settings);
     cJSON_Delete(settings);
     if (response == NULL) {
@@ -98,6 +99,11 @@ static esp_err_t handle_put_settings(httpd_req_t *request)
     if (get_query_value(request, "password", value, sizeof(value))) {
         strncpy(updated.password, value, sizeof(updated.password) - 1);
         updated.password[sizeof(updated.password) - 1] = '\0';
+        has_update = true;
+    }
+    if (get_query_value(request, "hostname", value, sizeof(value))) {
+        strncpy(updated.hostname, value, sizeof(updated.hostname) - 1);
+        updated.hostname[sizeof(updated.hostname) - 1] = '\0';
         has_update = true;
     }
 

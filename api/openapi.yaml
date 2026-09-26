@@ -28,7 +28,7 @@ paths:
                 $ref: "#/components/schemas/Settings"
     put:
       summary: Update Wi-Fi credentials
-      description: At least one of `ssid` or `password` must be provided.
+      description: At least one of `ssid`, `password`, or `hostname` must be provided.
       operationId: updateSettings
       parameters:
         - name: ssid
@@ -39,11 +39,16 @@ paths:
           in: query
           schema:
             type: string
+        - name: hostname
+          in: query
+          description: Optional network hostname advertised by the device (used for DHCP).
+          schema:
+            type: string
       responses:
         "204":
           description: Credentials saved
         "400":
-          description: Neither ssid nor password provided
+          description: Neither ssid, password, nor hostname provided
           content:
             application/json:
               schema:
@@ -205,6 +210,8 @@ components:
       type: object
       properties:
         ssid:
+          type: string
+        hostname:
           type: string
     Feeding:
       type: object

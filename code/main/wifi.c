@@ -111,8 +111,14 @@ void wifi_start(const WifiCredentials *credentials)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     wifi_event_group = xEventGroupCreate();
 
-    esp_netif_create_default_wifi_sta();
+    esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
     esp_netif_create_default_wifi_ap();
+    if (station_credentials.hostname[0] != '\0') {
+        esp_err_t hostname_result = esp_netif_set_hostname(sta_netif, station_credentials.hostname);
+        if (hostname_result != ESP_OK) {
+            ESP_LOGW(TAG, "Could not set hostname to '%s': %s", station_credentials.hostname, esp_err_to_name(hostname_result));
+        }
+    }
 
     wifi_init_config_t wifi_init_config = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&wifi_init_config));

@@ -113,6 +113,7 @@ bool datastore_read_wifi_credentials(WifiCredentials *credentials)
         trim_line_end(line);
         read_key_value(line, "ssid", credentials->ssid, sizeof(credentials->ssid));
         read_key_value(line, "password", credentials->password, sizeof(credentials->password));
+        read_key_value(line, "hostname", credentials->hostname, sizeof(credentials->hostname));
     }
     fclose(file);
 
@@ -132,7 +133,7 @@ bool datastore_write_wifi_credentials(const WifiCredentials *credentials)
         return false;
     }
 
-    int result = fprintf(file, "ssid=%s\npassword=%s\n", credentials->ssid, credentials->password);
+    int result = fprintf(file, "ssid=%s\npassword=%s\nhostname=%s\n", credentials->ssid, credentials->password, credentials->hostname);
     bool write_succeeded = result >= 0 && fclose(file) == 0;
     if (!write_succeeded) {
         fclose(file);
