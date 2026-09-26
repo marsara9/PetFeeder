@@ -12,12 +12,8 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 
-// SD card SPI bus wired to the HUZZAH32's left header, following the CS, DI, DO, CLK order of the
-// SD breakout, skipping GPIO0/2/15 (boot-strapping pins) and the RX/TX UART0 console pins.
-#define SD_CS_GPIO 4
-#define SD_MOSI_GPIO 16
-#define SD_MISO_GPIO 17
-#define SD_CLK_GPIO 5
+#include "board_pins.h"
+
 #define SD_MOUNT_POINT "/sdcard"
 #define WIFI_CREDENTIALS_PATH SD_MOUNT_POINT "/wifi"
 #define WIFI_CREDENTIALS_TEMP_PATH SD_MOUNT_POINT "/wifi.tmp"

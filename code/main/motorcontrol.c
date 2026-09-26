@@ -8,22 +8,12 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "board_pins.h"
 #include "feeding.h"
 
 #define MOTOR_RPM 10U
 #define MOTOR_STEPS_PER_REVOLUTION 200U
 #define MOTOR_CONTAINERS_PER_ROTATION 2U
-
-// TB6612FNG: AIN1/AIN2 and BIN1/BIN2 drive the two motor coils.
-// Wired to the HUZZAH32's right header in PWMB, BIN2, BIN1, STBY, AIN1, AIN2, PWMA order, skipping
-// GPIO12 (flash-voltage strapping pin) and the input-only GPIO34/35/39 pins.
-#define MOTOR_PWMB_GPIO GPIO_NUM_13
-#define MOTOR_BIN2_GPIO GPIO_NUM_14
-#define MOTOR_BIN1_GPIO GPIO_NUM_27
-#define MOTOR_STBY_GPIO GPIO_NUM_26
-#define MOTOR_AIN1_GPIO GPIO_NUM_25
-#define MOTOR_AIN2_GPIO GPIO_NUM_33
-#define MOTOR_PWMA_GPIO GPIO_NUM_32
 
 static const char *TAG = "motor";
 static bool initialized;

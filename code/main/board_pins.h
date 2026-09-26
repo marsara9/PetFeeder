@@ -1,0 +1,34 @@
+#pragma once
+
+#include "driver/gpio.h"
+#include "sdkconfig.h"
+
+#if defined(CONFIG_IDF_TARGET_ESP32)
+#define SD_CS_GPIO GPIO_NUM_4
+#define SD_MOSI_GPIO GPIO_NUM_16
+#define SD_MISO_GPIO GPIO_NUM_17
+#define SD_CLK_GPIO GPIO_NUM_18
+
+#define MOTOR_PWMB_GPIO GPIO_NUM_13
+#define MOTOR_BIN2_GPIO GPIO_NUM_14
+#define MOTOR_BIN1_GPIO GPIO_NUM_27
+#define MOTOR_STBY_GPIO GPIO_NUM_26
+#define MOTOR_AIN1_GPIO GPIO_NUM_25
+#define MOTOR_AIN2_GPIO GPIO_NUM_33
+#define MOTOR_PWMA_GPIO GPIO_NUM_32
+#elif defined(CONFIG_IDF_TARGET_ESP32S3)
+#define SD_CS_GPIO GPIO_NUM_18
+#define SD_MOSI_GPIO GPIO_NUM_17
+#define SD_MISO_GPIO GPIO_NUM_16
+#define SD_CLK_GPIO GPIO_NUM_15
+
+#define MOTOR_PWMB_GPIO GPIO_NUM_13
+#define MOTOR_BIN2_GPIO GPIO_NUM_12
+#define MOTOR_BIN1_GPIO GPIO_NUM_11
+#define MOTOR_STBY_GPIO GPIO_NUM_10
+#define MOTOR_AIN1_GPIO GPIO_NUM_9
+#define MOTOR_AIN2_GPIO GPIO_NUM_6
+#define MOTOR_PWMA_GPIO GPIO_NUM_5
+#else
+#error "PetFeeder GPIO mapping is only defined for ESP32 and ESP32-S3 targets"
+#endif

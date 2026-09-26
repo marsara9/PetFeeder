@@ -18,7 +18,12 @@ Install ESP-IDF and source its environment in the shell. For example:
 . "$HOME/esp/esp-idf/export.sh"
 ```
 
-The project currently targets the classic ESP32 (`esp32`). Change the target before configuring if the physical board is an ESP32 variant such as S3, C3, or C6.
+The GPIO mapping is selected at compile time from the ESP-IDF target in `main/board_pins.h`:
+
+- `esp32` selects the HUZZAH32 (Product 3405) pinout.
+- `esp32s3` selects the ESP32-S3 Feather (Product 5323) pinout.
+
+Switch targets with `idf.py set-target esp32` or `idf.py set-target esp32s3` before building. The S3 board has 8 MB flash; update the flash-size setting in `menuconfig` when switching to it.
 
 The current custom partition table gives the single factory application a 1.5 MiB partition. NVS and PHY calibration data remain reserved. This is an interim layout; it can later be replaced with an OTA table or an SD-card update layout without changing the application service boundaries.
 
@@ -42,38 +47,26 @@ To flash an already-built image without opening the monitor:
 idf.py -p /dev/ttyUSB0 flash
 ```
 
-## SD card wiring
+## GPIO wiring
 
-SD signals are wired to the HUZZAH32's left header, in the same top-to-bottom order as the header pins
-(BAT, 15, 2, 0, 4, 16, 17, 5, 18, 19, 21, RX, TX, 22, 23). GPIO0/2/15 (boot-strapping) and RX/TX (UART0
-console) are skipped.
+Wire the SD card and TB6612 to the GPIOs for the selected ESP-IDF target. The target-specific pin definitions are in `main/board_pins.h`.
 
-| SD reader | ESP32 | Signal |
+| Peripheral signal | HUZZAH32 (`esp32`) | ESP32-S3 Feather (`esp32s3`) |
 | --- | --- | --- |
-| CS | GPIO4 | Chip select |
-| DI | GPIO16 | MOSI, ESP32 to card |
-| DO | GPIO17 | MISO, card to ESP32 |
-| CLK | GPIO5 | SPI clock |
-| GND | GND | Common ground |
-| VCC | 3.3V | Use 3.3 V logic |
+| SD CS | GPIO4 | GPIO18 |
+| SD MOSI (DI) | GPIO16 | GPIO17 |
+| SD MISO (DO) | GPIO17 | GPIO16 |
+| SD CLK | GPIO18 | GPIO15 |
+| Motor PWMB | GPIO13 | GPIO13 |
+| Motor BIN2 | GPIO14 | GPIO12 |
+| Motor BIN1 | GPIO27 | GPIO11 |
+| Motor STBY | GPIO26 | GPIO10 |
+| Motor AIN1 | GPIO25 | GPIO9 |
+| Motor AIN2 | GPIO33 | GPIO6 |
+| Motor PWMA | GPIO32 | GPIO5 |
 
-## Stepper motor wiring
+The SD reader and TB6612 logic must use 3.3 V logic and share ground with the board. Connect the TB6612 motor supply to the 12 V regulator; the driver outputs connect to the NEMA-17 motor coils according to their coil pairs.
 
-The TB6612 motor driver uses the following ESP32 GPIOs in `motorcontrol.c`, wired to the right header in
-the same top-to-bottom order as the header pins (GND, 3V, 13, 12, 14, 27, 26, 25, 33, 32, 35, 34, 39, RST).
-GPIO12 (flash-voltage strapping pin) and the input-only GPIO34/35/39 pins are skipped.
-
-| TB6612 signal | ESP32 |
-| --- | --- |
-| PWMB | GPIO13 |
-| BIN2 | GPIO14 |
-| BIN1 | GPIO27 |
-| STBY | GPIO26 |
-| AIN1 | GPIO25 |
-| AIN2 | GPIO33 |
-| PWMA | GPIO32 |
-
-Connect the TB6612 motor supply to the 12 V regulator, logic VCC to 3.3 V, and share ground with the ESP32. The motor driver outputs connect to the NEMA-17 coils according to the motor coil pairs.
 The firmware expects a FAT-formatted card with a text file named `wifi` in the card root:
 
 ```text
