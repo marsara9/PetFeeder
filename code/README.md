@@ -18,12 +18,8 @@ Install ESP-IDF and source its environment in the shell. For example:
 . "$HOME/esp/esp-idf/export.sh"
 ```
 
-The GPIO mapping is selected at compile time from the ESP-IDF target in `main/board_pins.h`:
-
-- `esp32` selects the HUZZAH32 (Product 3405) pinout.
-- `esp32s3` selects the ESP32-S3 Feather (Product 5323) pinout.
-
-Switch targets with `idf.py set-target esp32` or `idf.py set-target esp32s3` before building. The S3 board has 8 MB flash; update the flash-size setting in `menuconfig` when switching to it.
+The firmware targets the ESP32-S3 Feather (Product 5323). Its GPIO mapping is defined in
+`main/board_pins.h`, and the project defaults to the board's 8 MB flash.
 
 The current custom partition table gives the single factory application a 1.5 MiB partition. NVS and PHY calibration data remain reserved. This is an interim layout; it can later be replaced with an OTA table or an SD-card update layout without changing the application service boundaries.
 
@@ -34,7 +30,7 @@ Wi-Fi reconnects indefinitely after a connection has once succeeded. Wi-Fi power
 From this directory:
 
 ```sh
-idf.py set-target esp32
+idf.py set-target esp32s3
 idf.py build
 idf.py -p /dev/ttyUSB0 flash monitor
 ```
@@ -51,19 +47,19 @@ idf.py -p /dev/ttyUSB0 flash
 
 Wire the SD card and TB6612 to the GPIOs for the selected ESP-IDF target. The target-specific pin definitions are in `main/board_pins.h`.
 
-| Peripheral signal | HUZZAH32 (`esp32`) | ESP32-S3 Feather (`esp32s3`) |
-| --- | --- | --- |
-| SD CS | GPIO4 | GPIO18 |
-| SD MOSI (DI) | GPIO16 | GPIO17 |
-| SD MISO (DO) | GPIO17 | GPIO16 |
-| SD CLK | GPIO18 | GPIO15 |
-| Motor PWMB | GPIO13 | GPIO13 |
-| Motor BIN2 | GPIO14 | GPIO12 |
-| Motor BIN1 | GPIO27 | GPIO11 |
-| Motor STBY | GPIO26 | GPIO10 |
-| Motor AIN1 | GPIO25 | GPIO9 |
-| Motor AIN2 | GPIO33 | GPIO6 |
-| Motor PWMA | GPIO32 | GPIO5 |
+| Peripheral signal | ESP32-S3 Feather GPIO |
+| --- | --- |
+| SD CS | GPIO18 |
+| SD MOSI (DI) | GPIO17 |
+| SD MISO (DO) | GPIO16 |
+| SD CLK | GPIO15 |
+| Motor PWMB | GPIO13 |
+| Motor BIN2 | GPIO12 |
+| Motor BIN1 | GPIO11 |
+| Motor STBY | GPIO10 |
+| Motor AIN1 | GPIO9 |
+| Motor AIN2 | GPIO6 |
+| Motor PWMA | GPIO5 |
 
 The SD reader and TB6612 logic must use 3.3 V logic and share ground with the board. Connect the TB6612 motor supply to the 12 V regulator; the driver outputs connect to the NEMA-17 motor coils according to their coil pairs.
 
